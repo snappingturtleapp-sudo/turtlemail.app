@@ -1,441 +1,436 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-<head> 
-<meta charset="UTF-8"> 
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-
-<!-- B2B HIGH-INTENT SEO METADATA (EMBEDDED & VERIFIED) --> 
-<title>On-Demand Global Print Fulfillment & Logistics Engine | Turtle Mail</title> 
-<meta name="description" content="Frictionless corporate print-on-demand and turnkey batch media routing. Secure session commerce with automated corporate tax invoices and address-verified global logistics."> 
-<meta name="keywords" content="on-demand global print fulfillment, API-driven print logistics, automated supply chain, enterprise-grade data printing, secure session commerce, B2B custom media fulfillment, turnkey batch media routing, logistics delivery, automated corporate tax invoices, address-verified global logistics"> 
-
-<!-- Professional Font Styling: Inter for deep readability, Syncopate strictly for short punchy labels --> 
-<link rel="preconnect" href="https://googleapis.com"> 
-<link rel="preconnect" href="https://gstatic.com" crossorigin> 
-<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"> 
-
-<style> 
-/* REFINED B2B SYSTEM PALETTE TOKENS */ 
-:root { 
---bg-midnight: #0D1B2A; 
---bg-charcoal: #121214; 
---card-dark: #203243; 
---text-white: #E6F2FF; 
---text-muted: #86868b; 
---electric-cyan: #00F0FF; 
---border-gray: #1E293B; 
---success-green: #22C55E; 
-} 
-body { 
-font-family: 'Inter', sans-serif; 
-background-color: var(--bg-charcoal); 
-/* BACKGROUND ASSET INTERPOLATION */
-background-image: url('Turtle_Mail_Background.png');
-background-size: cover;
-background-position: center center;
-background-repeat: no-repeat;
-background-attachment: fixed;
-color: var(--text-white); 
-margin: 0; 
-padding: 40px 20px; 
-display: flex; 
-flex-direction: column; 
-align-items: center; 
-min-height: 100vh; 
-box-sizing: border-box; 
-position: relative;
-} 
-.desktop-container { 
-width: 100%; 
-max-width: 1100px; 
-display: grid; 
-grid-template-columns: 1fr 1fr; 
-gap: 40px; 
-margin-bottom: 50px; 
-z-index: 1;
-} 
-.header-block { 
-grid-column: span 2; 
-border-bottom: 1px solid var(--border-gray); 
-padding-bottom: 30px; 
-display: flex; 
-flex-direction: column;
-align-items: center; 
-gap: 20px;
-position: relative;
-} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- B2B HIGH-INTENT SEO METADATA (EMBEDDED & VERIFIED) -->
+<title>On-Demand Global Print Fulfillment & Logistics Engine | Turtle Mail</title>
+<meta name="description" content="Frictionless corporate print-on-demand and turnkey batch media routing. Secure session commerce with automated corporate tax invoices and address-verified global logistics.">
+<meta name="keywords" content="on-demand global print fulfillment, API-driven print logistics, automated supply chain, enterprise-grade data printing, secure session commerce, B2B custom media fulfillment, turnkey batch media routing, logistics delivery, automated corporate tax invoices, address-verified global logistics">
+<!-- Professional Font Styling: Inter for deep readability, Syncopate strictly for short punchy labels -->
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com" rel="stylesheet">
+<style>
+/* REFINED B2B SYSTEM PALETTE TOKENS */
+:root {
+  --bg-midnight: #0D1B2A;
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --success-green: #22C55E;
+}
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-charcoal);
+  /* BACKGROUND ASSET INTERPOLATION */
+  background-image: url('Turtle_Mail_Background.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text-white);
+  margin: 0;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+  position: relative;
+}
+.desktop-container {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 50px;
+  z-index: 1;
+}
+.header-block {
+  grid-column: span 2;
+  border-bottom: 1px solid var(--border-gray);
+  padding-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
 /* FAVICON POSITIONING LAYER: scaled up and aligned natively */
 .turtle-favicon-wrapper {
-width: 72px;
-height: 72px;
-display: flex;
-align-items: center;
-justify-content: center;
-margin-bottom: -10px;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: -10px;
 }
 .turtle-favicon-img {
-width: 100%;
-height: 100%;
-object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 /* BALANCED HERO LOGO CONTAINER: Takes center stage, scaled larger */
 .header-logo-container {
-width: 100%;
-max-width: 500px;
-height: auto;
-display: flex;
-align-items: center;
-justify-content: center;
-margin-top: 10px;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
 }
 .header-logo-img {
-width: 100%;
-height: auto;
-object-fit: contain;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
-.compliance-badge { 
-position: absolute;
-top: 0;
-right: 0;
-background-color: rgba(0, 240, 255, 0.06); 
-border: 1px solid rgba(0, 240, 255, 0.2); 
-padding: 8px 14px; 
-border-radius: 6px; 
-font-size: 11px; 
-color: var(--electric-cyan); 
-font-family: 'Syncopate', sans-serif; 
-font-weight: 700;
-} 
-.control-panel, .review-panel { 
-background-color: rgba(32, 50, 67, 0.95); 
-border: 1px solid var(--border-gray); 
-border-radius: 12px; 
-padding: 35px; 
-display: flex; 
-flex-direction: column; 
-justify-content: space-between; 
-backdrop-filter: blur(8px);
-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-} 
-.form-group { 
-margin-bottom: 24px; 
-} 
-label { 
-display: block; 
-font-size: 11px; 
-color: var(--electric-cyan); 
-margin-bottom: 10px; 
-font-weight: 700; 
-font-family: 'Syncopate', sans-serif;
-text-transform: uppercase; 
-letter-spacing: 0.05em; 
-} 
-input[type="text"], input[type="email"] { 
-width: 100%; 
-box-sizing: border-box; 
-background-color: var(--bg-charcoal); 
-border: 1px solid var(--border-gray); 
-border-radius: 6px; 
-padding: 14px; 
-color: var(--text-white); 
-font-size: 16px; 
-font-family: 'Inter', sans-serif; 
-transition: border-color 0.2s; 
-} 
-input:focus { 
-border-color: var(--electric-cyan); 
-outline: none; 
-} 
-/* DISCLAIMER BLOCK: Swapped to Inter to stop font stretching and text edge bleed */
-.security-note { 
-background-color: rgba(18, 18, 20, 0.6); 
-border-left: 3px solid var(--electric-cyan); 
-padding: 18px; 
-border-radius: 0 8px 8px 0; 
-font-size: 13px; 
-color: var(--text-white); 
-line-height: 1.6; 
-margin-bottom: 24px; 
-font-family: 'Inter', sans-serif;
-font-weight: 600;
-} 
-.drop-zone { 
-border: 2px dashed var(--border-gray); 
-border-radius: 8px; 
-padding: 50px 20px; 
-text-align: center; 
-color: var(--text-white); 
-cursor: pointer; 
-font-weight: 600; 
-background-color: rgba(18, 18, 20, 0.5);
-transition: border-color 0.2s, background-color 0.2s, color 0.2s; 
-} 
-.drop-zone:hover, .drop-zone.dragover { 
-border-color: var(--electric-cyan); 
-color: var(--electric-cyan); 
-} 
-.btn-checkout { 
-width: 100%; 
-background-color: var(--electric-cyan); 
-color: var(--bg-charcoal); 
-border: none; 
-border-radius: 6px; 
-padding: 18px; 
-font-size: 13px; 
-font-weight: 700; 
-cursor: pointer; 
-font-family: 'Syncopate', sans-serif;
-text-transform: uppercase; 
-letter-spacing: 0.08em; 
-transition: opacity 0.2s, transform 0.1s; 
-box-shadow: 0 4px 15px rgba(0, 240, 255, 0.2);
-} 
-.btn-checkout:hover { 
-opacity: 0.95; 
-} 
-.btn-checkout:active { 
-transform: scale(0.99); 
-} 
-.trust-footer { 
-width: 100%; 
-max-width: 1100px; 
-border-top: 1px solid var(--border-gray); 
-padding-top: 30px; 
-display: flex; 
-justify-content: space-between; 
-align-items: center; 
-flex-wrap: wrap; 
-gap: 20px; 
-z-index: 1;
-} 
-.compliance-text { 
-font-size: 12px; 
-color: var(--text-white); 
-max-width: 520px; 
-line-height: 1.7; 
-font-family: 'Inter', sans-serif;
-font-weight: 500;
-} 
-.trust-badges { 
-display: flex; 
-gap: 12px; 
-font-family: 'Syncopate', sans-serif; 
-font-size: 10px; 
-font-weight: 700; 
-} 
-.badge-item { 
-border: 1px solid var(--border-gray); 
-padding: 10px 16px; 
-border-radius: 4px; 
-color: var(--text-white); 
-background-color: rgba(18, 18, 20, 0.85); 
-letter-spacing: 0.04em;
-} 
-</style> 
+.compliance-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 240, 255, 0.06);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--electric-cyan);
+  font-family: 'Syncopate', sans-serif;
+  font-weight: 700;
+}
+.control-panel, .review-panel {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+.form-group {
+  margin-bottom: 24px;
+}
+label {
+  display: block;
+  font-size: 11px;
+  color: var(--electric-cyan);
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+input[type="text"], input[type="email"] {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--bg-charcoal);
+  border: 1px solid var(--border-gray);
+  border-radius: 6px;
+  padding: 14px;
+  color: var(--text-white);
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+}
+input:focus {
+  border-color: var(--electric-cyan);
+  outline: none;
+}
+/* DISCLAIMER BLOCK */
+.security-note {
+  background-color: rgba(18, 18, 20, 0.6);
+  border-left: 3px solid var(--electric-cyan);
+  padding: 18px;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  color: var(--text-white);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+.drop-zone {
+  border: 2px dashed var(--border-gray);
+  border-radius: 8px;
+  padding: 50px 20px;
+  text-align: center;
+  color: var(--text-white);
+  cursor: pointer;
+  font-weight: 600;
+  background-color: rgba(18, 18, 20, 0.5);
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--electric-cyan);
+  color: var(--electric-cyan);
+}
+.btn-checkout {
+  width: 100%;
+  background-color: var(--electric-cyan);
+  color: var(--bg-charcoal);
+  border: none;
+  border-radius: 6px;
+  padding: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.2);
+}
+.btn-checkout:hover {
+  opacity: 0.95;
+}
+.btn-checkout:active {
+  transform: scale(0.99);
+}
+.trust-footer {
+  width: 100%;
+  max-width: 1100px;
+  border-top: 1px solid var(--border-gray);
+  padding-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  z-index: 1;
+}
+.compliance-text {
+  font-size: 12px;
+  color: var(--text-white);
+  max-width: 520px;
+  line-height: 1.7;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+.trust-badges {
+  display: flex;
+  gap: 12px;
+  font-family: 'Syncopate', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+}
+.badge-item {
+  border: 1px solid var(--border-gray);
+  padding: 10px 16px;
+  border-radius: 4px;
+  color: var(--text-white);
+  background-color: rgba(18, 18, 20, 0.85);
+  letter-spacing: 0.04em;
+}
+</style>
 </head>
-<body> 
-<div class="desktop-container"> 
-<!-- Branding Header Grid Row --> 
-<div class="header-block"> 
+<body>
+<div class="desktop-container">
+  <!-- Branding Header Grid Row -->
+  <div class="header-block">
     <!-- SCALED-UP FAVICON ELEMENT -->
     <div class="turtle-favicon-wrapper">
-        <img src="Turtle_Mail_Favicon.png" alt="Turtle Mail Icon" class="turtle-favicon-img">
-    </div> 
-    
-    <!-- MAIN CENTERED LOGO: Replaces plaintext headers, scaled up for clear visibility -->
+      <img src="Turtle_Mail_Favicon.png" alt="Turtle Mail Icon" class="turtle-favicon-img">
+    </div>
+    <!-- MAIN CENTERED LOGO -->
     <div class="header-logo-container">
-        <img src="Turtle_Mail_Digital_Secure_Delivered_Logo.png" alt="Turtle Mail Digital Secure Delivered" class="header-logo-img">
-    </div> 
-    
-    <div class="compliance-badge">🔒 SESSION-ISOLATED</div> 
-</div> 
+      <img src="Turtle_Mail_Digital_Secure_Delivered_Logo.png" alt="Turtle Mail Digital Secure Delivered" class="header-logo-img">
+    </div>
+    <div class="compliance-badge">🔒 SESSION-ISOLATED</div>
+  </div>
 
-<!-- Left Side: User Inputs / Control Panel --> 
-<div class="control-panel"> 
-<div> 
- <div class="security-note"> 
- <strong>NO DATABASE ACCOUNTS TO MANAGE:</strong> Maximum security through temporary, session-isolated data pipelines. We do not store static databases of your client records. Zero credentials to leak. Full internal audit alignment. 
- </div> 
- <div class="form-group"> 
- <label for="corporate-email">Corporate Expense Email Address</label> 
- <input type="email" id="corporate-email" placeholder="accounting-recipient@yourcompany.com"> 
- </div> 
- <div class="form-group"> 
- <label for="po-number">Purchase Order (PO) Number</label> 
- <input type="text" id="po-number" placeholder="PO-2026-XYZ"> 
- </div> 
-</div> 
-<div class="form-group" style="margin-bottom: 0;"> 
- <label>B2B High-Throughput Batch Media Routing</label> 
- <div class="drop-zone" id="csv-drop-zone"> Drag & Drop Attendee CSV File Here or Click to Browse </div> 
- <!-- Hidden Standard Native HTML File Selector --> 
- <input type="file" id="csv-file-input" accept=".csv" style="display: none;"> 
-</div> 
-<!-- INVISIBLE HONEYPOT TRAP LAYER --> 
-<div style="display: none; tab-index: -1;" aria-hidden="true"> 
- <label for="website_secondary">Secondary Security Check Item Fields</label> 
- <input type="text" id="website_secondary" name="website_secondary" autocomplete="off"> 
-</div> 
-</div> 
+      <!-- Left Side: User Inputs / Control Panel -->
+  <div class="control-panel">
+    <div>
+      <div class="security-note">
+        <strong>NO DATABASE ACCOUNTS TO MANAGE:</strong> Maximum security through temporary, session-isolated data pipelines. We do not store static databases of your client records. Zero credentials to leak. Full internal audit alignment.
+      </div>
+      <div class="form-group">
+        <label for="corporate-email">Corporate Expense Email Address</label>
+        <input type="email" id="corporate-email" placeholder="accounting-recipient@yourcompany.com">
+      </div>
+      <div class="form-group">
+        <label for="po-number">Purchase Order (PO) Number</label>
+        <input type="text" id="po-number" placeholder="PO-2026-XYZ">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>B2B High-Throughput Batch Media Routing</label>
+      <div class="drop-zone" id="csv-drop-zone"> Drag & Drop Attendee CSV File Here or Click to Browse </div>
+      <!-- Hidden Standard Native HTML File Selector -->
+      <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+    </div>
+    <!-- INVISIBLE HONEYPOT TRAP LAYER -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+      <label for="website_secondary">Secondary Security Check Item Fields</label>
+      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off">
+    </div>
+  </div>
 
-<!-- Right Side: Widescreen Review Ledger --> 
-<div class="review-panel"> 
-<div> 
- <div class="form-group"> 
- <label>Selected Asset Pool Configuration</label> 
- <p style="font-size: 14px; margin: 4px 0 20px 0; color: var(--text-white); line-height: 1.4; font-weight: 600;"> 
-    ✓ 5 Corporate Standard High-Resolution Assets Loaded in Production Buffer <br> 
-    <span style="color: var(--text-muted); font-size: 12px; font-weight: 400;">(4x6 Glossy Silver-Halide Artifact Formats)</span> 
- </p> 
- </div> 
- 
- <div class="form-group" style="background-color: rgba(18, 18, 20, 0.4); padding: 18px; border-radius: 6px; border: 1px solid var(--border-gray); font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.6; color: var(--text-white);"> 
- <div style="font-family: 'Syncopate', sans-serif; font-size: 11px; color: var(--electric-cyan); font-weight: 700; margin-bottom: 8px;">SECURITY & COMPLIANCE</div> 
- Enterprise-grade data printing, secure session commerce, automated corporate tax invoices, address-verified global logistics. Fully compliant with automated corporate auditing pipelines.
- </div> 
-</div> 
-<div class="form-group" style="margin-top: 40px; border-top: 1px solid var(--border-gray); padding-top: 20px; margin-bottom: 0;"> 
- <label>Financial Ledger Summary</label> 
- <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;"> 
- <span>Batch Volume Allocation:</span> 
- <span id="batch-qty" style="color: var(--electric-cyan); font-weight: 600;">0 Addresses Loaded</span> 
- </div> 
- <div style="display: flex; justify-content: space-between; font-size: 24px; font-weight: 800; margin-bottom: 30px; letter-spacing: -0.02em;"> 
- <span>Total Due (Upfront USD):</span> 
- <span id="total-amount">$0.00</span> 
- </div> 
- <button class="btn-checkout" onclick="triggerStripeCheckout()">Launch Automated Order Routing</button> 
-</div> 
-</div> 
-</div> 
-
-<!-- TRUST FOOTER ROW: Updated with your high-trust infrastructure parameters -->
-<div class="trust-footer"> 
- <div class="compliance-text"> 
- All logistical address tracking data transmission payload blocks are cryptographically isolated. Instant programmatic billing ledger synchronizations emit legal local Tax/VAT corporate documentation directly on success redirection. 
- </div> 
- <div class="trust-badges"> 
- <div class="badge-item">🔒 Powered by Stripe</div> 
- <div class="badge-item">✈️ Global Logistics via Prodigi API</div> 
- <div class="badge-item">🗺️ Address Validation by Smarty</div> 
- </div> 
+  <!-- Right Side: Widescreen Review Ledger -->
+  <div class="review-panel">
+    <div>
+      <div class="form-group">
+        <label>Selected Asset Pool Configuration</label>
+        <p style="font-size: 14px; margin: 4px 0 20px 0; color: var(--text-white); line-height: 1.4; font-weight: 600;"> ✓ 5 Corporate Standard High-Resolution Assets Loaded in Production Buffer <br>
+          <span style="color: var(--text-muted); font-size: 12px; font-weight: 400;">(4x6 Glossy Silver-Halide Artifact Formats)</span>
+        </p>
+      </div>
+      <div class="form-group" style="background-color: rgba(18, 18, 20, 0.4); padding: 18px; border-radius: 6px; border: 1px solid var(--border-gray); font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.6; color: var(--text-white);">
+        <div style="font-family: 'Syncopate', sans-serif; font-size: 11px; color: var(--electric-cyan); font-weight: 700; margin-bottom: 8px;">SECURITY & COMPLIANCE</div>
+        Enterprise-grade data printing, secure session commerce, automated corporate tax invoices, address-verified global logistics. Fully compliant with automated corporate auditing pipelines.
+      </div>
+    </div>
+    <div class="form-group" style="margin-top: 40px; border-top: 1px solid var(--border-gray); padding-top: 20px; margin-bottom: 0;">
+      <label>Financial Ledger Summary</label>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+        <span>Batch Volume Allocation:</span>
+        <span id="batch-qty" style="color: var(--electric-cyan); font-weight: 600;">0 Addresses Loaded</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 24px; font-weight: 800; margin-bottom: 30px; letter-spacing: -0.02em;">
+        <span>Total Due (Upfront USD):</span>
+        <span id="total-amount">$0.00</span>
+      </div>
+      <button class="btn-checkout" onclick="triggerStripeCheckout()">Launch Automated Order Routing</button>
+    </div>
+  </div>
 </div>
+
+<!-- TRUST FOOTER ROW -->
+<div class="trust-footer">
+  <div class="compliance-text"> All logistical address tracking data transmission payload blocks are cryptographically isolated. Instant programmatic billing ledger synchronizations emit legal local Tax/VAT corporate documentation directly on success redirection. </div>
+  <div class="trust-badges">
+    <div class="badge-item">🔒 Powered by Stripe</div>
+    <div class="badge-item">✈️ Global Logistics via Prodigi API</div>
+    <div class="badge-item">🗺️ Address Validation by Smarty</div>
+  </div>
+</div>
+
 <!-- ALL LOGICAL JAVASCRIPT ENGINE PROCESSES -->
-<script> 
-let recipientCount = 0; 
-const dropZone = document.getElementById('csv-drop-zone'); 
-const fileInput = document.getElementById('csv-file-input'); 
+<script>
+let recipientCount = 0;
+const dropZone = document.getElementById('csv-drop-zone');
+const fileInput = document.getElementById('csv-file-input');
 
-// 1. OPEN LOCAL BROWSER FILE SELECTOR ON WINDOW CLICK 
-dropZone.addEventListener('click', () => fileInput.click()); 
+// 1. OPEN LOCAL BROWSER FILE SELECTOR ON WINDOW CLICK
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length > 0) {
+    processCSVFileString(e.target.files[0]);
+  }
+});
 
-fileInput.addEventListener('change', (e) => { 
-    if (e.target.files.length > 0) { 
-        processCSVFileString(e.target.files[0]); 
-    } 
-}); 
+// 2. PREVENT BROWSER DEFAULT WINDOW REDIRECT FOR DRAG & DROP
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  dropZone.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, false);
+});
 
-// 2. PREVENT BROWSER DEFAULT WINDOW REDIRECT FOR DRAG & DROP 
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { 
-    dropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false); 
-}); 
+// 3. HIGHLIGHT HOVER BORDERS DURING DRAGS
+['dragenter', 'dragover'].forEach(eventName => {
+  dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+});
+['dragleave', 'drop'].forEach(eventName => {
+  dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+});
 
-// 3. HIGHLIGHT HOVER BORDERS DURING DRAGS 
-['dragenter', 'dragover'].forEach(eventName => { 
-    dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false); 
-}); 
-['dragleave', 'drop'].forEach(eventName => { 
-    dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false); 
-}); 
+// 4. HANDLE DROPPED SPREADSHEETS
+dropZone.addEventListener('drop', (e) => {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  if (files.length > 0) {
+    processCSVFileString(files[0]);
+  }
+});
 
-// 4. HANDLE DROPPED SPREADSHEETS 
-dropZone.addEventListener('drop', (e) => { 
-    const dt = e.dataTransfer; 
-    const files = dt.files; 
-    if (files.length > 0) { 
-        processCSVFileString(files[0]); 
-    } 
-}); 
+// 5. EXTRACT TEXT STRING FROM FILE AND SEND TO STREAM ENGINE PIPELINE
+function processCSVFileString(file) {
+  if (!file.name.endsWith('.csv')) {
+    alert("Please load a standard structural layout spreadsheet file (.csv format only).");
+    return;
+  }
+  dropZone.innerText = `Reading File: ${file.name}...`;
+  const reader = new FileReader();
+  reader.onload = async function(event) {
+    const textPayload = event.target.result;
+    const honeypotVal = document.getElementById('website_secondary').value;
+    try {
+      const response = await fetch('/api/batch/parse-csv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ csv_data_string: textPayload, website_secondary: honeypotVal })
+      });
+      const parsedResult = await response.json();
+      if (parsedResult.error) {
+        alert(`Error Processing Spreadsheet: ${parsedResult.error}`);
+        dropZone.innerText = "Drag & Drop Attendee CSV File Here or Click to Browse";
+        return;
+      }
+      recipientCount = parsedResult.quantity || 0;
+      document.getElementById('batch-qty').innerText = `${recipientCount} Addresses Verified (Smarty)`;
+      document.getElementById('total-amount').innerText = `$${(recipientCount * 25).toFixed(2)}`;
+      dropZone.innerText = `✓ Successfully Processed: ${file.name}`;
+    } catch (error) {
+      console.error("Transmission Error:", error);
+      alert("Could not establish communication link with the parsing core backend cluster.");
+      dropZone.innerText = "Drag & Drop Attendee CSV File Here or Click to Browse";
+    }
+  };
+  reader.readAsText(file);
+}
 
-// 5. EXTRACT TEXT STRING FROM FILE AND SEND TO STREAM ENGINE PIPELINE 
-function processCSVFileString(file) { 
-    if (!file.name.endsWith('.csv')) { 
-        alert("Please load a standard structural layout spreadsheet file (.csv format only)."); 
-        return; 
-    } 
+// 6. EXECUTE THE STRIPE SECURE SETTLEMENT TRANSACTION PIPELINE WITH HONEYPOT COMPLIANCE
+async function triggerStripeCheckout() {
+  const email = document.getElementById('corporate-email').value;
+  const po = document.getElementById('po-number').value;
+  
+  // SECURE HONEYPOT INTERCEPTION: Read the state of the invisible tracker field
+  const honeypotVal = document.getElementById('website_secondary').value;
+  if (honeypotVal) {
+    console.warn("⚠️ Bot detection pipeline tripped on frontend framework layer.");
+    // Quietly dump the bot onto the checkout-canceled page to break their script loop
+    window.location.href = `https://${window.location.host}/checkout-canceled`;
+    return;
+  }
 
-    dropZone.innerText = `Reading File: ${file.name}...`; 
+  if(!email) {
+    alert("Please supply a valid corporate email reference.");
+    return;
+  }
+  if(recipientCount < 1) {
+    alert("Please upload an attendee csv logistics file containing records before initiating checkout operations.");
+    return;
+  }
 
-    const reader = new FileReader(); 
-    reader.onload = async function(event) { 
-        const textPayload = event.target.result; 
-        const honeypotVal = document.getElementById('website_secondary').value; 
+  const response = await fetch('/api/orders/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_email: email,
+      purchase_order_number: po,
+      quantity: recipientCount,
+      locale: window.navigator.language.substring(0,2),
+      website_secondary: honeypotVal // Sync the field value straight to your backend route
+    })
+  });
 
-        try { 
-            const response = await fetch('/api/batch/parse-csv', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ 
-                    csv_data_string: textPayload, 
-                    website_secondary: honeypotVal 
-                }) 
-            }); 
+  const session = await response.json();
 
-            const parsedResult = await response.json(); 
-
-            if (parsedResult.error) { 
-                alert(`Error Processing Spreadsheet: ${parsedResult.error}`); 
-                dropZone.innerText = "Drag & Drop Attendee CSV File Here or Click to Browse"; 
-                return; 
-            } 
-
-            recipientCount = parsedResult.quantity || 0; 
-            document.getElementById('batch-qty').innerText = `${recipientCount} Addresses Verified (Smarty)`; 
-            document.getElementById('total-amount').innerText = `$${(recipientCount * 25).toFixed(2)}`; 
-            dropZone.innerText = `✓ Successfully Processed: ${file.name}`; 
-            
-        } catch (error) { 
-            console.error("Transmission Error:", error); 
-            alert("Could not establish communication link with the parsing core backend cluster."); 
-            dropZone.innerText = "Drag & Drop Attendee CSV File Here or Click to Browse"; 
-        } 
-    }; 
-    reader.readAsText(file); 
-} 
-
-// 6. EXECUTE THE STRIPE SECURE SETTLEMENT TRANSACTION PIPELINE 
-async function triggerStripeCheckout() { 
-    const email = document.getElementById('corporate-email').value; 
-    const po = document.getElementById('po-number').value; 
-    
-    if(!email) { 
-        alert("Please supply a valid corporate email reference."); 
-        return; 
-    } 
-    if(recipientCount < 1) { 
-        alert("Please upload an attendee csv logistics file containing records before initiating checkout operations."); 
-        return; 
-    } 
-
-    const response = await fetch('/api/orders/create', { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ 
-            user_email: email, 
-            purchase_order_number: po, 
-            quantity: recipientCount, 
-            locale: window.navigator.language.substring(0,2) 
-        }) 
-    }); 
-
-    const session = await response.json(); 
-    
-    if (session.checkout_url) { 
-        window.location.href = session.checkout_url; 
-    } else { 
-        alert(`Failed to initialize transactional gateway: ${session.error || 'Check server records'}`); 
-    } 
-} 
-</script> 
-</body> 
+  if (session.checkout_url) {
+    window.location.href = session.checkout_url;
+  } else {
+    alert(`Failed to initialize transactional gateway: ${session.error || 'Check server records'}`);
+  }
+}
+</script>
+</body>
 </html>
+
