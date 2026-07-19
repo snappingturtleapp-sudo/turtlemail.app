@@ -162,6 +162,12 @@ label {
         </div>
       </div>
     </div>
+
+    <!-- IDENTICAL HIGH-DECEPTION HONEYPOT TRAP -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+      <label for="website_secondary">Secondary Security Check Item Fields</label>
+      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptCheckoutBotAttack()">
+    </div>
     
     <button class="btn-checkout" id="settle-payment-btn" onclick="executeFinancialSettlementPipeline()" style="opacity: 0.4; cursor: not-allowed;" disabled>
       Execute Secure Bank Settlement
@@ -170,10 +176,23 @@ label {
 </div>
 
 <script>
+let checkoutClickTimestamps = [];
+
 // Parse session configuration fields immediately out of transient cross-page memory structures
 document.addEventListener("DOMContentLoaded", () => {
     console.log("[Checkout Engine] Initializing settlement parameters...");
     
+    // FRONTEND RATE LIMITER DEFENSE: Detects automated rapid click script bursts
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        checkoutClickTimestamps.push(now);
+        checkoutClickTimestamps = checkoutClickTimestamps.filter(t => now - t < 5000);
+        if (checkoutClickTimestamps.length > 15) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get("email") || "accounting-preview@company.com";
     const po = urlParams.get("po") || "N/A";
@@ -185,8 +204,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("display-total").innerText = `$${(qty * 25).toFixed(2)}`;
 });
 
+// HONEYPOT INTERCEPTION ENGINE: Instantly breaks bot scripts filling the field
+function interceptCheckoutBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on checkout node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+        return true;
+    }
+    return false;
+}
+
 // Enforce un-skippable agreement toggle behavior tracking
 function toggleSettlementButton() {
+    if (interceptCheckoutBotAttack()) return;
+    
     const isChecked = document.getElementById("legal-agreement-checkbox").checked;
     const btn = document.getElementById("settle-payment-btn");
     
@@ -203,6 +235,8 @@ function toggleSettlementButton() {
 
 // Outbound trigger forwarding directly to post-purchase processing confirmation block
 function executeFinancialSettlementPipeline() {
+    if (interceptCheckoutBotAttack()) return;
+    
     const isChecked = document.getElementById("legal-agreement-checkbox").checked;
     if (!isChecked) return;
     
@@ -212,3 +246,4 @@ function executeFinancialSettlementPipeline() {
 </script>
 </body>
 </html>
+
