@@ -1,0 +1,124 @@
+<!-- Paste this style block into your head section to handle tab switching visuals -->
+<style>
+.ingestion-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.tab-btn {
+  background-color: rgba(18, 18, 20, 0.5);
+  border: 1px solid var(--border-gray);
+  color: var(--text-muted);
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Syncopate', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+.tab-btn.active {
+  background-color: var(--card-dark);
+  border-color: var(--electric-cyan);
+  color: var(--electric-cyan);
+}
+.ingestion-content {
+  display: none;
+}
+.ingestion-content.active {
+  display: block;
+}
+.manual-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+}
+</style>
+
+<!-- Replace your old CSV file drop section with this universal multi-mode container -->
+<div class="form-group">
+  <label>Logistical Recipient Definition Mode</label>
+  <div class="ingestion-tabs">
+    <button class="tab-btn active" onclick="switchIngestionMode('manual')">Single Manual Entry</button>
+    <button class="tab-btn" onclick="switchIngestionMode('bulk')">Bulk CSV Spreadsheet</button>
+  </div>
+
+  <!-- MODE A: SINGLE RETAIL INPUT FORM -->
+  <div id="mode-manual" class="ingestion-content active">
+    <div class="form-group">
+      <input type="text" id="manual-name" placeholder="Recipient Full Name (e.g., Jane Doe)" oninput="syncManualRecipient()">
+    </div>
+    <div class="form-group">
+      <input type="text" id="manual-street" placeholder="Street Address" oninput="syncManualRecipient()">
+    </div>
+    <div class="manual-grid">
+      <input type="text" id="manual-city" placeholder="City" oninput="syncManualRecipient()">
+      <input type="text" id="manual-state" placeholder="State (e.g., FL)" oninput="syncManualRecipient()">
+    </div>
+    <div class="form-group" style="margin-top: 15px;">
+      <input type="text" id="manual-zip" placeholder="Zip / Postal Code" oninput="syncManualRecipient()">
+    </div>
+  </div>
+
+  <!-- MODE B: BULK ENTERPRISE DROP ZONE -->
+  <div id="mode-bulk" class="ingestion-content">
+    <div class="drop-zone" id="csv-drop-zone">
+      Drag & Drop Attendee CSV File Here or Click to Browse
+    </div>
+    <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+  </div>
+</div>
+
+// This array holds your standardized rows whether they come from the form or spreadsheet
+let finalizedRecipientsList = [];
+
+function switchIngestionMode(mode) {
+    // Toggle UI tab active classes
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.ingestion-content').forEach(content => content.classList.remove('active'));
+    
+    if(mode === 'manual') {
+        document.querySelector("button[onclick*='manual']").classList.add('active');
+        document.getElementById('mode-manual').classList.add('active');
+        syncManualRecipient(); // Immediately convert whatever is written in the fields
+    } else {
+        document.querySelector("button[onclick*='bulk']").classList.add('active');
+        document.getElementById('mode-bulk').classList.add('active');
+        // Clear manual memory row count when switching to bulk to allow fresh CSV reading
+        recipientCount = 0;
+        finalizedRecipientsList = [];
+        updateReviewLedgerMetrics();
+    }
+}
+
+// Automatically processes the single manual fields into your core data flow as 1 recipient
+function syncManualRecipient() {
+    const name = document.getElementById('manual-name').value.trim();
+    const street = document.getElementById('manual-street').value.trim();
+    const city = document.getElementById('manual-city').value.trim();
+    const state = document.getElementById('manual-state').value.trim();
+    const zip = document.getElementById('manual-zip').value.trim();
+
+    // Only count as a valid row if the user has started filling out basic fields
+    if (name || street || city || state || zip) {
+        finalizedRecipientsList = [{
+            name: name || "Recipient",
+            street: street,
+            city: city,
+            state: state,
+            zip: zip
+        }];
+        recipientCount = 1;
+    } else {
+        finalizedRecipientsList = [];
+        recipientCount = 0;
+    }
+    updateReviewLedgerMetrics();
+}
+
+// Unified metric updater used by BOTH manual typing and CSV spreadsheet drops
+function updateReviewLedgerMetrics() {
+    document.getElementById('batch-qty').innerText = `${recipientCount} Address(es) Configured`;
+    document.getElementById('total-amount').innerText = `$${(recipientCount * 25).toFixed(2)}`;
+    console.log(`[Ledger Sync] Unified state updated. Current count: ${recipientCount}`);
+}
