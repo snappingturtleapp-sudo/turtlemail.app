@@ -111,9 +111,8 @@ body {
 </style>
 </head>
 
-<body>
+  <body>
 <div class="billboard-container">
-  <!-- Core Scaled Branding Asset Selection -->
   <div class="header-logo-container">
     <img src="Turtle_Mail_Digital_Secure_Delivered_Logo.png" alt="Turtle Mail Digital Secure Delivered" class="header-logo-img">
   </div>
@@ -122,7 +121,6 @@ body {
     Stop burning high-value marketing budgets on skippable digital clicks. Deliver premium, permanent, 100-year archival heirloom artifacts directly into the hands of enterprise decision-makers.
   </p>
 
-  <!-- The Strategic Enterprise Value Propositon Matrix -->
   <div class="value-matrix">
     <div class="matrix-card">
       <div class="matrix-label">100% Guaranteed Open Rates</div>
@@ -142,10 +140,47 @@ body {
     </div>
   </div>
 
-  <!-- THE OPEN RE-ROUTING CTA LINK GATEWAY -->
-  <a href="/workspace.html" class="btn-launch">
+  <!-- ACTIVE LANDING DECEPTION HONEYPOT TRAP -->
+  <div style="display: none; tab-index: -1;" aria-hidden="true">
+    <label for="website_secondary">Secondary Security Check Item Fields</label>
+    <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+  </div>
+
+  <button class="btn-launch" onclick="executeSafeLandingNavigation()">
     Launch Production Workspace
-  </a>
+  </button>
 </div>
+
+<script>
+// FRONTEND RATE LIMITER DEFENSE: Detects automated rapid script refresh patterns
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    // Monitor user interaction cadence natively to evaluate automation risks
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000); // 5-second tracking track
+        if (landingClickTimestamps.length > 20) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+// HONEYPOT INTERCEPTION ENGINE: Automatically trips if a bot fills the hidden field
+function interceptBillboardBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
+
+// Secure navigation conduit checking states before forwarding users to Page 2
+function executeSafeLandingNavigation() {
+    interceptBillboardBotAttack();
+    window.location.href = "/workspace.html";
+}
+</script>
 </body>
 </html>
