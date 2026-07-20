@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>Corporate Privacy Architecture & Compliance Policy | Turtle Mail</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Inter:wght@400;600;700&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-midnight: #0D1B2A;
+            --bg-charcoal: #121214;
+            --card-dark: #203243;
+            --text-white: #E6F2FF;
+            --text-muted: #86868b;
+            --electric-cyan: #00F0FF;
+            --border-gray: #1E293B;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-charcoal);
+            background-image: url('Turtle_Mail_Background.png');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text-white);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .policy-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(13, 27, 42, 0.95);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 45px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .logo-frame {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .logo-icon {
+            width: 80px;
+            height: auto;
+            filter: drop-shadow(0 0 8px var(--electric-cyan));
+        }
+        h1 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 16px;
+            color: var(--electric-cyan);
+            letter-spacing: 0.08em;
+            margin-bottom: 30px;
+            text-align: center;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-gray);
+            padding-bottom: 20px;
+        }
+        h2 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 11px;
+            color: var(--electric-cyan);
+            letter-spacing: 0.05em;
+            margin-top: 30px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        p, li {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-white);
+            opacity: 0.9;
+        }
+        .contact-block {
+            background-color: var(--card-dark);
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 35px;
+        }
+        .contact-block p {
+            margin: 6px 0;
+            font-size: 13px;
+        }
+        .compliance-link {
+            color: var(--electric-cyan);
+            text-decoration: none;
+        }
+        .compliance-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="policy-container">
+    <div class="logo-frame">
+        <img src="Turtle_Mail_Icon.png" alt="Turtle Mail Architecture Logo" class="logo-icon">
+    </div>
+    
+    <h1>Corporate Privacy Architecture</h1>
+    
+    <p>We operate a strict, registration-free checkout workspace to maximize global data compliance. This document outlines how recipient parameters flow through our processing infrastructure.</p>
+
+    <h2>What We Collect</h2>
+    <p>When an enterprise partner initiates a bulk campaign or a manual domestic checkout, we capture the final recipient names and physical delivery addresses exclusively to facilitate shipping and logistics.</p>
+
+    <h2>Why We Collect It</h2>
+    <p>This information is processed solely to fulfill physical product deliveries via external printing lanes and to ensure your organization complies with standard legal tax and regional accounting obligations.</p>
+
+    <h2>Third-Party Sharing</h2>
+    <p>Delivery details are passed securely over memory layers directly to our global print-on-demand and fulfillment partner, <strong>Prodigi</strong>. Prodigi processes this data strictly as a downstream data processor on our behalf.</p>
+
+    <h2>Data Retention Limits</h2>
+    <p>To eliminate systemic liability, we explicitly opt out of saving local email records or persistent database rows containing recipient data. Financial totals and anonymous batch order numbers are kept for the minimum duration required by tax authorities, while raw address arrays vanish from system RAM post-submission.</p>
+
+    <div class="contact-block">
+        <h2>Data Compliance Framework</h2>
+        <p><strong>Corporate Node:</strong> Turtle Mail, 411 Walnut St, GCS, FL 32043</p>
+        <p><strong>Digital Gateway:</strong> <a href="https://turtlemail.app/" class="compliance-link">https://turtlemail.app/</a></p>
+        <p><strong>Inbound Support Portal:</strong> <a href="mailto:customer_service@turtlemail.app" class="compliance-link">customer_service@turtlemail.app</a></p>
+        <p><strong>Communications Line:</strong> TBD</p>
+    </div>
+
+    <!-- MANDATORY ACTIVE HONEYPOT DECEPTION TRAP -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+        <label for="website_secondary">Secondary Security Check Item Fields</label>
+        <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptPrivacyBotAttack()">
+    </div>
+</div>
+
+<script>
+// MANDATORY FRONTEND RATE LIMITER DEFENSE
+let privacyClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        privacyClickTimestamps.push(now);
+        privacyClickTimestamps = privacyClickTimestamps.filter(t => now - t < 5000); 
+        
+        if (privacyClickTimestamps.length > 20) {
+            alert("Protective security cooldown active due to rapid interaction spikes.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+// MANDATORY HONEYPOT INTERCEPTION ENGINE
+function interceptPrivacyBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("Spam crawler detected in privacy document context. Evacuating layer.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
+</script>
+
+</body>
+</html>
