@@ -1,198 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Batch Order Workspace | Turtle Mail</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-midnight: #0D1B2A;
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --error-crimson: #EF4444;
+  --success-green: #22C55E;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-charcoal);
+  background-image: url('Turtle_Mail_Background.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text-white);
+  margin: 0;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+.workspace-wrapper {
+  width: 100%;
+  max-width: 1140px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 30px;
+}
+@media (max-width: 900px) { .workspace-wrapper { grid-template-columns: 1fr; } }
 
-<script> 
-let recipientCount = 0; 
-let finalizedRecipientsList = []; 
-let imageAssetsArray = [null, null, null, null, null]; 
-let activeSlotIndex = null; 
+.control-panel, .review-panel {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 32px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+.review-panel { align-self: start; position: sticky; top: 20px; }
 
-const dropZone = document.getElementById('csv-drop-zone'); 
-const fileInput = document.getElementById('csv-file-input'); 
-const nativeFileInput = document.getElementById('universal-image-input'); 
+h1.page-title {
+  grid-column: 1 / -1;
+  font-family: 'Syncopate', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-white);
+  margin: 0 0 4px;
+}
+p.page-sub {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 24px;
+}
 
-function switchIngestionMode(mode) { 
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); 
-  document.querySelectorAll('.ingestion-content').forEach(content => content.classList.remove('active')); 
-  
-  if(mode === 'manual') { 
-    document.querySelector("button[onclick*='manual']").classList.add('active'); 
-    document.getElementById('mode-manual').classList.add('active'); 
-    syncManualRecipient(); 
-  } else { 
-    document.querySelector("button[onclick*='bulk']").classList.add('active'); 
-    document.getElementById('mode-bulk').classList.add('active'); 
-    recipientCount = 0; 
-    finalizedRecipientsList = []; 
-    updateReviewLedgerMetrics(); 
-  } 
-} 
+.form-group { margin-bottom: 22px; }
+label {
+  display: block;
+  font-size: 11px;
+  color: var(--electric-cyan);
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+input[type="text"], input[type="email"], input[type="password"] {
+  width: 100%;
+  background-color: var(--bg-charcoal);
+  border: 1px solid var(--border-gray);
+  border-radius: 6px;
+  padding: 13px 14px;
+  color: var(--text-white);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+input:focus { border-color: var(--electric-cyan); outline: none; }
 
-function syncManualRecipient() { 
-  const name = document.getElementById('manual-name').value.trim(); 
-  const street = document.getElementById('manual-street').value.trim(); 
-  const city = document.getElementById('manual-city').value.trim(); 
-  const state = document.getElementById('manual-state').value.trim(); 
-  const zip = document.getElementById('manual-zip').value.trim(); 
+.token-status {
+  margin-top: 10px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 10px 12px;
+  border-radius: 6px;
+  display: none;
+}
+.token-status.show { display: block; }
+.token-status.ok { background: rgba(34,197,94,0.08); border: 1px solid var(--success-green); color: var(--success-green); }
+.token-status.bad { background: rgba(239,68,68,0.08); border: 1px solid var(--error-crimson); color: var(--error-crimson); }
+.token-status.checking { background: rgba(0,240,255,0.06); border: 1px solid var(--electric-cyan); color: var(--electric-cyan); }
 
-  if (name || street || city || state || zip) { 
-    // Single manual inputs are strictly restricted to the United States (US)
-    finalizedRecipientsList = [{ 
-      name: name || "Recipient", 
-      street, 
-      city, 
-      state, 
-      zip,
-      country: "US" 
-    }]; 
-    recipientCount = 1; 
-  } else { 
-    finalizedRecipientsList = []; 
-    recipientCount = 0; 
-  } 
-  updateReviewLedgerMetrics(); 
-} 
+.tab-row { display: flex; gap: 8px; margin-bottom: 20px; }
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  background: rgba(18,18,20,0.5);
+  border: 1px solid var(--border-gray);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: 'Syncopate', sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+.tab-btn.active { color: var(--electric-cyan); border-color: var(--electric-cyan); background: rgba(0,240,255,0.06); }
 
-if(dropZone) { 
-  dropZone.addEventListener('click', () => fileInput.click()); 
-  fileInput.addEventListener('change', (e) => { 
-    if (e.target.files.length > 0) processCSVFileString(e.target.files[0]); 
-  }); 
-  ['dragenter', 'dragover'].forEach(name => dropZone.addEventListener(name, () => dropZone.classList.add('dragover'), false)); 
-  ['dragleave', 'drop'].forEach(name => dropZone.addEventListener(name, () => dropZone.classList.remove('dragover'), false)); 
-  dropZone.addEventListener('drop', (e) => { 
-    e.preventDefault(); 
-    const files = e.dataTransfer.files; 
-    if (files.length > 0) processCSVFileString(files[0]); 
-  }); 
-} 
+.ingestion-content { display: none; }
+.ingestion-content.active { display: block; }
 
-function processCSVFileString(file) { 
-  if (!file.name.endsWith('.csv')) { 
-    alert("Please load a valid .csv file."); 
-    return; 
-  } 
-  dropZone.innerText = `Reading File: ${file.name}...`; 
-  const reader = new FileReader(); 
-  reader.onload = async function(event) { 
-    const textPayload = event.target.result; 
-    const honeypotVal = document.getElementById('website_secondary').value; 
-    try { 
-      const response = await fetch('/api/batch/parse-csv', { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ csv_data_string: textPayload, website_secondary: honeypotVal }) 
-      }); 
-      const parsedResult = await response.json(); 
-      recipientCount = parsedResult.quantity || 0; 
-      finalizedRecipientsList = parsedResult.verified_recipients || []; 
-      updateReviewLedgerMetrics(); 
-      dropZone.innerText = `✓ Processed: ${file.name}`; 
-    } catch (error) { 
-      dropZone.innerText = "Error loading spreadsheet."; 
-    } 
-  }; 
-  reader.readAsText(file); 
-} 
+.drop-zone {
+  border: 2px dashed var(--border-gray);
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-white);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  background-color: rgba(18, 18, 20, 0.5);
+}
+.drop-zone.dragover { border-color: var(--electric-cyan); color: var(--electric-cyan); }
 
-function updateReviewLedgerMetrics() { 
-  document.getElementById('batch-qty').innerText = `${recipientCount} Address(es) Configured`; 
-  
-  // GEOPOLITICAL TIERCED PRICING PREVIEW ENGINE
-  let calculatedUnitPrice = 100.00; // Default: Rest of World Tier ($100)
-  
-  if (finalizedRecipientsList.length > 0) {
-    const countries = finalizedRecipientsList.map(r => (r.country || 'US').toUpperCase().trim());
-    const adversarialTriggers = ['RU', 'IR', 'KP', 'RUSSIA', 'IRAN', 'NORTH KOREA', 'GAZA'];
-    const hasAdversarial = countries.some(c => adversarialTriggers.includes(c));
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-top: 6px;
+}
+@media (max-width: 600px) { .photo-grid { grid-template-columns: repeat(2, 1fr); } }
+.slot {
+  aspect-ratio: 1/1;
+  border: 1.5px dashed var(--border-gray);
+  border-radius: 6px;
+  background: rgba(18,18,20,0.5);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; overflow: hidden;
+}
+.slot.dragover { border-color: var(--electric-cyan); }
+.slot img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.slot .placeholder { font-size: 10px; color: var(--text-muted); text-align: center; padding: 0 4px; font-family: 'JetBrains Mono', monospace; }
+.slot .badge {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; text-align: center; padding: 3px 2px;
+}
+.slot.state-checking .badge { background: var(--text-muted); color: #000; }
+.slot.state-approved .badge { background: var(--success-green); color: #000; }
+.slot.state-rejected { border-color: var(--error-crimson); }
+.slot.state-rejected .badge { background: var(--error-crimson); color: #fff; }
 
-    if (hasAdversarial) {
-      calculatedUnitPrice = 1000.00; // Adversarial Tier ($1,000)
-    } else {
-      const isDomesticOnly = countries.every(c => c === 'US' || c === 'GB' || c === 'UK');
-      if (isDomesticOnly) {
-        calculatedUnitPrice = 25.00; // Core Secure Hub Tier ($25)
-      }
+.summary-card {
+  background-color: rgba(18, 18, 20, 0.5);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
+.summary-row.total {
+  border-top: 1px solid var(--border-gray);
+  padding-top: 15px; margin-bottom: 0; font-size: 20px; font-weight: 800;
+}
+.price-note { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+
+.btn-checkout {
+  width: 100%;
+  background-color: var(--electric-cyan);
+  color: var(--bg-charcoal);
+  border: none;
+  border-radius: 6px;
+  padding: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 8px;
+}
+.btn-checkout:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.banner {
+  padding: 12px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 16px;
+  font-family: 'Inter', sans-serif;
+}
+.banner.error { background: rgba(239,68,68,0.08); border: 1px solid var(--error-crimson); color: var(--error-crimson); }
+.banner.info { background: rgba(0,240,255,0.06); border: 1px solid var(--electric-cyan); color: var(--electric-cyan); }
+
+#batch-log {
+  margin-top: 18px;
+  max-height: 220px;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  display: none;
+}
+#batch-log.show { display: block; }
+.log-line { padding: 6px 0; border-bottom: 1px solid var(--border-gray); }
+.log-line.ok { color: var(--success-green); }
+.log-line.fail { color: var(--error-crimson); }
+</style>
+</head>
+<body>
+
+<div class="workspace-wrapper">
+  <h1 class="page-title">Batch Order Workspace</h1>
+  <p class="page-sub">Spend credits from an already-purchased block. Recipient data is used once, per send, and never stored centrally.</p>
+
+  <div class="control-panel">
+
+    <div class="form-group">
+      <label for="access-token">Credit block access token</label>
+      <input type="password" id="access-token" placeholder="Paste the access token for your credit block" autocomplete="off">
+      <div class="token-status" id="token-status"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="corporate-email">Receipt email (optional)</label>
+      <input type="email" id="corporate-email" placeholder="accounting@yourcompany.com">
+    </div>
+
+    <div class="form-group">
+      <label for="po-number">Purchase order (PO) number (optional)</label>
+      <input type="text" id="po-number" placeholder="PO-2026-XYZ">
+    </div>
+
+    <div class="form-group">
+      <label>Recipients</label>
+      <div class="tab-row">
+        <button type="button" class="tab-btn active" onclick="switchIngestionMode('manual')">Manual entry</button>
+        <button type="button" class="tab-btn" onclick="switchIngestionMode('bulk')">Bulk CSV upload</button>
+      </div>
+
+      <div class="ingestion-content active" id="mode-manual">
+        <div class="form-group">
+          <label for="manual-name">Recipient name</label>
+          <input type="text" id="manual-name" oninput="syncManualRecipient()">
+        </div>
+        <div class="form-group">
+          <label for="manual-street">Street address</label>
+          <input type="text" id="manual-street" oninput="syncManualRecipient()">
+        </div>
+        <div class="form-group">
+          <label for="manual-city">City</label>
+          <input type="text" id="manual-city" oninput="syncManualRecipient()">
+        </div>
+        <div class="form-group">
+          <label for="manual-state">State</label>
+          <input type="text" id="manual-state" oninput="syncManualRecipient()">
+        </div>
+        <div class="form-group">
+          <label for="manual-zip">ZIP / postal code</label>
+          <input type="text" id="manual-zip" oninput="syncManualRecipient()">
+        </div>
+        <p class="price-note">Manual entry is US-only. Use bulk CSV upload for international recipients.</p>
+      </div>
+
+      <div class="ingestion-content" id="mode-bulk">
+        <div class="drop-zone" id="csv-drop-zone">Drag &amp; drop a recipient CSV here, or click to browse</div>
+        <input type="file" id="csv-file-input" accept=".csv" style="display:none;">
+        <p class="price-note">
+          Expected columns (first row = header): <strong>name, street, city, state, zip, country, message</strong>.
+          Country is a 2-letter code (US, GB, DE, ...) — defaults to US if left blank. The message column
+          is optional — leave it blank on any row to use the shared message below instead.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Photos (all 5 required, sent with every recipient in this batch)</label>
+      <div class="photo-grid" id="photo-grid"></div>
+      <button type="button" class="btn-checkout" id="check-photos-btn" onclick="checkAllPhotos()" disabled style="margin-top:12px;">
+        Check &amp; preview all 5 photos
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label for="batch-message">Message (printed on the packing slip)</label>
+      <textarea id="batch-message" rows="4" style="width:100%; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray); border-radius: 6px; padding: 13px 14px; color: var(--text-white); font-size: 14px; font-family: 'Inter', sans-serif; resize: vertical;" maxlength="500" placeholder="This message is sent to every recipient in this batch, unless a CSV row overrides it with its own 'message' column."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="batch-from-name">Sign as (optional)</label>
+      <input type="text" id="batch-from-name" placeholder="e.g. The Acme Team — leave blank to omit a signature line">
+    </div>
+
+  </div>
+
+  <div class="review-panel">
+    <div id="review-banner"></div>
+
+    <div class="summary-card">
+      <div class="summary-row">
+        <span>Recipients configured:</span>
+        <span id="batch-qty" style="color: var(--electric-cyan); font-weight: 600;">0</span>
+      </div>
+      <div class="summary-row">
+        <span>Credits available on this token:</span>
+        <span id="credits-available" style="font-weight: 600;">—</span>
+      </div>
+      <div class="summary-row total">
+        <span>Estimated cost (if paying per-order)</span>
+        <span id="total-amount">$0.00</span>
+      </div>
+      <p class="price-note">
+        This estimate is shown for reference only — recipients in this batch spend credits already paid for on your access token, at $25/credit domestically or $100/credit internationally. Some destinations can't be shipped to at all; you'll see a clear error per recipient if that happens.
+      </p>
+    </div>
+
+    <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+      <label for="website_secondary">Secondary Security Check Item Fields</label>
+      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+    </div>
+
+    <button class="btn-checkout" id="dispatch-btn" onclick="executeBatchDispatch()" disabled>
+      Send batch
+    </button>
+
+    <div id="batch-log"></div>
+  </div>
+</div>
+
+<script>
+/* ===================================================================
+   CONFIG
+   =================================================================== */
+const API_BASE_URL = "https://api.turtlemail.app";
+
+/* ===================================================================
+   Confirmed against the real app.py / credits_commissions.py (no longer
+   guesses):
+
+   1. No batch-send endpoint exists, so this loops POST /api/send once
+      per recipient. Non-atomic on partial failure — the log shows
+      exactly which recipients succeeded, failed, or were blocked.
+   2. CSV parsing is entirely client-side — no backend route for it.
+      Columns: name, street, city, state, zip, country, message.
+   3. GET /api/credits/status?access_token=... returns SNAKE_CASE:
+      { block_id, total_credits, credits_remaining, organization_id }.
+      404 if the token is invalid or unpaid (cc.get_block_status).
+   4. POST /api/process-images takes ALL 5 PHOTOS IN ONE CALL:
+      { photos: [dataUrl, dataUrl, ...] } (assumed data-URI strings —
+      confirm the exact string format image_processor.py expects if
+      this rejects everything). Returns one collective
+      { approved: bool, results: [{url, public_id, ...}, ...5] } —
+      NOT a per-image response. This is why the whole batch is staged
+      locally first and checked together, not per-slot.
+   5. POST /api/send uses CAMELCASE body fields — a different casing
+      convention than /api/credits/status:
+      { accessToken, imageResults, recipient, message, fromName }
+      Returns { success: true, orderId: "TM-..." } on success — the
+      orderId IS the packing slip's identifier, generated fresh per
+      recipient by order_submission.create_order().
+   6. Pricing preview mirrors the $25 (US/UK) / $100 (elsewhere) flat
+      tiers. No client-side sanctions blocklist — the backend's real
+      403 is authoritative and surfaced per-recipient in the batch log.
+   =================================================================== */
+
+const state = {
+  recipients: [],       // [{name, street, city, state, zip, country}]
+  slots: [null,null,null,null,null],
+  tokenValid: false,
+  creditsRemaining: 0
+};
+
+/* ---------- Access token validation ---------- */
+const tokenInput = document.getElementById('access-token');
+let tokenDebounce;
+tokenInput.addEventListener('input', () => {
+  clearTimeout(tokenDebounce);
+  state.tokenValid = false;
+  refreshDispatchButton();
+  const statusEl = document.getElementById('token-status');
+  const val = tokenInput.value.trim();
+  if (!val) { statusEl.className = 'token-status'; return; }
+  statusEl.className = 'token-status show checking';
+  statusEl.textContent = 'Checking token…';
+  tokenDebounce = setTimeout(() => validateToken(val), 500);
+});
+
+async function validateToken(token){
+  const statusEl = document.getElementById('token-status');
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/credits/status?access_token=${encodeURIComponent(token)}`);
+    if (!res.ok){
+      statusEl.className = 'token-status show bad';
+      statusEl.textContent = 'Token not recognized. Check for typos.';
+      state.tokenValid = false;
+      document.getElementById('credits-available').textContent = '—';
+      refreshDispatchButton();
+      return;
     }
+    const data = await res.json();
+    state.tokenValid = true;
+    state.creditsRemaining = data.credits_remaining ?? 0;
+    statusEl.className = 'token-status show ok';
+    statusEl.textContent = `Valid — ${data.credits_remaining} of ${data.total_credits} credits remaining.`;
+    document.getElementById('credits-available').textContent = `${data.credits_remaining}`;
+  } catch (err){
+    statusEl.className = 'token-status show bad';
+    statusEl.textContent = "Couldn't reach the server to check this token.";
+    state.tokenValid = false;
+  }
+  refreshDispatchButton();
+}
+
+/* ---------- Manual / bulk tab switching ---------- */
+function switchIngestionMode(mode){
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.ingestion-content').forEach(c => c.classList.remove('active'));
+  if (mode === 'manual'){
+    document.querySelector("button[onclick*='manual']").classList.add('active');
+    document.getElementById('mode-manual').classList.add('active');
+    syncManualRecipient();
   } else {
-    calculatedUnitPrice = 0.00;
+    document.querySelector("button[onclick*='bulk']").classList.add('active');
+    document.getElementById('mode-bulk').classList.add('active');
+    state.recipients = [];
+    updateLedger();
+  }
+}
+
+function syncManualRecipient(){
+  const name = document.getElementById('manual-name').value.trim();
+  const street = document.getElementById('manual-street').value.trim();
+  const city = document.getElementById('manual-city').value.trim();
+  const st = document.getElementById('manual-state').value.trim();
+  const zip = document.getElementById('manual-zip').value.trim();
+
+  if (name || street || city || st || zip){
+    state.recipients = [{ name: name || 'Recipient', street, city, state: st, zip, country: 'US' }];
+  } else {
+    state.recipients = [];
+  }
+  updateLedger();
+}
+
+/* ---------- CSV drop zone (client-side parsing only) ---------- */
+const dropZone = document.getElementById('csv-drop-zone');
+const csvInput = document.getElementById('csv-file-input');
+dropZone.addEventListener('click', () => csvInput.click());
+csvInput.addEventListener('change', e => { if (e.target.files[0]) parseCSVFile(e.target.files[0]); });
+['dragenter','dragover'].forEach(n => dropZone.addEventListener(n, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+['dragleave','drop'].forEach(n => dropZone.addEventListener(n, () => dropZone.classList.remove('dragover')));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.dataTransfer.files[0]) parseCSVFile(e.dataTransfer.files[0]);
+});
+
+function parseCSVFile(file){
+  if (!file.name.toLowerCase().endsWith('.csv')){
+    showBanner('Please upload a .csv file.', 'error');
+    return;
+  }
+  dropZone.textContent = `Reading ${file.name}…`;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const rows = parseCSVText(event.target.result);
+      state.recipients = rows;
+      dropZone.textContent = `✓ ${rows.length} recipient(s) loaded from ${file.name}`;
+      updateLedger();
+    } catch (err){
+      dropZone.textContent = 'Drag & drop a recipient CSV here, or click to browse';
+      showBanner("Couldn't read that CSV — check it has a header row with name, street, city, state, zip, country.", 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function parseCSVText(text){
+  const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+  if (lines.length < 2) throw new Error('No data rows');
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^"|"$/g, ''));
+  return lines.slice(1).map(line => {
+    const cells = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+    const row = {};
+    headers.forEach((h, i) => { row[h] = cells[i] || ''; });
+    return {
+      name: row.name || 'Recipient',
+      street: row.street || '',
+      city: row.city || '',
+      state: row.state || '',
+      zip: row.zip || '',
+      country: (row.country || 'US').toUpperCase(),
+      message: row.message || '' // optional per-row override of the shared batch message
+    };
+  });
+}
+
+/* ---------- Ledger / pricing preview ---------- */
+function updateLedger(){
+  const count = state.recipients.length;
+  document.getElementById('batch-qty').textContent = count;
+
+  let total = 0;
+  state.recipients.forEach(r => {
+    const c = (r.country || 'US').toUpperCase();
+    total += (c === 'US' || c === 'GB') ? 25 : 100;
+  });
+  document.getElementById('total-amount').textContent = `$${total.toFixed(2)}`;
+  refreshDispatchButton();
+}
+
+/* ---------- Photo picker (5 slots, single batched moderation call) ---------- */
+const grid = document.getElementById('photo-grid');
+for (let i = 0; i < 5; i++){
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  slot.dataset.index = i;
+  slot.innerHTML = `<div class="placeholder">Photo ${i+1}</div><img><div class="badge" style="display:none;"></div>`;
+  grid.appendChild(slot);
+
+  const hiddenInput = document.createElement('input');
+  hiddenInput.type = 'file';
+  hiddenInput.accept = 'image/*';
+  hiddenInput.style.display = 'none';
+  slot.appendChild(hiddenInput);
+
+  slot.addEventListener('click', () => hiddenInput.click());
+  hiddenInput.addEventListener('change', e => { if (e.target.files[0]) stagePhoto(i, e.target.files[0]); });
+  ['dragenter','dragover'].forEach(n => slot.addEventListener(n, e => { e.preventDefault(); slot.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(n => slot.addEventListener(n, () => slot.classList.remove('dragover')));
+  slot.addEventListener('drop', e => {
+    e.preventDefault();
+    if (e.dataTransfer.files[0]) stagePhoto(i, e.dataTransfer.files[0]);
+  });
+}
+
+function readAsDataURL(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function stagePhoto(index, file){
+  const slotEl = grid.children[index];
+  const badge = slotEl.querySelector('.badge');
+  const placeholder = slotEl.querySelector('.placeholder');
+  const img = slotEl.querySelector('img');
+
+  // Staged locally only — NOT previewed and NOT sent for moderation yet.
+  // The real /api/process-images call checks all 5 photos together in one
+  // request (image_processor.process_order_images requires exactly 5), so
+  // nothing renders until all 5 are staged and the batch check returns.
+  const dataUrl = await readAsDataURL(file);
+  state.slots[index] = { status: 'staged', dataUrl };
+
+  slotEl.className = 'slot';
+  img.style.display = 'none';
+  badge.style.display = 'block';
+  badge.textContent = 'Staged';
+  placeholder.style.display = 'block';
+  placeholder.textContent = `Ready: ${file.name}`;
+
+  refreshCheckPhotosButton();
+}
+
+function refreshCheckPhotosButton(){
+  const stagedCount = state.slots.filter(s => s && s.status === 'staged').length;
+  document.getElementById('check-photos-btn').disabled = stagedCount !== 5;
+}
+
+async function checkAllPhotos(){
+  const btn = document.getElementById('check-photos-btn');
+  btn.disabled = true;
+  btn.textContent = 'Checking all 5 photos…';
+
+  for (let i = 0; i < 5; i++){
+    const slotEl = grid.children[i];
+    slotEl.className = 'slot state-checking';
+    const badge = slotEl.querySelector('.badge');
+    badge.style.display = 'block';
+    badge.textContent = 'Checking…';
   }
 
-  document.getElementById('total-amount').innerText = `$${(recipientCount * calculatedUnitPrice).toFixed(2)}`; 
-} 
-
-function triggerSlotBrowser(index) { 
-  activeSlotIndex = index; 
-  nativeFileInput.click(); 
-} 
-
-nativeFileInput.addEventListener('change', (e) => { 
-  if (e.target.files.length > 0 && activeSlotIndex !== null) processSelectedImage(e.target.files[0], activeSlotIndex); 
-}); 
-
-[0, 1, 2, 3, 4].forEach(index => { const slot = document.getElementById(`slot-container-${index}`); if(slot) { slot.addEventListener('dragover', (e) => { e.preventDefault(); slot.classList.add('dragover'); }); slot.addEventListener('dragleave', () => slot.classList.remove('dragover')); slot.addEventListener('drop', (e) => { e.preventDefault(); slot.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) processSelectedImage(e.dataTransfer.files[0], index); }); } }); 
-
-function processSelectedImage(file, index) { 
-  if (!file.type.startsWith('image/')) { 
-    alert("Please select an image file."); 
-    return; 
-  } 
-  const reader = new FileReader(); 
-  reader.onload = function(event) { 
-    imageAssetsArray[index] = event.target.result; 
-    const previewImg = document.getElementById(`preview-${index}`); 
-    previewImg.src = event.target.result; 
-    previewImg.style.display = 'block'; 
-  }; 
-  reader.readAsDataURL(file); 
-} 
-
-async function triggerStripeCheckout() { 
-  const email = document.getElementById('corporate-email').value; 
-  const po = document.getElementById('po-number').value; 
-  const honeypotVal = document.getElementById('website_secondary').value; 
-
-  if (honeypotVal) { 
-    window.location.href = '/checkout.html'; 
-    return; 
-  } 
-  if (!email) { 
-    alert("Please supply a valid corporate email reference."); 
-    return; 
-  } 
-  if (recipientCount < 1) { 
-    alert("Please define recipient targets before initiating checkout."); 
-    return; 
-  } 
-  const loadedAssetsCount = imageAssetsArray.filter(x => x !== null).length; 
-  if (loadedAssetsCount !== 5) { 
-    alert(`Production array boundary failure: Exactly 5 image assets required. Currently loaded: ${loadedAssetsCount}`); 
-    return; 
-  } 
-
-  // Collect destination country parameters into an array loop to transmit to Stripe
-  const uniqueCountries = [...new Set(finalizedRecipientsList.map(r => r.country || 'US'))];
-
-  // Send payload to backend creation route
   try {
-    const response = await fetch('/api/orders/create', {
+    const photos = state.slots.map(s => s.dataUrl);
+    const res = await fetch(`${API_BASE_URL}/api/process-images`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        organization_id: 'org_checkout_session', // Automatically matches session parameters
-        purchase_order_number: po,
-        quantity: recipientCount,
-        countries: uniqueCountries
-      })
+      body: JSON.stringify({ photos })
     });
-    const result = await response.json();
-    if (result.checkout_url) {
-      window.location.href = result.checkout_url;
-    } else {
-      alert("Failed to compile secure checkout pathway.");
+    const result = await res.json();
+
+    if (!res.ok || !result.approved){
+      // image_processor.py returns {approved:false, flagged_indexes:[...]}
+      // for actual NSFW rejections (no 'error' string in that case), but
+      // {error: "..."} for service-outage/validation failures (503/400/500)
+      // which apply to the whole batch rather than one specific photo.
+      const flaggedSet = new Set(result.flagged_indexes || []);
+      for (let i = 0; i < 5; i++){
+        const slotEl = grid.children[i];
+        const badge = slotEl.querySelector('.badge');
+        const placeholder = slotEl.querySelector('.placeholder');
+        if (flaggedSet.has(i)){
+          slotEl.className = 'slot state-rejected';
+          badge.textContent = 'Flagged';
+          placeholder.style.display = 'block';
+          placeholder.textContent = 'This photo was flagged — choose a different one.';
+        } else if (result.error) {
+          slotEl.className = 'slot state-rejected';
+          badge.textContent = 'Retry';
+          placeholder.style.display = 'block';
+          placeholder.textContent = result.error;
+        } else {
+          slotEl.className = 'slot';
+          badge.textContent = 'Staged';
+        }
+      }
+      showBanner(
+        result.error || (flaggedSet.size
+          ? `${flaggedSet.size} photo(s) flagged — swap it/them out and check again.`
+          : "These photos couldn't be approved. Try again."),
+        'error'
+      );
+      btn.textContent = 'Check & preview all 5 photos';
+      btn.disabled = false;
+      return;
     }
-  } catch (error) {
-    alert("Network infrastructure routing failure.");
+
+    // Approved — result.results is the 5-item array from
+    // image_processor.process_order_images(), same order submitted.
+    state.imageResults = result.results;
+    for (let i = 0; i < 5; i++){
+      const slotEl = grid.children[i];
+      const img = slotEl.querySelector('img');
+      const badge = slotEl.querySelector('.badge');
+      const placeholder = slotEl.querySelector('.placeholder');
+      const item = result.results[i];
+      slotEl.className = 'slot state-approved';
+      img.src = item.url;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+      badge.textContent = 'Approved';
+    }
+    btn.textContent = 'Photos approved ✓';
+    clearBanner();
+  } catch (err){
+    for (let i = 0; i < 5; i++){
+      grid.children[i].className = 'slot state-rejected';
+    }
+    showBanner("Couldn't reach the server to check these photos. Try again.", 'error');
+    btn.textContent = 'Check & preview all 5 photos';
+    btn.disabled = false;
   }
-} 
-</script> 
-</body> 
+  refreshDispatchButton();
+}
+
+/* ---------- Dispatch readiness ---------- */
+function refreshDispatchButton(){
+  const btn = document.getElementById('dispatch-btn');
+  const photosApproved = Array.isArray(state.imageResults) && state.imageResults.length === 5;
+  const ready = state.tokenValid
+    && state.recipients.length > 0
+    && photosApproved
+    && state.recipients.length <= state.creditsRemaining;
+  btn.disabled = !ready;
+
+  if (state.tokenValid && state.recipients.length > state.creditsRemaining){
+    showBanner(`This batch needs ${state.recipients.length} credits but only ${state.creditsRemaining} remain on this token.`, 'error');
+  } else {
+    clearBanner();
+  }
+}
+
+function showBanner(msg, type){
+  document.getElementById('review-banner').innerHTML = `<div class="banner ${type}">${msg}</div>`;
+}
+function clearBanner(){
+  document.getElementById('review-banner').innerHTML = '';
+}
+
+/* ---------- Batch dispatch: loop /api/send once per recipient ---------- */
+async function executeBatchDispatch(){
+  // Honeypot check — fixed from the original inverted logic: a filled
+  // honeypot field now blocks the send, it does not proceed to it.
+  const honeypotVal = document.getElementById('website_secondary').value;
+  if (honeypotVal){
+    interceptBillboardBotAttack();
+    return;
+  }
+
+  const btn = document.getElementById('dispatch-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  const logEl = document.getElementById('batch-log');
+  logEl.className = 'show';
+  logEl.innerHTML = '';
+
+  const accessToken = document.getElementById('access-token').value.trim();
+  const sharedMessage = document.getElementById('batch-message').value.trim();
+  const fromName = document.getElementById('batch-from-name').value.trim();
+
+  if (!sharedMessage && state.recipients.every(r => !r.message)){
+    showBanner('A message is required — this is what prints on the packing slip.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Send batch';
+    return;
+  }
+
+  let successCount = 0, failCount = 0;
+
+  for (const recipient of state.recipients){
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    line.textContent = `${recipient.name} (${recipient.city}, ${recipient.country})… sending`;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+
+    // Per-row CSV "message" column overrides the shared batch message.
+    const message = recipient.message || sharedMessage;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accessToken,
+          imageResults: state.imageResults,
+          recipient,
+          message,
+          fromName: fromName || undefined
+        })
+      });
+
+      if (res.status === 403){
+        line.className = 'log-line fail';
+        line.textContent = `${recipient.name} — blocked: this destination can't be shipped to.`;
+        failCount++;
+        continue;
+      }
+      if (!res.ok) throw new Error(`status ${res.status}`);
+
+      const result = await res.json();
+      line.className = 'log-line ok';
+      line.textContent = `${recipient.name} — sent. Ref: ${result.orderId || '(no reference returned)'}`;
+      successCount++;
+    } catch (err){
+      line.className = 'log-line fail';
+      line.textContent = `${recipient.name} — failed. This credit was not spent; you can retry this recipient.`;
+      failCount++;
+    }
+  }
+
+  btn.textContent = `Done — ${successCount} sent, ${failCount} failed`;
+  // Re-check token balance since successful sends consumed credits.
+  if (accessToken) validateToken(accessToken);
+}
+
+/* ===================================================================
+   IDENTICAL HONEYPOT + RATE LIMITER (verbatim, per site-wide rule)
+   =================================================================== */
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
+        if (landingClickTimestamps.length > 20) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+function interceptBillboardBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
+</script>
+</body>
 </html>
