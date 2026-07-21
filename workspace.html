@@ -1,282 +1,198 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<title>Secure Production Workspace Engine | Turtle Mail</title>
-<link rel="preconnect" href="https://googleapis.com">
-<link rel="preconnect" href="https://gstatic.com" crossorigin>
-<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg-midnight: #0D1B2A;
-  --bg-charcoal: #121214;
-  --card-dark: #203243;
-  --text-white: #E6F2FF;
-  --text-muted: #86868b;
-  --electric-cyan: #00F0FF;
-  --border-gray: #1E293B;
-}
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-charcoal);
-  background-image: url('Turtle_Mail_Background.png');
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  color: var(--text-white);
-  margin: 0;
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  box-sizing: border-box;
-}
-.desktop-container {
-  width: 100%;
-  max-width: 1100px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 50px;
-}
-.control-panel, .review-panel {
-  background-color: rgba(32, 50, 67, 0.95);
-  border: 1px solid var(--border-gray);
-  border-radius: 12px;
-  padding: 35px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-.form-group { margin-bottom: 24px; }
-label {
-  display: block; font-size: 11px; color: var(--electric-cyan); margin-bottom: 10px;
-  font-weight: 700; font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.05em;
-}
-input[type="text"], input[type="email"] {
-  width: 100%; box-sizing: border-box; background-color: var(--bg-charcoal);
-  border: 1px solid var(--border-gray); border-radius: 6px; padding: 14px;
-  color: var(--text-white); font-size: 16px; transition: border-color 0.2s;
-}
-input:focus { border-color: var(--electric-cyan); outline: none; }
-.ingestion-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-.tab-btn {
-  background-color: rgba(18, 18, 20, 0.5); border: 1px solid var(--border-gray);
-  color: var(--text-muted); padding: 12px 20px; border-radius: 6px; cursor: pointer;
-  font-family: 'Syncopate', sans-serif; font-size: 11px; font-weight: 700; transition: all 0.2s;
-}
-.tab-btn.active { background-color: var(--card-dark); border-color: var(--electric-cyan); color: var(--electric-cyan); }
-.ingestion-content { display: none; }
-.ingestion-content.active { display: block; }
-.manual-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
-.drop-zone {
-  border: 2px dashed var(--border-gray); border-radius: 8px; padding: 50px 20px;
-  text-align: center; color: var(--text-white); cursor: pointer; font-weight: 600;
-  background-color: rgba(18, 18, 20, 0.5); transition: all 0.2s;
-}
-.drop-zone:hover, .drop-zone.dragover { border-color: var(--electric-cyan); color: var(--electric-cyan); }
-.picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 20px 0; }
-.image-slot {
-  background-color: var(--bg-charcoal); border: 2px dashed var(--border-gray);
-  border-radius: 8px; aspect-ratio: 2 / 3; position: relative; display: flex;
-  flex-direction: column; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;
-}
-.image-slot:hover, .image-slot.dragover { border-color: var(--electric-cyan); background-color: rgba(0, 240, 255, 0.03); }
-.slot-preview { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0; z-index: 2; }
-.slot-label { font-family: 'Syncopate', sans-serif; font-size: 9px; font-weight: 700; color: var(--text-muted); text-align: center; z-index: 1; padding: 5px; pointer-events: none; }
-.slot-number { font-size: 20px; font-weight: 800; color: rgba(230, 242, 255, 0.1); margin-bottom: 2px; }
-.btn-checkout {
-  width: 100%; background-color: var(--electric-cyan); color: var(--bg-charcoal); border: none;
-  border-radius: 6px; padding: 18px; font-size: 13px; font-weight: 700; cursor: pointer;
-  font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.08em; box-shadow: 0 4px 15px rgba(0, 240, 255, 0.2);
-}
-</style>
-</head>
-<body>
-<div class="desktop-container">
-  <div class="control-panel">
-    <div>
-      <div class="form-group">
-        <label for="corporate-email">Corporate Expense Email Address</label>
-        <input type="email" id="corporate-email" placeholder="accounting@yourcompany.com">
-      </div>
-      <div class="form-group">
-        <label for="po-number">Purchase Order (PO) Number</label>
-        <input type="text" id="po-number" placeholder="PO-2026-XYZ">
-      </div>
-      <div class="form-group">
-        <label>Logistical Recipient Definition Mode</label>
-        <div class="ingestion-tabs">
-          <button class="tab-btn active" onclick="switchIngestionMode('manual')">Single Manual Entry</button>
-          <button class="tab-btn" onclick="switchIngestionMode('bulk')">Bulk CSV Spreadsheet</button>
-        </div>
-        <div id="mode-manual" class="ingestion-content active">
-          <div class="form-group"><input type="text" id="manual-name" placeholder="Recipient Full Name" oninput="syncManualRecipient()"></div>
-          <div class="form-group"><input type="text" id="manual-street" placeholder="Street Address" oninput="syncManualRecipient()"></div>
-          <div class="manual-grid">
-            <input type="text" id="manual-city" placeholder="City" oninput="syncManualRecipient()">
-            <input type="text" id="manual-state" placeholder="State" oninput="syncManualRecipient()">
-          </div>
-          <div class="form-group" style="margin-top: 15px;"><input type="text" id="manual-zip" placeholder="Zip / Postal Code" oninput="syncManualRecipient()"></div>
-        </div>
-        <div id="mode-bulk" class="ingestion-content">
-          <div class="drop-zone" id="csv-drop-zone">Drag & Drop Attendee CSV File Here or Click to Browse</div>
-          <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
-        </div>
-      </div>
-    </div>
-    <!-- INVISIBLE HONEYPOT TRAP LAYER -->
-    <div style="display: none; tab-index: -1;" aria-hidden="true">
-      <label for="website_secondary">Secondary Security Check Item Fields</label>
-      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off">
-    </div>
-  </div>
 
-    <div class="review-panel">
-    <div>
-      <div class="form-group">
-        <label>Required Production Assets (Exactly 5 High-Intent Photos)</label>
-        <div class="picker-grid" id="universal-picker-grid">
-          <div class="image-slot" onclick="triggerSlotBrowser(0)" id="slot-container-0"><div class="slot-number">1</div><div class="slot-label">Select Asset</div><img class="slot-preview" id="preview-0"></div>
-          <div class="image-slot" onclick="triggerSlotBrowser(1)" id="slot-container-1"><div class="slot-number">2</div><div class="slot-label">Select Asset</div><img class="slot-preview" id="preview-1"></div>
-          <div class="image-slot" onclick="triggerSlotBrowser(2)" id="slot-container-2"><div class="slot-number">3</div><div class="slot-label">Select Asset</div><img class="slot-preview" id="preview-2"></div>
-          <div class="image-slot" onclick="triggerSlotBrowser(3)" id="slot-container-3"><div class="slot-number">4</div><div class="slot-label">Select Asset</div><img class="slot-preview" id="preview-3"></div>
-          <div class="image-slot" onclick="triggerSlotBrowser(4)" id="slot-container-4"><div class="slot-number">5</div><div class="slot-label">Select Asset</div><img class="slot-preview" id="preview-4"></div>
-        </div>
-        <input type="file" id="universal-image-input" accept="image/*" style="display: none;">
-      </div>
-    </div>
-    <div class="form-group" style="border-top: 1px solid var(--border-gray); padding-top: 20px; margin-bottom: 0;">
-      <label>Financial Ledger Summary</label>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-        <span>Batch Volume Allocation:</span>
-        <span id="batch-qty" style="color: var(--electric-cyan); font-weight: 600;">0 Address(es) Configured</span>
-      </div>
-      <div style="display: flex; justify-content: space-between; font-size: 24px; font-weight: 800; margin-bottom: 30px; letter-spacing: -0.02em;">
-        <span>Total Due (Upfront USD):</span>
-        <span id="total-amount">$0.00</span>
-      </div>
-      <button class="btn-checkout" onclick="triggerStripeCheckout()">Launch Automated Order Routing</button>
-    </div>
-  </div>
-</div>
+<script> 
+let recipientCount = 0; 
+let finalizedRecipientsList = []; 
+let imageAssetsArray = [null, null, null, null, null]; 
+let activeSlotIndex = null; 
 
-<script>
-let recipientCount = 0;
-let finalizedRecipientsList = [];
-let imageAssetsArray = [null, null, null, null, null];
-let activeSlotIndex = null;
+const dropZone = document.getElementById('csv-drop-zone'); 
+const fileInput = document.getElementById('csv-file-input'); 
+const nativeFileInput = document.getElementById('universal-image-input'); 
 
-const dropZone = document.getElementById('csv-drop-zone');
-const fileInput = document.getElementById('csv-file-input');
-const nativeFileInput = document.getElementById('universal-image-input');
+function switchIngestionMode(mode) { 
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); 
+  document.querySelectorAll('.ingestion-content').forEach(content => content.classList.remove('active')); 
+  
+  if(mode === 'manual') { 
+    document.querySelector("button[onclick*='manual']").classList.add('active'); 
+    document.getElementById('mode-manual').classList.add('active'); 
+    syncManualRecipient(); 
+  } else { 
+    document.querySelector("button[onclick*='bulk']").classList.add('active'); 
+    document.getElementById('mode-bulk').classList.add('active'); 
+    recipientCount = 0; 
+    finalizedRecipientsList = []; 
+    updateReviewLedgerMetrics(); 
+  } 
+} 
 
-function switchIngestionMode(mode) {
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.ingestion-content').forEach(content => content.classList.remove('active'));
-    if(mode === 'manual') {
-        document.querySelector("button[onclick*='manual']").classList.add('active');
-        document.getElementById('mode-manual').classList.add('active');
-        syncManualRecipient();
+function syncManualRecipient() { 
+  const name = document.getElementById('manual-name').value.trim(); 
+  const street = document.getElementById('manual-street').value.trim(); 
+  const city = document.getElementById('manual-city').value.trim(); 
+  const state = document.getElementById('manual-state').value.trim(); 
+  const zip = document.getElementById('manual-zip').value.trim(); 
+
+  if (name || street || city || state || zip) { 
+    // Single manual inputs are strictly restricted to the United States (US)
+    finalizedRecipientsList = [{ 
+      name: name || "Recipient", 
+      street, 
+      city, 
+      state, 
+      zip,
+      country: "US" 
+    }]; 
+    recipientCount = 1; 
+  } else { 
+    finalizedRecipientsList = []; 
+    recipientCount = 0; 
+  } 
+  updateReviewLedgerMetrics(); 
+} 
+
+if(dropZone) { 
+  dropZone.addEventListener('click', () => fileInput.click()); 
+  fileInput.addEventListener('change', (e) => { 
+    if (e.target.files.length > 0) processCSVFileString(e.target.files[0]); 
+  }); 
+  ['dragenter', 'dragover'].forEach(name => dropZone.addEventListener(name, () => dropZone.classList.add('dragover'), false)); 
+  ['dragleave', 'drop'].forEach(name => dropZone.addEventListener(name, () => dropZone.classList.remove('dragover'), false)); 
+  dropZone.addEventListener('drop', (e) => { 
+    e.preventDefault(); 
+    const files = e.dataTransfer.files; 
+    if (files.length > 0) processCSVFileString(files[0]); 
+  }); 
+} 
+
+function processCSVFileString(file) { 
+  if (!file.name.endsWith('.csv')) { 
+    alert("Please load a valid .csv file."); 
+    return; 
+  } 
+  dropZone.innerText = `Reading File: ${file.name}...`; 
+  const reader = new FileReader(); 
+  reader.onload = async function(event) { 
+    const textPayload = event.target.result; 
+    const honeypotVal = document.getElementById('website_secondary').value; 
+    try { 
+      const response = await fetch('/api/batch/parse-csv', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ csv_data_string: textPayload, website_secondary: honeypotVal }) 
+      }); 
+      const parsedResult = await response.json(); 
+      recipientCount = parsedResult.quantity || 0; 
+      finalizedRecipientsList = parsedResult.verified_recipients || []; 
+      updateReviewLedgerMetrics(); 
+      dropZone.innerText = `✓ Processed: ${file.name}`; 
+    } catch (error) { 
+      dropZone.innerText = "Error loading spreadsheet."; 
+    } 
+  }; 
+  reader.readAsText(file); 
+} 
+
+function updateReviewLedgerMetrics() { 
+  document.getElementById('batch-qty').innerText = `${recipientCount} Address(es) Configured`; 
+  
+  // GEOPOLITICAL TIERCED PRICING PREVIEW ENGINE
+  let calculatedUnitPrice = 100.00; // Default: Rest of World Tier ($100)
+  
+  if (finalizedRecipientsList.length > 0) {
+    const countries = finalizedRecipientsList.map(r => (r.country || 'US').toUpperCase().trim());
+    const adversarialTriggers = ['RU', 'IR', 'KP', 'RUSSIA', 'IRAN', 'NORTH KOREA', 'GAZA'];
+    const hasAdversarial = countries.some(c => adversarialTriggers.includes(c));
+
+    if (hasAdversarial) {
+      calculatedUnitPrice = 1000.00; // Adversarial Tier ($1,000)
     } else {
-        document.querySelector("button[onclick*='bulk']").classList.add('active');
-        document.getElementById('mode-bulk').classList.add('active');
-        recipientCount = 0; finalizedRecipientsList = []; updateReviewLedgerMetrics();
+      const isDomesticOnly = countries.every(c => c === 'US' || c === 'GB' || c === 'UK');
+      if (isDomesticOnly) {
+        calculatedUnitPrice = 25.00; // Core Secure Hub Tier ($25)
+      }
     }
-}
+  } else {
+    calculatedUnitPrice = 0.00;
+  }
 
-function syncManualRecipient() {
-    const name = document.getElementById('manual-name').value.trim();
-    const street = document.getElementById('manual-street').value.trim();
-    const city = document.getElementById('manual-city').value.trim();
-    const state = document.getElementById('manual-state').value.trim();
-    const zip = document.getElementById('manual-zip').value.trim();
-    if (name || street || city || state || zip) {
-        finalizedRecipientsList = [{ name: name || "Recipient", street, city, state, zip }];
-        recipientCount = 1;
-    } else { finalizedRecipientsList = []; recipientCount = 0; }
-    updateReviewLedgerMetrics();
-}
+  document.getElementById('total-amount').innerText = `$${(recipientCount * calculatedUnitPrice).toFixed(2)}`; 
+} 
 
-if(dropZone) {
-    dropZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) processCSVFileString(e.target.files[0]); });
-    ['dragenter', 'dragover'].forEach(name => dropZone.addEventListener(name, () => dropZone.classList.add('dragover'), false));
-    ['dragleave', 'drop'].forEach(name => dropZone.addEventListener(name, () => dropZone.classList.remove('dragover'), false));
-    dropZone.addEventListener('drop', (e) => { e.preventDefault(); const files = e.dataTransfer.files; if (files.length > 0) processCSVFileString(files[0]); });
-}
+function triggerSlotBrowser(index) { 
+  activeSlotIndex = index; 
+  nativeFileInput.click(); 
+} 
 
-function processCSVFileString(file) {
-    if (!file.name.endsWith('.csv')) { alert("Please load a valid .csv file."); return; }
-    dropZone.innerText = `Reading File: ${file.name}...`;
-    const reader = new FileReader();
-    reader.onload = async function(event) {
-        const textPayload = event.target.result;
-        const honeypotVal = document.getElementById('website_secondary').value;
-        try {
-            const response = await fetch('/api/batch/parse-csv', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ csv_data_string: textPayload, website_secondary: honeypotVal })
-            });
-            const parsedResult = await response.json();
-            recipientCount = parsedResult.quantity || 0;
-            finalizedRecipientsList = parsedResult.verified_recipients || [];
-            updateReviewLedgerMetrics();
-            dropZone.innerText = `✓ Processed: ${file.name}`;
-        } catch (error) { dropZone.innerText = "Error loading spreadsheet."; }
-    };
-    reader.readAsText(file);
-}
+nativeFileInput.addEventListener('change', (e) => { 
+  if (e.target.files.length > 0 && activeSlotIndex !== null) processSelectedImage(e.target.files[0], activeSlotIndex); 
+}); 
 
-function updateReviewLedgerMetrics() {
-    document.getElementById('batch-qty').innerText = `${recipientCount} Address(es) Configured`;
-    document.getElementById('total-amount').innerText = `$${(recipientCount * 25).toFixed(2)}`;
-}
+[0, 1, 2, 3, 4].forEach(index => { const slot = document.getElementById(`slot-container-${index}`); if(slot) { slot.addEventListener('dragover', (e) => { e.preventDefault(); slot.classList.add('dragover'); }); slot.addEventListener('dragleave', () => slot.classList.remove('dragover')); slot.addEventListener('drop', (e) => { e.preventDefault(); slot.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) processSelectedImage(e.dataTransfer.files[0], index); }); } }); 
 
-function triggerSlotBrowser(index) { activeSlotIndex = index; nativeFileInput.click(); }
-nativeFileInput.addEventListener('change', (e) => { if (e.target.files.length > 0 && activeSlotIndex !== null) processSelectedImage(e.target.files[0], activeSlotIndex); });
+function processSelectedImage(file, index) { 
+  if (!file.type.startsWith('image/')) { 
+    alert("Please select an image file."); 
+    return; 
+  } 
+  const reader = new FileReader(); 
+  reader.onload = function(event) { 
+    imageAssetsArray[index] = event.target.result; 
+    const previewImg = document.getElementById(`preview-${index}`); 
+    previewImg.src = event.target.result; 
+    previewImg.style.display = 'block'; 
+  }; 
+  reader.readAsDataURL(file); 
+} 
 
-[0, 1, 2, 3, 4].forEach(index => {
-    const slot = document.getElementById(`slot-container-${index}`);
-    if(slot) {
-        slot.addEventListener('dragover', (e) => { e.preventDefault(); slot.classList.add('dragover'); });
-        slot.addEventListener('dragleave', () => slot.classList.remove('dragover'));
-        slot.addEventListener('drop', (e) => { e.preventDefault(); slot.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) processSelectedImage(e.dataTransfer.files[0], index); });
+async function triggerStripeCheckout() { 
+  const email = document.getElementById('corporate-email').value; 
+  const po = document.getElementById('po-number').value; 
+  const honeypotVal = document.getElementById('website_secondary').value; 
+
+  if (honeypotVal) { 
+    window.location.href = '/checkout.html'; 
+    return; 
+  } 
+  if (!email) { 
+    alert("Please supply a valid corporate email reference."); 
+    return; 
+  } 
+  if (recipientCount < 1) { 
+    alert("Please define recipient targets before initiating checkout."); 
+    return; 
+  } 
+  const loadedAssetsCount = imageAssetsArray.filter(x => x !== null).length; 
+  if (loadedAssetsCount !== 5) { 
+    alert(`Production array boundary failure: Exactly 5 image assets required. Currently loaded: ${loadedAssetsCount}`); 
+    return; 
+  } 
+
+  // Collect destination country parameters into an array loop to transmit to Stripe
+  const uniqueCountries = [...new Set(finalizedRecipientsList.map(r => r.country || 'US'))];
+
+  // Send payload to backend creation route
+  try {
+    const response = await fetch('/api/orders/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        organization_id: 'org_checkout_session', // Automatically matches session parameters
+        purchase_order_number: po,
+        quantity: recipientCount,
+        countries: uniqueCountries
+      })
+    });
+    const result = await response.json();
+    if (result.checkout_url) {
+      window.location.href = result.checkout_url;
+    } else {
+      alert("Failed to compile secure checkout pathway.");
     }
-});
-
-function processSelectedImage(file, index) {
-    if (!file.type.startsWith('image/')) { alert("Please select an image file."); return; }
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        imageAssetsArray[index] = event.target.result;
-        const previewImg = document.getElementById(`preview-${index}`);
-        previewImg.src = event.target.result; previewImg.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-}
-
-async function triggerStripeCheckout() {
-    const email = document.getElementById('corporate-email').value;
-    const po = document.getElementById('po-number').value;
-    const honeypotVal = document.getElementById('website_secondary').value;
-    
-    if (honeypotVal) { window.location.href = '/checkout.html'; return; }
-    if (!email) { alert("Please supply a valid corporate email reference."); return; }
-    if (recipientCount < 1) { alert("Please define recipient targets before initiating checkout."); return; }
-    
-    const loadedAssetsCount = imageAssetsArray.filter(x => x !== null).length;
-    if (loadedAssetsCount !== 5) { alert(`Production array boundary failure: Exactly 5 image assets required. Currently loaded: ${loadedAssetsCount}`); return; }
-
-    // Redirect to checkout page, carrying the setup data in the web link link
-    window.location.href = `/checkout.html?email=${encodeURIComponent(email)}&po=${encodeURIComponent(po)}&qty=${recipientCount}`;
-}
-</script>
-</body>
+  } catch (error) {
+    alert("Network infrastructure routing failure.");
+  }
+} 
+</script> 
+</body> 
 </html>

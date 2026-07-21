@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Secure Unified Settlement Gateway | Turtle Mail</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+<style>
+/* CORPORATE ALIGNED VALUE MATRIX */
+:root {
+  --bg-midnight: #0D1B2A;
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --error-crimson: #EF4444;
+}
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-charcoal);
+  background-image: url('Turtle_Mail_Background.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text-white);
+  margin: 0;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+.checkout-wrapper {
+  width: 100%;
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 40px;
+  margin-top: 20px;
+}
+.review-column, .payment-column {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 35px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.form-group { margin-bottom: 24px; }
+label {
+  display: block; font-size: 11px; color: var(--electric-cyan); margin-bottom: 12px;
+  font-weight: 700; font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.summary-card {
+  background-color: rgba(18, 18, 20, 0.5);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.summary-row.total {
+  border-top: 1px solid var(--border-gray);
+  padding-top: 15px;
+  margin-bottom: 0;
+  font-size: 20px;
+  font-weight: 800;
+}
+.legal-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: rgba(239, 68, 68, 0.04);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+.legal-box input[type="checkbox"] {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+.legal-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(230, 242, 255, 0.8);
+  font-weight: 500;
+}
+.legal-text a { color: var(--electric-cyan); text-decoration: none; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="checkout-wrapper">
+  <!-- Left Side: Order Verification Summary -->
+  <div class="review-column">
+    <div>
+      <div class="form-group">
+        <label>Campaign Order Audit Review</label>
+        <div class="summary-card">
+          <div class="summary-row">
+            <span>Corporate Account Reference:</span>
+            <span id="display-email" style="font-weight: 600; color: var(--text-white);">loading...</span>
+          </div>
+          <div class="summary-row">
+            <span>Purchase Order (PO) Identifier:</span>
+            <span id="display-po" style="font-weight: 600; color: var(--text-white);">None Given</span>
+          </div>
+          <div class="summary-row">
+            <span>Programmatic Address Count:</span>
+            <span id="display-qty" style="font-weight: 600; color: var(--electric-cyan);">0 Targets</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total Operational Due:</span>
+            <span id="display-total" style="color: var(--electric-cyan);">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+            <div class="form-group" style="background-color: rgba(18, 18, 20, 0.3); padding: 18px; border-radius: 8px; border: 1px solid var(--border-gray); font-size: 13px; line-height: 1.6; color: var(--text-muted);">
+        <div style="font-family: 'Syncopate', sans-serif; font-size: 10px; color: var(--text-white); font-weight: 700; margin-bottom: 6px;">FINANCIAL ACCOUNTABILITY PROTECTION</div>
+        To enforce anti-harassment safety boundaries, your banking institution's verified first name and last initial will be combined with the final 4 digits of your secure Stripe PaymentIntent ID onto the delivery slip format: <span style="color: var(--electric-cyan); font-weight: 600;">Sender: Firstname L. (#xxxx)</span>. Raw identity vectors are instantly purged from frontend tracking space upon completion.
+      </div>
+    </div>
+    
+    <!-- STRICT STRUCTURAL LEGAL GUARDRAIL -->
+    <div class="legal-box">
+      <input type="checkbox" id="legal-agreement-checkbox" onchange="toggleSettlementButton()">
+      <div class="legal-text">
+        I explicitly authorize this batch media deployment. I accept the <a href="/terms.html" target="_blank">Terms of Sale</a>, acknowledging that all print operations represent highly-customized premium Lustre final sales with a strict 48-hour hardware error damage claim boundary window.
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Stripe Transaction Frame Core -->
+  <div class="payment-column">
+    <div>
+      <div class="form-group">
+        <label>Encrypted Settlement Matrix</label>
+        <!-- STRIPE EMBED ANCHOR FRAME CONTAINER -->
+        <div style="background-color: var(--bg-charcoal); border: 1px solid var(--border-gray); border-radius: 8px; padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600; border-style: dashed; margin-bottom: 20px;">
+          🔒 SECURE TRANSACTION PANEL HUB<br><br>
+          <span style="font-size: 11px; font-weight: 400; color: rgba(230, 242, 255, 0.4);">
+            [Stripe Credit Elements / Corporate ACH Network Interface Container Placeholder]
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- IDENTICAL HIGH-DECEPTION HONEYPOT TRAP -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+      <label for="website_secondary">Secondary Security Check Item Fields</label>
+      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptCheckoutBotAttack()">
+    </div>
+    
+    <button class="btn-checkout" id="settle-payment-btn" onclick="executeFinancialSettlementPipeline()" style="opacity: 0.4; cursor: not-allowed;" disabled>
+      Execute Secure Bank Settlement
+    </button>
+  </div>
+</div>
+
+<script>
+let checkoutClickTimestamps = [];
+
+// Parse session configuration fields immediately out of transient cross-page memory structures
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("[Checkout Engine] Initializing settlement parameters...");
+    
+    // FRONTEND RATE LIMITER DEFENSE: Detects automated rapid click script bursts
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        checkoutClickTimestamps.push(now);
+        checkoutClickTimestamps = checkoutClickTimestamps.filter(t => now - t < 5000);
+        if (checkoutClickTimestamps.length > 15) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get("email") || "accounting-preview@company.com";
+    const po = urlParams.get("po") || "N/A";
+    const qty = parseInt(urlParams.get("qty")) || 0;
+    
+    document.getElementById("display-email").innerText = email;
+    document.getElementById("display-po").innerText = po;
+    document.getElementById("display-qty").innerText = `${qty} Recipient Target(s)`;
+    document.getElementById("display-total").innerText = `$${(qty * 25).toFixed(2)}`;
+});
+
+// HONEYPOT INTERCEPTION ENGINE: Instantly breaks bot scripts filling the field
+function interceptCheckoutBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on checkout node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+        return true;
+    }
+    return false;
+}
+
+// Enforce un-skippable agreement toggle behavior tracking
+function toggleSettlementButton() {
+    if (interceptCheckoutBotAttack()) return;
+    
+    const isChecked = document.getElementById("legal-agreement-checkbox").checked;
+    const btn = document.getElementById("settle-payment-btn");
+    
+    if (isChecked) {
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+        btn.disabled = false;
+    } else {
+        btn.style.opacity = "0.4";
+        btn.style.cursor = "not-allowed";
+        btn.disabled = true;
+    }
+}
+
+// Outbound trigger forwarding directly to post-purchase processing confirmation block
+function executeFinancialSettlementPipeline() {
+    if (interceptCheckoutBotAttack()) return;
+    
+    const isChecked = document.getElementById("legal-agreement-checkbox").checked;
+    if (!isChecked) return;
+    
+    console.log("[Checkout Engine] Settlement triggered. Redirecting to transaction processing node.");
+    window.location.href = "/confirmation.html?status=processing_deployment";
+}
+</script>
+</body>
+</html>
+
