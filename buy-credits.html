@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Buy a Credit Block | Turtle Mail</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-midnight: #0D1B2A;
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --error-crimson: #EF4444;
+  --success-green: #22C55E;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-charcoal);
+  background-image: url('Turtle_Mail_Background.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text-white);
+  margin: 0;
+  padding: 40px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.wrapper { width: 100%; max-width: 640px; }
+.card {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 36px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+h1.page-title {
+  font-family: 'Syncopate', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; }
+
+label {
+  display: block; font-size: 11px; color: var(--electric-cyan);
+  margin-bottom: 10px; font-weight: 700; font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.05em; margin-top: 22px;
+}
+label:first-child { margin-top: 0; }
+
+.qty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 480px) { .qty-grid { grid-template-columns: repeat(2, 1fr); } }
+.qty-btn {
+  background: rgba(18,18,20,0.5); border: 1.5px solid var(--border-gray);
+  border-radius: 8px; padding: 16px 10px; text-align: center; cursor: pointer;
+}
+.qty-btn .n { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; color: var(--text-white); }
+.qty-btn .p { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.qty-btn.selected { border-color: var(--electric-cyan); background: rgba(0,240,255,0.06); }
+.qty-btn.selected .n { color: var(--electric-cyan); }
+.qty-btn.perk .p { color: var(--success-green); }
+
+input[type="text"], input[type="number"] {
+  width: 100%; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray);
+  border-radius: 6px; padding: 13px 14px; color: var(--text-white);
+  font-size: 14px; font-family: 'Inter', sans-serif;
+}
+input:focus { border-color: var(--electric-cyan); outline: none; }
+
+.summary-card {
+  background-color: rgba(18, 18, 20, 0.5); border: 1px solid var(--border-gray);
+  border-radius: 8px; padding: 20px; margin-top: 24px;
+}
+.price-line { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+.price-total { border-top: 1px solid var(--border-gray); padding-top: 12px; margin-top: 8px; font-size: 22px; font-weight: 800; color: var(--electric-cyan); }
+.price-note { font-size: 11px; color: var(--text-muted); margin-top: 10px; line-height: 1.5; }
+.perk-note { font-size: 12px; color: var(--success-green); margin-top: 10px; }
+
+button {
+  font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 12px;
+  padding: 14px 24px; border-radius: 6px; border: none; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.05em; width: 100%; margin-top: 24px;
+  background-color: var(--electric-cyan); color: var(--bg-charcoal);
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.banner { padding: 12px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; }
+.banner.error { background: rgba(239,68,68,0.08); border: 1px solid var(--error-crimson); color: var(--error-crimson); }
+
+.confirm-wrap { text-align: center; }
+.confirm-status { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); margin-top: 12px; }
+.token-reveal {
+  background: rgba(0,240,255,0.06); border: 2px solid var(--electric-cyan);
+  border-radius: 8px; padding: 24px; margin-top: 24px; text-align: left;
+}
+.token-value {
+  font-family: 'JetBrains Mono', monospace; font-size: 16px; color: var(--electric-cyan);
+  word-break: break-all; background: rgba(0,0,0,0.3); padding: 12px 14px; border-radius: 6px;
+  margin: 10px 0;
+}
+.copy-btn {
+  background: transparent; border: 1px solid var(--electric-cyan); color: var(--electric-cyan);
+  width: auto; padding: 8px 16px; margin-top: 0; font-size: 11px;
+}
+.warning-note {
+  font-size: 12px; color: var(--error-crimson); margin-top: 14px; line-height: 1.5;
+}
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <div class="card" id="purchase-flow">
+    <h1 class="page-title">Buy a Credit Block</h1>
+    <p class="page-sub">Purchase credits up front, spend them over time through the Batch Order Workspace.</p>
+
+    <div id="banner"></div>
+
+    <label>Choose a block size</label>
+    <div class="qty-grid" id="qty-grid"></div>
+
+    <label for="custom-qty">Or enter a custom amount</label>
+    <input type="number" id="custom-qty" min="1" placeholder="e.g. 250" oninput="handleCustomQty()">
+
+    <label for="org-name">Organization (optional — for rep-assisted purchases)</label>
+    <input type="text" id="org-name" placeholder="Leave blank for a self-serve purchase">
+
+    <div class="summary-card">
+      <div class="price-line"><span>Credits</span><span id="summary-qty">—</span></div>
+      <div class="price-line"><span>Price per credit</span><span>$25.00</span></div>
+      <div class="price-line price-total"><span>Total</span><span id="summary-total">$0.00</span></div>
+      <p class="perk-note hidden" id="perk-note">✓ 100+ credits unlocks ACH, SEPA, and BACS bank payment at checkout.</p>
+      <p class="price-note">Under 100 credits: card payment only. This block does not expire and can be spent gradually through the Batch Order Workspace.</p>
+    </div>
+
+    <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+      <label for="website_secondary">Secondary Security Check Item Fields</label>
+      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+    </div>
+
+    <button id="pay-btn" onclick="startCheckout()" disabled>Continue to payment →</button>
+  </div>
+
+  <div class="card confirm-wrap hidden" id="confirm-flow">
+    <h1 class="page-title" id="confirm-title">Confirming your payment…</h1>
+    <p class="page-sub" id="confirm-body">This usually takes a few seconds. Don't close this tab.</p>
+    <p class="confirm-status" id="confirm-status"></p>
+
+    <div class="token-reveal hidden" id="token-reveal">
+      <label style="margin:0;">Your access token</label>
+      <div class="token-value" id="token-value"></div>
+      <button class="copy-btn" onclick="copyToken()">Copy token</button>
+      <p class="warning-note">
+        <strong>Save this now.</strong> This token is the only way to access your credit block —
+        there is no account, no login, and no password recovery. If it's lost, contact
+        <a href="mailto:customer_service@turtlemail.app" style="color:var(--electric-cyan);">customer_service@turtlemail.app</a>.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===================================================================
+   CONFIG
+   =================================================================== */
+const API_BASE_URL = "https://api.turtlemail.app";
+
+/* ===================================================================
+   Confirmed against the real app.py / credits_commissions.py:
+
+   POST /api/checkout/credit-block
+     - CAMELCASE body: { totalCredits, unitPriceCents (optional, default
+       2500), successUrl, cancelUrl, organizationId (optional),
+       soldByRepId (optional), buyerTimezone (optional) }
+     - successUrl / cancelUrl REQUIRED, same as the solo checkout route.
+     - Response: { checkout_url, block_id }
+
+   GET /api/checkout-status?session_id=...
+     - Response once paid includes accessToken — revealed here for the
+       first time, per create_credit_block_checkout()'s original design
+       intent (this wiring needed to be added; it didn't exist before).
+
+   Note: organizationId here expects an existing organization record.
+   There's no organization-creation UI yet, so this field is a plain
+   text passthrough for now — real rep-assisted org linkage is a
+   future build, not implemented today.
+   =================================================================== */
+
+const PRESET_SIZES = [
+  { qty: 10, label: 'Starter' },
+  { qty: 50, label: 'Small Batch' },
+  { qty: 100, label: 'Convention', perk: true },
+  { qty: 250, label: 'Multi-Event', perk: true },
+  { qty: 500, label: 'Enterprise', perk: true },
+  { qty: 1000, label: 'Full Campaign', perk: true }
+];
+
+let selectedQty = null;
+
+const qtyGrid = document.getElementById('qty-grid');
+PRESET_SIZES.forEach(preset => {
+  const btn = document.createElement('div');
+  btn.className = 'qty-btn' + (preset.perk ? ' perk' : '');
+  btn.innerHTML = `<div class="n">${preset.qty}</div><div class="p">${preset.label}</div>`;
+  btn.addEventListener('click', () => selectQty(preset.qty, btn));
+  qtyGrid.appendChild(btn);
+});
+
+function selectQty(qty, btnEl){
+  document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
+  if (btnEl) btnEl.classList.add('selected');
+  document.getElementById('custom-qty').value = '';
+  selectedQty = qty;
+  updateSummary();
+}
+
+function handleCustomQty(){
+  const val = parseInt(document.getElementById('custom-qty').value, 10);
+  document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
+  selectedQty = (val > 0) ? val : null;
+  updateSummary();
+}
+
+function updateSummary(){
+  const qtyEl = document.getElementById('summary-qty');
+  const totalEl = document.getElementById('summary-total');
+  const perkNote = document.getElementById('perk-note');
+  const payBtn = document.getElementById('pay-btn');
+
+  if (!selectedQty){
+    qtyEl.textContent = '—';
+    totalEl.textContent = '$0.00';
+    perkNote.classList.add('hidden');
+    payBtn.disabled = true;
+    return;
+  }
+
+  qtyEl.textContent = `${selectedQty} credits`;
+  totalEl.textContent = `$${(selectedQty * 25).toFixed(2)}`;
+  perkNote.classList.toggle('hidden', selectedQty < 100);
+  payBtn.disabled = false;
+}
+
+function showBanner(msg, type){
+  document.getElementById('banner').innerHTML = `<div class="banner ${type}">${msg}</div>`;
+}
+
+async function startCheckout(){
+  const honeypotVal = document.getElementById('website_secondary').value;
+  if (honeypotVal){ interceptBillboardBotAttack(); return; }
+
+  if (!selectedQty || selectedQty < 1){
+    showBanner('Choose a block size or enter a custom amount first.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true;
+  btn.textContent = 'Contacting checkout…';
+
+  const successUrl = `${window.location.origin}${window.location.pathname}?session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${window.location.origin}${window.location.pathname}`;
+  let buyerTimezone;
+  try { buyerTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e) { buyerTimezone = undefined; }
+
+  const orgName = document.getElementById('org-name').value.trim();
+
+  const payload = {
+    totalCredits: selectedQty,
+    successUrl,
+    cancelUrl,
+    buyerTimezone,
+    organizationId: orgName || undefined
+  };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/checkout/credit-block`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok){
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || `Checkout session creation failed with status ${res.status}`);
+    }
+
+    const data = await res.json();
+    window.location.href = data.checkout_url;
+
+  } catch (err){
+    showBanner(err.message || 'Something went wrong starting checkout. Please try again.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Continue to payment →';
+  }
+}
+
+/* ---------- Post-payment confirmation + token reveal ---------- */
+(function handleReturnFromStripe(){
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get('session_id');
+  if (!sessionId) return;
+
+  document.getElementById('purchase-flow').classList.add('hidden');
+  document.getElementById('confirm-flow').classList.remove('hidden');
+  pollCheckoutStatus(sessionId);
+})();
+
+async function pollCheckoutStatus(sessionId, attempt = 0){
+  const statusEl = document.getElementById('confirm-status');
+  const titleEl = document.getElementById('confirm-title');
+  const bodyEl = document.getElementById('confirm-body');
+  const MAX_ATTEMPTS = 20;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/checkout-status?session_id=${encodeURIComponent(sessionId)}`);
+    const data = await res.json();
+
+    if (data.status === 'paid'){
+      titleEl.textContent = "You're all set.";
+      bodyEl.textContent = `${data.totalCredits} credits are ready to use.`;
+      statusEl.textContent = '';
+
+      if (data.accessToken){
+        document.getElementById('token-value').textContent = data.accessToken;
+        document.getElementById('token-reveal').classList.remove('hidden');
+      }
+      return;
+    }
+    if (data.status === 'failed'){
+      titleEl.textContent = "Payment didn't go through.";
+      bodyEl.textContent = 'No charge was completed. You can go back and try again.';
+      statusEl.textContent = '';
+      return;
+    }
+
+    statusEl.textContent = `Checking… (${attempt + 1})`;
+    if (attempt < MAX_ATTEMPTS){
+      setTimeout(() => pollCheckoutStatus(sessionId, attempt + 1), 3000);
+    } else {
+      titleEl.textContent = 'Still confirming.';
+      bodyEl.textContent = "Some payment methods (bank transfers) take a few business days to settle. You'll get an email once confirmed.";
+      statusEl.textContent = '';
+    }
+  } catch (err){
+    statusEl.textContent = 'Having trouble checking status — retrying…';
+    if (attempt < MAX_ATTEMPTS) setTimeout(() => pollCheckoutStatus(sessionId, attempt + 1), 4000);
+  }
+}
+
+function copyToken(){
+  const token = document.getElementById('token-value').textContent;
+  navigator.clipboard.writeText(token).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = original; }, 2000);
+  });
+}
+
+/* ===================================================================
+   IDENTICAL HONEYPOT + RATE LIMITER (verbatim, per site-wide rule)
+   =================================================================== */
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
+        if (landingClickTimestamps.length > 20) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+function interceptBillboardBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
+</script>
+</body>
+</html>
