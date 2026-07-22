@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://googleapis.com">
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <style>
 :root {
   --bg-midnight: #0D1B2A;
@@ -127,6 +128,20 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .confirm-wrap { text-align: center; padding: 30px 10px; }
 .confirm-status { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); margin-top: 12px; }
 .hidden { display: none !important; }
+
+.crop-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.crop-tool-btn { flex: 1; min-width: 120px; padding: 10px 8px; font-size: 11px; }
+.cropper-wrap {
+  width: 100%; max-height: 420px; overflow: hidden;
+  background: var(--bg-charcoal); border: 1px solid var(--border-gray); border-radius: 8px;
+}
+.cropper-wrap img { display: block; max-width: 100%; }
+.crop-preview-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.crop-preview-box {
+  width: 90px; height: 60px; overflow: hidden; border-radius: 4px;
+  border: 1px solid var(--border-gray); background: var(--bg-charcoal);
+}
+.crop-preview-box img { display: block; }
 </style>
 </head>
 <body>
@@ -139,14 +154,25 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
     <div class="stepper">
       <div class="step-tab active" data-step="1">1 · Photos</div>
-      <div class="step-tab" data-step="2">2 · Recipient &amp; message</div>
-      <div class="step-tab" data-step="3">3 · Review &amp; pay</div>
+      <div class="step-tab" data-step="2">2 · Crop &amp; rotate</div>
+      <div class="step-tab" data-step="3">3 · Recipient &amp; message</div>
+      <div class="step-tab" data-step="4">4 · Review &amp; pay</div>
     </div>
 
     <div id="global-banner"></div>
 
     <section class="panel active" id="panel-1">
       <label>Choose 5 photos</label>
+      <p class="price-note" style="margin-top:0;">
+        <strong>Please use landscape (horizontal) photos.</strong> If a photo is portrait, rotate it
+        in your phone's own photo app first, then upload the rotated version — this keeps the
+        printed crop framed correctly.
+      </p>
+      <button type="button" class="btn-ghost" id="choose-all-btn" style="width:100%; margin-bottom:10px;">
+        Choose all 5 from your device →
+      </button>
+      <input type="file" id="multi-photo-input" accept="image/*" multiple style="display:none;">
+      <p class="price-note" style="margin-top:-4px; margin-bottom:10px;">Or click an individual slot below to replace just one photo.</p>
       <div class="photo-grid" id="photo-grid"></div>
       <button type="button" class="btn-primary" id="check-photos-btn" onclick="checkAllPhotos()" disabled style="margin-top:12px; width:100%;">
         Check &amp; preview all 5 photos
@@ -158,6 +184,40 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     </section>
 
     <section class="panel" id="panel-2">
+      <label>Adjust framing (photo <span id="crop-photo-index">1</span> of 5)</label>
+      <p class="price-note" style="margin-top:0;">
+        Drag to reposition, use the handles to resize, or rotate if the photo is sideways. This is
+        exactly how each photo will be printed.
+      </p>
+
+      <div class="crop-toolbar">
+        <button type="button" class="btn-ghost crop-tool-btn" id="rotate-left-btn">↺ Rotate left</button>
+        <button type="button" class="btn-ghost crop-tool-btn" id="rotate-right-btn">↻ Rotate right</button>
+        <button type="button" class="btn-ghost crop-tool-btn" id="orientation-toggle-btn">⇄ Switch orientation</button>
+        <button type="button" class="btn-ghost crop-tool-btn" id="reset-crop-btn">Reset</button>
+      </div>
+
+      <div class="cropper-wrap">
+        <img id="cropper-image" src="" alt="">
+      </div>
+
+      <div class="crop-preview-row">
+        <span class="price-note" style="margin:0;">Print preview:</span>
+        <div class="crop-preview-box" id="crop-preview-box"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-ghost" id="crop-prev-btn">← Previous photo</button>
+        <button class="btn-ghost" id="crop-next-btn">Next photo →</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn-ghost" id="back-to-1">Back</button>
+        <button class="btn-primary" id="to-step-3">Confirm all 5 crops</button>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-3">
       <label for="r-name">Recipient name</label>
       <input type="text" id="r-name">
       <label for="r-addr1">Address line 1</label>
@@ -192,12 +252,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <input type="email" id="sender-email">
 
       <div class="actions">
-        <button class="btn-ghost" id="back-to-1">Back</button>
-        <button class="btn-primary" id="to-step-3" disabled>Review order</button>
+        <button class="btn-ghost" id="back-to-2">Back</button>
+        <button class="btn-primary" id="to-step-4" disabled>Review order</button>
       </div>
     </section>
 
-    <section class="panel" id="panel-3">
+    <section class="panel" id="panel-4">
       <label>Photos</label>
       <div class="review-thumbs" id="review-thumbs"></div>
 
@@ -215,7 +275,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       </div>
 
       <div class="actions">
-        <button class="btn-ghost" id="back-to-2">Back</button>
+        <button class="btn-ghost" id="back-to-3">Back</button>
         <button class="btn-primary" id="pay-btn">Continue to payment →</button>
       </div>
     </section>
@@ -237,6 +297,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script>
 /* ===================================================================
    CONFIG
@@ -269,11 +330,15 @@ const API_BASE_URL = "https://api.turtlemail.app";
 
 const state = {
   imageResults: null,
+  cropData: [null, null, null, null, null], // Cropper.js getData() output per photo: {x, y, width, height, rotate}
+  currentCropIndex: 0,
   recipient: {},
   message: "",
   fromName: "",
   senderEmail: ""
 };
+
+let cropperInstance = null;
 
 function goToStep(n){
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -286,6 +351,7 @@ function goToStep(n){
 }
 document.getElementById('back-to-1').addEventListener('click', () => goToStep(1));
 document.getElementById('back-to-2').addEventListener('click', () => goToStep(2));
+document.getElementById('back-to-3').addEventListener('click', () => goToStep(3));
 
 function showBanner(msg, type){
   document.getElementById('global-banner').innerHTML = `<div class="banner ${type}">${msg}</div>`;
@@ -310,6 +376,18 @@ for (let i = 0; i < 5; i++){
   slot.addEventListener('click', () => hiddenInput.click());
   hiddenInput.addEventListener('change', e => { if (e.target.files[0]) stagePhoto(i, e.target.files[0]); });
 }
+
+/* ---------- Multi-select: pick all 5 (or up to 5) in one dialog ---------- */
+const multiInput = document.getElementById('multi-photo-input');
+document.getElementById('choose-all-btn').addEventListener('click', () => multiInput.click());
+multiInput.addEventListener('change', e => {
+  const files = Array.from(e.target.files).slice(0, 5);
+  if (files.length > 5) {
+    showBanner('Only the first 5 selected photos were used.', 'error');
+  }
+  files.forEach((file, i) => stagePhoto(i, file));
+  multiInput.value = ''; // allow re-selecting the same files again if needed
+});
 
 function readAsDataURL(file){
   return new Promise((resolve, reject) => {
@@ -414,18 +492,107 @@ async function checkAllPhotos(){
   }
 }
 
-document.getElementById('to-step-2').addEventListener('click', () => { clearBanner(); goToStep(2); });
+document.getElementById('to-step-2').addEventListener('click', () => {
+  clearBanner();
+  goToStep(2);
+  initCropStep();
+});
+
+/* ===================================================================
+   Step 2: Crop & Rotate — Cropper.js drives the interactive UI, but we
+   never export its canvas as the final image (that would bypass the
+   color-managed sRGB conversion and could downscale below print
+   resolution). We only capture the numbers — rotation angle and crop
+   rectangle — via cropper.getData(). The actual pixel-level crop/rotate/
+   sRGB work still happens server-side, same as before; wiring those
+   captured numbers into that backend step is a follow-up build, not
+   done yet. For now this UI captures and holds the data in state.cropData.
+   =================================================================== */
+function initCropStep(){
+  state.currentCropIndex = 0;
+  loadCropperForIndex(0);
+}
+
+function loadCropperForIndex(index){
+  const url = state.imageResults[index].url;
+  document.getElementById('crop-photo-index').textContent = index + 1;
+  document.getElementById('crop-prev-btn').disabled = (index === 0);
+  document.getElementById('crop-next-btn').disabled = (index === 4);
+
+  const imgEl = document.getElementById('cropper-image');
+
+  if (cropperInstance){
+    cropperInstance.destroy();
+  }
+  imgEl.src = url;
+
+  imgEl.onload = () => {
+    cropperInstance = new Cropper(imgEl, {
+      viewMode: 1,
+      autoCropArea: 1,
+      aspectRatio: NaN, // set correctly once we know the image's natural size, below
+      preview: '#crop-preview-box',
+      ready(){
+        const imgData = cropperInstance.getImageData();
+        const isLandscape = imgData.naturalWidth >= imgData.naturalHeight;
+        cropperInstance.setAspectRatio(isLandscape ? 1.5 : (2/3));
+        // Restore a previously-set crop for this photo, if the user already
+        // adjusted it once and navigated away and back.
+        if (state.cropData[index]){
+          cropperInstance.setData(state.cropData[index]);
+        }
+      }
+    });
+  };
+}
+
+function saveCurrentCropData(){
+  if (cropperInstance){
+    state.cropData[state.currentCropIndex] = cropperInstance.getData();
+  }
+}
+
+document.getElementById('rotate-left-btn').addEventListener('click', () => {
+  if (cropperInstance) cropperInstance.rotate(-90);
+});
+document.getElementById('rotate-right-btn').addEventListener('click', () => {
+  if (cropperInstance) cropperInstance.rotate(90);
+});
+document.getElementById('orientation-toggle-btn').addEventListener('click', () => {
+  if (!cropperInstance) return;
+  const current = cropperInstance.getData().width / cropperInstance.getData().height;
+  cropperInstance.setAspectRatio(current > 1 ? (2/3) : 1.5);
+});
+document.getElementById('reset-crop-btn').addEventListener('click', () => {
+  if (cropperInstance) cropperInstance.reset();
+});
+
+document.getElementById('crop-prev-btn').addEventListener('click', () => {
+  saveCurrentCropData();
+  state.currentCropIndex = Math.max(0, state.currentCropIndex - 1);
+  loadCropperForIndex(state.currentCropIndex);
+});
+document.getElementById('crop-next-btn').addEventListener('click', () => {
+  saveCurrentCropData();
+  state.currentCropIndex = Math.min(4, state.currentCropIndex + 1);
+  loadCropperForIndex(state.currentCropIndex);
+});
+
+document.getElementById('to-step-3').addEventListener('click', () => {
+  saveCurrentCropData();
+  goToStep(3);
+});
 
 const step2Fields = ['r-name','r-addr1','r-city','r-zip','message'];
 function validateStep2(){
   const ok = step2Fields.every(id => document.getElementById(id).value.trim().length > 0);
-  document.getElementById('to-step-3').disabled = !ok;
+  document.getElementById('to-step-4').disabled = !ok;
 }
 ['r-name','r-addr1','r-city','r-state','r-zip','r-country','message','from-name','sender-email'].forEach(id => {
   document.getElementById(id).addEventListener('input', validateStep2);
 });
 
-document.getElementById('to-step-3').addEventListener('click', () => {
+document.getElementById('to-step-4').addEventListener('click', () => {
   state.recipient = {
     name: document.getElementById('r-name').value.trim(),
     street: document.getElementById('r-addr1').value.trim(),
@@ -450,7 +617,7 @@ document.getElementById('to-step-3').addEventListener('click', () => {
   document.getElementById('price-intl-line').style.display = isDomestic ? 'none' : 'flex';
   document.getElementById('price-total').textContent = isDomestic ? '$25.00' : '$100.00';
 
-  goToStep(3);
+  goToStep(4);
 });
 
 document.getElementById('pay-btn').addEventListener('click', async () => {

@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://googleapis.com">
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <style>
 :root {
   --bg-midnight: #0D1B2A;
@@ -168,6 +169,22 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
 .slot.state-rejected { border-color: var(--error-crimson); }
 .slot.state-rejected .badge { background: var(--error-crimson); color: #fff; }
 
+.hidden { display: none !important; }
+
+.crop-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.crop-tool-btn { flex: 1; min-width: 120px; padding: 10px 8px; font-size: 11px; }
+.cropper-wrap {
+  width: 100%; max-height: 420px; overflow: hidden;
+  background: var(--bg-charcoal); border: 1px solid var(--border-gray); border-radius: 8px;
+}
+.cropper-wrap img { display: block; max-width: 100%; }
+.crop-preview-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.crop-preview-box {
+  width: 90px; height: 60px; overflow: hidden; border-radius: 4px;
+  border: 1px solid var(--border-gray); background: var(--bg-charcoal);
+}
+.crop-preview-box img { display: block; }
+
 .summary-card {
   background-color: rgba(18, 18, 20, 0.5);
   border: 1px solid var(--border-gray);
@@ -295,10 +312,52 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
     </div>
 
     <div class="form-group">
-      <label>Photos (all 5 required, sent with every recipient in this batch)</label>
+      <label>Photos (1 to 5, sent with every recipient in this batch)</label>
+      <p class="price-note" style="margin-top:0;">
+        <strong>Please use landscape (horizontal) photos.</strong> If a photo is portrait, rotate it
+        in your phone's own photo app first, then upload the rotated version — this keeps the
+        printed crop framed correctly.
+      </p>
+      <button type="button" class="tab-btn" id="choose-all-btn" style="width:100%; margin-bottom:10px;">
+        Choose up to 5 from your device →
+      </button>
+      <input type="file" id="multi-photo-input" accept="image/*" multiple style="display:none;">
+      <p class="price-note" style="margin-bottom:10px;">Or click an individual slot below to replace just one photo.</p>
       <div class="photo-grid" id="photo-grid"></div>
       <button type="button" class="btn-checkout" id="check-photos-btn" onclick="checkAllPhotos()" disabled style="margin-top:12px;">
-        Check &amp; preview all 5 photos
+        Check &amp; preview photos
+      </button>
+    </div>
+
+    <div class="form-group hidden" id="crop-section">
+      <label>Adjust framing (photo <span id="crop-photo-index">1</span> of <span id="crop-photo-total">5</span>)</label>
+      <p class="price-note" style="margin-top:0;">
+        Drag to reposition, use the handles to resize, or rotate if the photo is sideways.
+      </p>
+
+      <div class="crop-toolbar">
+        <button type="button" class="tab-btn crop-tool-btn" id="rotate-left-btn">↺ Rotate left</button>
+        <button type="button" class="tab-btn crop-tool-btn" id="rotate-right-btn">↻ Rotate right</button>
+        <button type="button" class="tab-btn crop-tool-btn" id="orientation-toggle-btn">⇄ Switch orientation</button>
+        <button type="button" class="tab-btn crop-tool-btn" id="reset-crop-btn">Reset</button>
+      </div>
+
+      <div class="cropper-wrap">
+        <img id="cropper-image" src="" alt="">
+      </div>
+
+      <div class="crop-preview-row">
+        <span class="price-note" style="margin:0;">Print preview:</span>
+        <div class="crop-preview-box" id="crop-preview-box"></div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button type="button" class="tab-btn" id="crop-prev-btn" style="flex:1;">← Previous</button>
+        <button type="button" class="tab-btn" id="crop-next-btn" style="flex:1;">Next →</button>
+      </div>
+
+      <button type="button" class="btn-checkout" id="confirm-crops-btn" style="margin-top:14px;">
+        Confirm crops
       </button>
     </div>
 
@@ -349,6 +408,7 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script>
 /* ===================================================================
    CONFIG
@@ -388,9 +448,14 @@ const API_BASE_URL = "https://api.turtlemail.app";
 const state = {
   recipients: [],       // [{name, street, city, state, zip, country}]
   slots: [null,null,null,null,null],
+  cropData: [null,null,null,null,null], // Cropper.js getData() output per photo
+  currentCropIndex: 0,
+  cropsFinalized: false,
   tokenValid: false,
   creditsRemaining: 0
 };
+
+let cropperInstance = null;
 
 /* ---------- Access token validation (hard gate) ---------- */
 async function attemptGateEntry(){
@@ -562,6 +627,18 @@ for (let i = 0; i < 5; i++){
   });
 }
 
+/* ---------- Multi-select: pick all 5 (or up to 5) in one dialog ---------- */
+const multiInput = document.getElementById('multi-photo-input');
+document.getElementById('choose-all-btn').addEventListener('click', () => multiInput.click());
+multiInput.addEventListener('change', e => {
+  const files = Array.from(e.target.files).slice(0, 5);
+  if (files.length > 5) {
+    showBanner('Only the first 5 selected photos were used.', 'error');
+  }
+  files.forEach((file, i) => stagePhoto(i, file));
+  multiInput.value = '';
+});
+
 function readAsDataURL(file){
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -596,24 +673,28 @@ async function stagePhoto(index, file){
 
 function refreshCheckPhotosButton(){
   const stagedCount = state.slots.filter(s => s && s.status === 'staged').length;
-  document.getElementById('check-photos-btn').disabled = stagedCount !== 5;
+  document.getElementById('check-photos-btn').disabled = stagedCount < 1;
 }
 
 async function checkAllPhotos(){
   const btn = document.getElementById('check-photos-btn');
   btn.disabled = true;
-  btn.textContent = 'Checking all 5 photos…';
+  btn.textContent = 'Checking your photos…';
 
+  const stagedIndices = [];
   for (let i = 0; i < 5; i++){
-    const slotEl = grid.children[i];
-    slotEl.className = 'slot state-checking';
-    const badge = slotEl.querySelector('.badge');
-    badge.style.display = 'block';
-    badge.textContent = 'Checking…';
+    if (state.slots[i] && state.slots[i].status === 'staged'){
+      stagedIndices.push(i);
+      const slotEl = grid.children[i];
+      slotEl.className = 'slot state-checking';
+      const badge = slotEl.querySelector('.badge');
+      badge.style.display = 'block';
+      badge.textContent = 'Checking…';
+    }
   }
 
   try {
-    const photos = state.slots.map(s => s.dataUrl);
+    const photos = stagedIndices.map(i => state.slots[i].dataUrl);
     const res = await fetch(`${API_BASE_URL}/api/process-images`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -622,12 +703,10 @@ async function checkAllPhotos(){
     const result = await res.json();
 
     if (!res.ok || !result.approved){
-      // image_processor.py returns {approved:false, flagged_indexes:[...]}
-      // for actual NSFW rejections (no 'error' string in that case), but
-      // {error: "..."} for service-outage/validation failures (503/400/500)
-      // which apply to the whole batch rather than one specific photo.
-      const flaggedSet = new Set(result.flagged_indexes || []);
-      for (let i = 0; i < 5; i++){
+      // flagged_indexes refer to positions within the submitted (staged-only)
+      // array — map back to the real slot index before touching the grid.
+      const flaggedSet = new Set((result.flagged_indexes || []).map(i => stagedIndices[i]));
+      stagedIndices.forEach(i => {
         const slotEl = grid.children[i];
         const badge = slotEl.querySelector('.badge');
         const placeholder = slotEl.querySelector('.placeholder');
@@ -645,50 +724,144 @@ async function checkAllPhotos(){
           slotEl.className = 'slot';
           badge.textContent = 'Staged';
         }
-      }
+      });
       showBanner(
         result.error || (flaggedSet.size
           ? `${flaggedSet.size} photo(s) flagged — swap it/them out and check again.`
           : "These photos couldn't be approved. Try again."),
         'error'
       );
-      btn.textContent = 'Check & preview all 5 photos';
+      btn.textContent = 'Check & preview photos';
       btn.disabled = false;
       return;
     }
 
-    // Approved — result.results is the 5-item array from
-    // image_processor.process_order_images(), same order submitted.
     state.imageResults = result.results;
-    for (let i = 0; i < 5; i++){
+    state.cropsFinalized = false;
+    stagedIndices.forEach((i, resultIdx) => {
       const slotEl = grid.children[i];
       const img = slotEl.querySelector('img');
       const badge = slotEl.querySelector('.badge');
       const placeholder = slotEl.querySelector('.placeholder');
-      const item = result.results[i];
+      const item = result.results[resultIdx];
       slotEl.className = 'slot state-approved';
       img.src = item.url;
       img.style.display = 'block';
       placeholder.style.display = 'none';
       badge.textContent = 'Approved';
-    }
-    btn.textContent = 'Photos approved ✓';
+    });
+    btn.textContent = `${stagedIndices.length} photo(s) approved ✓`;
     clearBanner();
+
+    document.getElementById('crop-section').classList.remove('hidden');
+    document.getElementById('crop-photo-total').textContent = state.imageResults.length;
+    state.currentCropIndex = 0;
+    loadCropperForIndex(0);
   } catch (err){
-    for (let i = 0; i < 5; i++){
-      grid.children[i].className = 'slot state-rejected';
-    }
+    stagedIndices.forEach(i => grid.children[i].className = 'slot state-rejected');
     showBanner("Couldn't reach the server to check these photos. Try again.", 'error');
-    btn.textContent = 'Check & preview all 5 photos';
+    btn.textContent = 'Check & preview photos';
     btn.disabled = false;
   }
   refreshDispatchButton();
 }
 
+/* ---------- Crop & Rotate (Cropper.js) ---------- */
+function loadCropperForIndex(index){
+  const url = state.imageResults[index].url;
+  const lastIndex = state.imageResults.length - 1;
+  document.getElementById('crop-photo-index').textContent = index + 1;
+  document.getElementById('crop-prev-btn').disabled = (index === 0);
+  document.getElementById('crop-next-btn').disabled = (index === lastIndex);
+
+  const imgEl = document.getElementById('cropper-image');
+  if (cropperInstance) cropperInstance.destroy();
+  imgEl.src = url;
+
+  imgEl.onload = () => {
+    cropperInstance = new Cropper(imgEl, {
+      viewMode: 1,
+      autoCropArea: 1,
+      aspectRatio: NaN,
+      preview: '#crop-preview-box',
+      ready(){
+        const imgData = cropperInstance.getImageData();
+        const isLandscape = imgData.naturalWidth >= imgData.naturalHeight;
+        cropperInstance.setAspectRatio(isLandscape ? 1.5 : (2/3));
+        if (state.cropData[index]){
+          cropperInstance.setData(state.cropData[index]);
+        }
+      }
+    });
+  };
+}
+
+function saveCurrentCropData(){
+  if (cropperInstance){
+    state.cropData[state.currentCropIndex] = cropperInstance.getData();
+  }
+}
+
+document.getElementById('rotate-left-btn').addEventListener('click', () => {
+  if (cropperInstance) cropperInstance.rotate(-90);
+});
+document.getElementById('rotate-right-btn').addEventListener('click', () => {
+  if (cropperInstance) cropperInstance.rotate(90);
+});
+document.getElementById('orientation-toggle-btn').addEventListener('click', () => {
+  if (!cropperInstance) return;
+  const current = cropperInstance.getData().width / cropperInstance.getData().height;
+  cropperInstance.setAspectRatio(current > 1 ? (2/3) : 1.5);
+});
+document.getElementById('reset-crop-btn').addEventListener('click', () => {
+  if (cropperInstance) cropperInstance.reset();
+});
+document.getElementById('crop-prev-btn').addEventListener('click', () => {
+  saveCurrentCropData();
+  state.currentCropIndex = Math.max(0, state.currentCropIndex - 1);
+  loadCropperForIndex(state.currentCropIndex);
+});
+document.getElementById('crop-next-btn').addEventListener('click', () => {
+  saveCurrentCropData();
+  state.currentCropIndex = Math.min(state.imageResults.length - 1, state.currentCropIndex + 1);
+  loadCropperForIndex(state.currentCropIndex);
+});
+
+document.getElementById('confirm-crops-btn').addEventListener('click', async () => {
+  saveCurrentCropData();
+  const btn = document.getElementById('confirm-crops-btn');
+  btn.disabled = true;
+  btn.textContent = 'Finalizing your crops…';
+  clearBanner();
+
+  const crops = state.imageResults.map((r, i) => ({ url: r.url, cropData: state.cropData[i] }));
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/finalize-crops`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ crops })
+    });
+    if (!res.ok){
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || `Finalizing crops failed with status ${res.status}`);
+    }
+    const data = await res.json();
+    state.imageResults = data.results;
+    state.cropsFinalized = true;
+    btn.textContent = 'Crops confirmed ✓';
+    refreshDispatchButton();
+  } catch (err){
+    showBanner(err.message || "Couldn't finalize your crops. Please try again.", 'error');
+    btn.disabled = false;
+    btn.textContent = 'Confirm crops';
+  }
+});
+
 /* ---------- Dispatch readiness ---------- */
 function refreshDispatchButton(){
   const btn = document.getElementById('dispatch-btn');
-  const photosApproved = Array.isArray(state.imageResults) && state.imageResults.length === 5;
+  const photosApproved = Array.isArray(state.imageResults) && state.imageResults.length >= 1 && state.cropsFinalized;
   const ready = state.tokenValid
     && state.recipients.length > 0
     && photosApproved
