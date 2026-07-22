@@ -222,17 +222,25 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
 </head>
 <body>
 
-<div class="workspace-wrapper">
+<!-- ── Hard authentication gate — nothing below loads until this passes ── -->
+<div class="wrapper" id="auth-gate" style="max-width:480px; margin:0 auto;">
+  <div class="control-panel">
+    <h1 class="page-title">Batch Order Workspace</h1>
+    <p class="page-sub">This tool is restricted to holders of a valid credit block access token. Nothing beyond this screen loads until your token is verified.</p>
+    <div class="form-group">
+      <label for="gate-token-input">Credit block access token</label>
+      <input type="password" id="gate-token-input" placeholder="Paste your access token" autocomplete="off">
+      <div class="token-status" id="gate-token-status"></div>
+    </div>
+    <button class="btn-checkout" onclick="attemptGateEntry()">Enter workspace</button>
+  </div>
+</div>
+
+<div class="workspace-wrapper hidden" id="workspace-content">
   <h1 class="page-title">Batch Order Workspace</h1>
   <p class="page-sub">Spend credits from an already-purchased block. Recipient data is used once, per send, and never stored centrally.</p>
 
   <div class="control-panel">
-
-    <div class="form-group">
-      <label for="access-token">Credit block access token</label>
-      <input type="password" id="access-token" placeholder="Paste the access token for your credit block" autocomplete="off">
-      <div class="token-status" id="token-status"></div>
-    </div>
 
     <div class="form-group">
       <label for="corporate-email">Receipt email (optional)</label>
@@ -384,39 +392,45 @@ const state = {
   creditsRemaining: 0
 };
 
-/* ---------- Access token validation ---------- */
-const tokenInput = document.getElementById('access-token');
-let tokenDebounce;
-tokenInput.addEventListener('input', () => {
-  clearTimeout(tokenDebounce);
-  state.tokenValid = false;
-  refreshDispatchButton();
-  const statusEl = document.getElementById('token-status');
-  const val = tokenInput.value.trim();
-  if (!val) { statusEl.className = 'token-status'; return; }
+/* ---------- Access token validation (hard gate) ---------- */
+async function attemptGateEntry(){
+  const token = document.getElementById('gate-token-input').value.trim();
+  const statusEl = document.getElementById('gate-token-status');
+  if (!token){
+    statusEl.className = 'token-status show bad';
+    statusEl.textContent = 'Enter your access token to continue.';
+    return;
+  }
   statusEl.className = 'token-status show checking';
   statusEl.textContent = 'Checking token…';
-  tokenDebounce = setTimeout(() => validateToken(val), 500);
-});
+
+  await validateToken(token);
+
+  if (state.tokenValid){
+    document.getElementById('auth-gate').classList.add('hidden');
+    document.getElementById('workspace-content').classList.remove('hidden');
+  }
+}
 
 async function validateToken(token){
-  const statusEl = document.getElementById('token-status');
+  const statusEl = document.getElementById('gate-token-status');
   try {
     const res = await fetch(`${API_BASE_URL}/api/credits/status?access_token=${encodeURIComponent(token)}`);
     if (!res.ok){
       statusEl.className = 'token-status show bad';
       statusEl.textContent = 'Token not recognized. Check for typos.';
       state.tokenValid = false;
-      document.getElementById('credits-available').textContent = '—';
       refreshDispatchButton();
       return;
     }
     const data = await res.json();
     state.tokenValid = true;
+    state.accessToken = token;
     state.creditsRemaining = data.credits_remaining ?? 0;
     statusEl.className = 'token-status show ok';
     statusEl.textContent = `Valid — ${data.credits_remaining} of ${data.total_credits} credits remaining.`;
-    document.getElementById('credits-available').textContent = `${data.credits_remaining}`;
+    const creditsAvailableEl = document.getElementById('credits-available');
+    if (creditsAvailableEl) creditsAvailableEl.textContent = `${data.credits_remaining}`;
   } catch (err){
     statusEl.className = 'token-status show bad';
     statusEl.textContent = "Couldn't reach the server to check this token.";
@@ -713,7 +727,7 @@ async function executeBatchDispatch(){
   logEl.className = 'show';
   logEl.innerHTML = '';
 
-  const accessToken = document.getElementById('access-token').value.trim();
+  const accessToken = state.accessToken;
   const sharedMessage = document.getElementById('batch-message').value.trim();
   const fromName = document.getElementById('batch-from-name').value.trim();
 

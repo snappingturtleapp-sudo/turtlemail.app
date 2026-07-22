@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Damage Claim | Turtle Mail</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-midnight: #0D1B2A;
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --error-crimson: #EF4444;
+  --success-green: #22C55E;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-charcoal);
+  background-image: url('Turtle_Mail_Background.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text-white);
+  margin: 0;
+  padding: 40px 20px;
+  min-height: 100vh;
+}
+.wrapper { width: 100%; max-width: 640px; margin: 0 auto; }
+.card {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 36px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+h1.page-title {
+  font-family: 'Syncopate', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; }
+
+label {
+  display: block; font-size: 11px; color: var(--electric-cyan);
+  margin-bottom: 10px; font-weight: 700; font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.05em; margin-top: 20px;
+}
+label:first-child { margin-top: 0; }
+input[type="text"], textarea {
+  width: 100%; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray);
+  border-radius: 6px; padding: 13px 14px; color: var(--text-white);
+  font-size: 14px; font-family: 'Inter', sans-serif;
+}
+input:focus, textarea:focus { border-color: var(--electric-cyan); outline: none; }
+textarea { resize: vertical; min-height: 90px; }
+
+.photo-drop {
+  border: 2px dashed var(--border-gray); border-radius: 8px; padding: 30px 16px;
+  text-align: center; cursor: pointer; background: rgba(18,18,20,0.5);
+  font-size: 13px; color: var(--text-muted);
+}
+.photo-drop.has-photo { border-style: solid; border-color: var(--success-green); color: var(--success-green); }
+.photo-drop img { max-width: 100%; max-height: 160px; border-radius: 6px; margin-top: 10px; display: block; margin-left: auto; margin-right: auto; }
+
+.disclaimer {
+  background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 8px; padding: 16px; margin-top: 24px; font-size: 12px; line-height: 1.6; color: var(--text-muted);
+}
+.disclaimer strong { color: var(--text-white); }
+
+button {
+  font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 12px;
+  padding: 14px 24px; border-radius: 6px; border: none; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.05em; width: 100%; margin-top: 24px;
+  background-color: var(--electric-cyan); color: var(--bg-charcoal);
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.banner { padding: 12px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; }
+.banner.error { background: rgba(239,68,68,0.08); border: 1px solid var(--error-crimson); color: var(--error-crimson); }
+.banner.success { background: rgba(34,197,94,0.08); border: 1px solid var(--success-green); color: var(--success-green); }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="card" id="claim-form-card">
+    <h1 class="page-title">Submit a Damage Claim</h1>
+    <p class="page-sub">Claims must be submitted within 48 hours of delivery. Photo evidence is required.</p>
+
+    <div id="banner"></div>
+
+    <label for="order-id">Order ID</label>
+    <input type="text" id="order-id" placeholder="TM-...">
+
+    <label for="claimant-name">Your name</label>
+    <input type="text" id="claimant-name">
+
+    <label for="description">Describe the damage</label>
+    <textarea id="description" placeholder="What's wrong with the print(s)?"></textarea>
+
+    <label for="how-occurred">How did the damage occur, as far as you know?</label>
+    <textarea id="how-occurred" placeholder="e.g. box was crushed in transit, print arrived creased, etc."></textarea>
+
+    <label>Photo of the damage (required)</label>
+    <div class="photo-drop" id="photo-drop">
+      <span id="photo-drop-label">Click to upload a photo</span>
+      <img id="photo-preview" style="display:none;">
+    </div>
+    <input type="file" id="photo-input" accept="image/*" style="display:none;">
+
+    <div class="disclaimer">
+      <strong>Please read before submitting:</strong> Because all items are custom-printed and cannot be resold or recovered, all sales are final. If an item arrives damaged, you may submit a claim within 48 hours of delivery for a free reprint. We do not issue cash or credit refunds for shipping damage. Reprint approval is at our sole discretion following manual review. By submitting this form, you acknowledge that a replacement print is the sole remedy offered for transit damage.
+    </div>
+
+    <button id="submit-btn" onclick="submitClaim()">Submit claim</button>
+
+    <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+      <label for="website_secondary">Secondary Security Check Item Fields</label>
+      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+    </div>
+  </div>
+
+  <div class="card hidden" id="claim-success-card">
+    <h1 class="page-title">Claim received</h1>
+    <p class="page-sub" id="success-message">We'll respond within 1 business day.</p>
+  </div>
+</div>
+
+<script>
+/* ===================================================================
+   CONFIG
+   =================================================================== */
+const API_BASE_URL = "https://api.turtlemail.app";
+
+/* ===================================================================
+   Confirmed against the real app.py / damage_claims.py:
+
+   POST /api/damage-claims
+     - CAMELCASE body: { orderId, claimantName, description,
+       howDamageOccurred, photoBase64 }
+     - photoBase64 is OPTIONAL in the backend signature, but this page
+       requires it client-side per the stated business rule ("requires
+       photo proof of damage").
+     - Success: { success: true, message: "..." }
+     - Errors (all return {error: "..."} with these specific statuses):
+       400 — missing field, claim window closed, already submitted
+       404 — order not found
+       (an "order not yet delivered" case also returns 400, per
+       OrderNotDeliveredError in damage_claims.py)
+   =================================================================== */
+
+let photoBase64 = null;
+
+const photoDrop = document.getElementById('photo-drop');
+const photoInput = document.getElementById('photo-input');
+photoDrop.addEventListener('click', () => photoInput.click());
+photoInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    photoBase64 = reader.result;
+    document.getElementById('photo-preview').src = photoBase64;
+    document.getElementById('photo-preview').style.display = 'block';
+    document.getElementById('photo-drop-label').textContent = file.name;
+    photoDrop.classList.add('has-photo');
+  };
+  reader.readAsDataURL(file);
+});
+
+function showBanner(msg, type){
+  document.getElementById('banner').innerHTML = `<div class="banner ${type}">${msg}</div>`;
+}
+function clearBanner(){ document.getElementById('banner').innerHTML = ''; }
+
+async function submitClaim(){
+  const honeypotVal = document.getElementById('website_secondary').value;
+  if (honeypotVal){ interceptBillboardBotAttack(); return; }
+
+  clearBanner();
+
+  const orderId = document.getElementById('order-id').value.trim();
+  const claimantName = document.getElementById('claimant-name').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const howOccurred = document.getElementById('how-occurred').value.trim();
+
+  if (!orderId || !claimantName || !description || !howOccurred){
+    showBanner('Please fill in every field.', 'error');
+    return;
+  }
+  if (!photoBase64){
+    showBanner('A photo of the damage is required to submit a claim.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/damage-claims`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderId,
+        claimantName,
+        description,
+        howDamageOccurred: howOccurred,
+        photoBase64
+      })
+    });
+
+    const result = await res.json();
+
+    if (!res.ok){
+      showBanner(result.error || 'Something went wrong submitting your claim.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Submit claim';
+      return;
+    }
+
+    document.getElementById('claim-form-card').classList.add('hidden');
+    document.getElementById('claim-success-card').classList.remove('hidden');
+    document.getElementById('success-message').textContent =
+      result.message || "We'll respond within 1 business day.";
+
+  } catch (err){
+    showBanner("Couldn't reach the server. Please try again.", 'error');
+    btn.disabled = false;
+    btn.textContent = 'Submit claim';
+  }
+}
+
+/* ===================================================================
+   IDENTICAL HONEYPOT + RATE LIMITER (verbatim, per site-wide rule)
+   =================================================================== */
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
+        if (landingClickTimestamps.length > 20) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+function interceptBillboardBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
+</script>
+</body>
+</html>

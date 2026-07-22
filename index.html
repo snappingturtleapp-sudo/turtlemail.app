@@ -108,10 +108,52 @@ body {
   transition: all 0.2s;
 }
 .btn-launch:hover { opacity: 0.95; transform: translateY(-1px); }
+
+.site-nav {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.site-nav a {
+  font-family: 'Syncopate', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-white);
+  text-decoration: none;
+  opacity: 0.85;
+}
+.site-nav a:hover { color: var(--electric-cyan); opacity: 1; }
+.site-footer-nav {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-gray);
+}
+.site-footer-nav a {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.site-footer-nav a:hover { color: var(--electric-cyan); }
 </style>
 </head>
 
   <body>
+<nav class="site-nav">
+  <a href="/index.html">Home</a>
+  <a href="/turtle-mail-send.html">Send a Package</a>
+  <a href="/claims.html">Submit a Damage Claim</a>
+</nav>
 <div class="billboard-container">
   <div class="header-logo-container">
     <img src="Turtle_Mail_Digital_Secure_Delivered_Logo.png" alt="Turtle Mail Digital Secure Delivered" class="header-logo-img">
@@ -147,8 +189,16 @@ body {
   </div>
 
   <button class="btn-launch" onclick="executeSafeLandingNavigation()">
-    Launch Production Workspace
+    Send a Package
   </button>
+<footer class="site-footer-nav">
+  <a href="/about.html">About</a>
+  <a href="/faq.html">FAQ</a>
+  <a href="/terms.html">Terms</a>
+  <a href="/privacy.html">Privacy</a>
+  <a href="/docs.html">Developer Docs</a>
+  <a href="/results.html">Case Studies</a>
+</footer>
 </div>
 
 <script>
@@ -179,7 +229,7 @@ function interceptBillboardBotAttack() {
 // Secure navigation conduit checking states before forwarding users to Page 2
 function executeSafeLandingNavigation() {
     interceptBillboardBotAttack();
-    window.location.href = "/workspace.html";
+    window.location.href = "/turtle-mail-send.html";
 }
 </script>
 </body>
