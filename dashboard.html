@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Credit Block Dashboard | Turtle Mail</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-midnight: #0D1B2A;
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --error-crimson: #EF4444;
+  --success-green: #22C55E;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-charcoal);
+  background-image: url('Turtle_Mail_Background.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text-white);
+  margin: 0;
+  padding: 40px 20px;
+  min-height: 100vh;
+}
+.wrapper { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+.card {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 32px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-bottom: 24px;
+}
+
+h1.page-title {
+  font-family: 'Syncopate', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; }
+
+/* ── Token entry gate ─────────────────────────────────────────── */
+#token-gate label {
+  display: block;
+  font-size: 11px;
+  color: var(--electric-cyan);
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+#token-gate input {
+  width: 100%;
+  background-color: var(--bg-charcoal);
+  border: 1px solid var(--border-gray);
+  border-radius: 6px;
+  padding: 13px 14px;
+  color: var(--text-white);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+#token-gate input:focus { border-color: var(--electric-cyan); outline: none; }
+#token-gate button {
+  margin-top: 14px;
+  background-color: var(--electric-cyan);
+  color: var(--bg-charcoal);
+  border: none;
+  border-radius: 6px;
+  padding: 13px 22px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Summary chips ────────────────────────────────────────────── */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-bottom: 8px;
+}
+.chip {
+  background-color: rgba(18, 18, 20, 0.5);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+.chip .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--electric-cyan);
+}
+.chip .label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  font-family: 'Syncopate', sans-serif;
+}
+
+/* ── Table ────────────────────────────────────────────────────── */
+.table-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.table-controls input, .table-controls select {
+  background-color: var(--bg-charcoal);
+  border: 1px solid var(--border-gray);
+  border-radius: 6px;
+  padding: 9px 12px;
+  color: var(--text-white);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+}
+.table-controls input { flex: 1; min-width: 180px; }
+.refresh-btn {
+  background: transparent;
+  border: 1px solid var(--electric-cyan);
+  color: var(--electric-cyan);
+  border-radius: 6px;
+  padding: 9px 16px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  font-family: 'Syncopate', sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-gray);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(30,41,59,0.5);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+tbody tr:hover { background: rgba(0,240,255,0.03); }
+
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+.dot.on { background: var(--success-green); box-shadow: 0 0 6px var(--success-green); }
+.dot.off { background: var(--border-gray); }
+.status-cell { display: flex; align-items: center; gap: 8px; }
+
+.unused-row { opacity: 0.45; }
+
+#error-banner, #loading-banner {
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+#error-banner { background: rgba(239,68,68,0.08); border: 1px solid var(--error-crimson); color: var(--error-crimson); }
+#loading-banner { background: rgba(0,240,255,0.06); border: 1px solid var(--electric-cyan); color: var(--electric-cyan); }
+
+.hidden { display: none !important; }
+.table-scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ── Token entry gate ──────────────────────────────────────── -->
+  <div class="card" id="token-gate">
+    <h1 class="page-title">Credit Block Dashboard</h1>
+    <p class="page-sub">Paste the access token for your credit block — this is the same one used at checkout and in the batch workspace.</p>
+    <label for="token-input">Access token</label>
+    <input type="password" id="token-input" placeholder="Paste your access token" autocomplete="off">
+    <button onclick="loadDashboard()">View dashboard</button>
+  </div>
+
+  <!-- ── Dashboard content (hidden until a valid token loads) ──── -->
+  <div id="dashboard-content" class="hidden">
+
+    <div class="card">
+      <h1 class="page-title">Credit Block Dashboard</h1>
+      <p class="page-sub" id="block-meta">Loading block details…</p>
+
+      <div class="summary-grid">
+        <div class="chip"><div class="num" id="stat-total">—</div><div class="label">Total Credits</div></div>
+        <div class="chip"><div class="num" id="stat-remaining">—</div><div class="label">Remaining</div></div>
+        <div class="chip"><div class="num" id="stat-submitted">—</div><div class="label">Submitted</div></div>
+        <div class="chip"><div class="num" id="stat-delivered">—</div><div class="label">Delivered</div></div>
+        <div class="chip"><div class="num" id="stat-claims">—</div><div class="label">Damage Claims</div></div>
+        <div class="chip"><div class="num" id="stat-reprints">—</div><div class="label">Reprints Sent</div></div>
+        <div class="chip"><div class="num" id="stat-scanned">—</div><div class="label">QR Scanned</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-controls">
+        <input type="text" id="search-box" placeholder="Search by credit # or identifier…" oninput="renderTable()">
+        <select id="filter-select" onchange="renderTable()">
+          <option value="all">All credits</option>
+          <option value="used">Used only</option>
+          <option value="unused">Unused only</option>
+          <option value="delivered">Delivered only</option>
+          <option value="claims">Damage claims only</option>
+        </select>
+        <button class="refresh-btn" onclick="loadDashboard(true)">↻ Refresh</button>
+      </div>
+
+      <div id="loading-banner" class="hidden">Loading ledger…</div>
+      <div id="error-banner" class="hidden"></div>
+
+      <div class="table-scroll">
+        <table id="ledger-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Identifier</th>
+              <th>Used</th>
+              <th>Submitted</th>
+              <th>Delivered</th>
+              <th>Damage Claim</th>
+              <th>Reprint Sent</th>
+              <th>QR Scanned</th>
+              <th>Sales Rep</th>
+            </tr>
+          </thead>
+          <tbody id="ledger-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+      <label for="website_secondary">Secondary Security Check Item Fields</label>
+      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ===================================================================
+   CONFIG
+   =================================================================== */
+const API_BASE_URL = "https://api.turtlemail.app";
+
+/* ===================================================================
+   NOT YET BUILT — this page assumes a route that does not exist yet.
+
+   ASSUMED: GET /api/dashboard?access_token=...
+   (query-param style, matching the existing convention used by
+   /api/credits/status and /api/checkout-status — NOT a /dashboard/<token>
+   path route, since this is a static frontend page with no server-side
+   path routing. The clickable link given to a client would be:
+     https://turtlemail.app/dashboard.html?token=<access_token>
+   which this page reads and forwards as the access_token query param.)
+
+   ASSUMED RESPONSE SHAPE:
+   {
+     block_id: "...",
+     total_credits: 500,
+     credits_remaining: 320,
+     sales_rep_id: "..." | null,
+     credits: [
+       {
+         credit_number: 1,
+         qr_token: "8F2A1C9K",
+         is_used: true,
+         submitted: true,
+         delivered: true,
+         damage_claim: false,
+         reprint_sent: false,
+         qr_scanned: true
+       },
+       ...
+     ]
+   }
+
+   404 if the access_token is invalid or the block is unpaid, matching
+   cc.get_block_status()'s existing behavior on every other route that
+   takes access_token.
+
+   ⚠️ REMINDER: the actual Flask route for this does not exist in app.py
+   yet — see the note requested alongside this file.
+   =================================================================== */
+
+let ledgerData = null; // full response from the dashboard endpoint, cached for filtering/search
+
+/* ---------- Read ?token= from the URL and auto-load if present ---------- */
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const tokenFromUrl = params.get('token');
+  if (tokenFromUrl){
+    document.getElementById('token-input').value = tokenFromUrl;
+    loadDashboard();
+  }
+});
+
+async function loadDashboard(isRefresh = false){
+  const token = document.getElementById('token-input').value.trim();
+  if (!token) return;
+
+  const loadingBanner = document.getElementById('loading-banner');
+  const errorBanner = document.getElementById('error-banner');
+  loadingBanner.className = '';
+  errorBanner.className = 'hidden';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/dashboard?access_token=${encodeURIComponent(token)}`);
+    if (!res.ok){
+      throw new Error(res.status === 404 ? 'Token not recognized, or this block is not yet paid.' : `Server error (${res.status})`);
+    }
+    const data = await res.json();
+    ledgerData = data;
+
+    document.getElementById('token-gate').className = 'hidden';
+    document.getElementById('dashboard-content').className = '';
+
+    document.getElementById('block-meta').textContent =
+      `Block ${data.block_id}${data.sales_rep_id ? ' · Rep ' + data.sales_rep_id : ' · No sales rep (below 100-credit threshold, or self-serve)'}`;
+
+    document.getElementById('stat-total').textContent = data.total_credits;
+    document.getElementById('stat-remaining').textContent = data.credits_remaining;
+    document.getElementById('stat-submitted').textContent = data.credits.filter(c => c.submitted).length;
+    document.getElementById('stat-delivered').textContent = data.credits.filter(c => c.delivered).length;
+    document.getElementById('stat-claims').textContent = data.credits.filter(c => c.damage_claim).length;
+    document.getElementById('stat-reprints').textContent = data.credits.filter(c => c.reprint_sent).length;
+    document.getElementById('stat-scanned').textContent = data.credits.filter(c => c.qr_scanned).length;
+
+    renderTable();
+    loadingBanner.className = 'hidden';
+  } catch (err){
+    loadingBanner.className = 'hidden';
+    errorBanner.className = '';
+    errorBanner.textContent = err.message || "Couldn't load this dashboard. Check the token and try again.";
+    if (!isRefresh){
+      document.getElementById('dashboard-content').className = 'hidden';
+      document.getElementById('token-gate').className = '';
+    }
+  }
+}
+
+function dot(value){
+  return `<span class="dot ${value ? 'on' : 'off'}"></span>`;
+}
+
+function renderTable(){
+  if (!ledgerData) return;
+  const search = document.getElementById('search-box').value.trim().toLowerCase();
+  const filter = document.getElementById('filter-select').value;
+
+  let rows = ledgerData.credits;
+
+  if (search){
+    rows = rows.filter(c =>
+      String(c.credit_number).includes(search) ||
+      (c.qr_token || '').toLowerCase().includes(search)
+    );
+  }
+
+  if (filter === 'used') rows = rows.filter(c => c.is_used);
+  else if (filter === 'unused') rows = rows.filter(c => !c.is_used);
+  else if (filter === 'delivered') rows = rows.filter(c => c.delivered);
+  else if (filter === 'claims') rows = rows.filter(c => c.damage_claim);
+
+  const tbody = document.getElementById('ledger-body');
+  tbody.innerHTML = rows.map(c => `
+    <tr class="${c.is_used ? '' : 'unused-row'}">
+      <td>${c.credit_number}</td>
+      <td>${c.qr_token || '—'}</td>
+      <td>${dot(c.is_used)}</td>
+      <td>${dot(c.submitted)}</td>
+      <td>${dot(c.delivered)}</td>
+      <td>${dot(c.damage_claim)}</td>
+      <td>${dot(c.reprint_sent)}</td>
+      <td>${dot(c.qr_scanned)}</td>
+      <td>${ledgerData.sales_rep_id || '—'}</td>
+    </tr>
+  `).join('');
+}
+
+/* ===================================================================
+   IDENTICAL HONEYPOT + RATE LIMITER (verbatim, per site-wide rule)
+   =================================================================== */
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
+        if (landingClickTimestamps.length > 20) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+function interceptBillboardBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
+</script>
+</body>
+</html>
