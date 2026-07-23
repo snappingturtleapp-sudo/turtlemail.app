@@ -88,6 +88,13 @@ strong { opacity: 1; }
 }
 .warning-box p { margin: 0; }
 .divider { border: none; border-top: 1px solid var(--border-gray); margin: 40px 0; }
+.site-footer-nav {
+  width: 100%; max-width: 800px; margin: 24px auto 0; display: flex;
+  justify-content: center; gap: 18px; flex-wrap: wrap;
+  padding-top: 20px; border-top: 1px solid var(--border-gray);
+}
+.site-footer-nav a { font-size: 11px; color: var(--text-muted); text-decoration: none; }
+.site-footer-nav a:hover { color: var(--electric-cyan); }
 a { color: var(--electric-cyan); text-decoration: none; }
 a:hover { text-decoration: underline; }
 .section-divider-label {
@@ -174,6 +181,18 @@ a:hover { text-decoration: underline; }
   </ul>
   <p>To submit a damage claim, use our <a href="/claims.html">damage claim form</a> with your order number (begins with <strong>TM-</strong>), a description of the damage, how it occurred, and a photo of the damaged print.</p>
 
+  <h2>Access Tokens — Sole Responsibility of the Buyer</h2>
+  <div class="warning-box">
+    <p>Credit blocks are accessed exclusively through a single access token, shown to you once at the time of purchase. <strong>We do not maintain accounts, passwords, or any password-recovery process</strong> — possession of the access token is the sole means of accessing and spending a credit block, by design. Anyone in possession of a valid access token may use the credits associated with it.</p>
+  </div>
+  <p>By completing a credit block purchase, you acknowledge and agree that:</p>
+  <ul>
+    <li>You are solely responsible for recording and securing your access token. We do not store it in any form you can retrieve after the reveal screen closes, and we cannot look it up, reset it, or reissue it on your behalf.</li>
+    <li>The sale of a credit block is <strong>final upon payment</strong>, regardless of whether the token is subsequently lost, misplaced, stolen, or shared, and regardless of whether any or all of the associated credits are ever redeemed.</li>
+    <li>Loss of an access token does not entitle you to a refund, credit, replacement token, or any other remedy. Turtle Mail has fully performed its obligations under this sale by activating and revealing a usable access token at the time of purchase.</li>
+    <li>You will not initiate a chargeback or payment dispute on the basis of a lost, misplaced, or stolen access token. Doing so is inconsistent with the terms you agreed to at the time of purchase, and Turtle Mail reserves the right to dispute any such chargeback using your affirmative acknowledgment of this policy, made at checkout, as evidence.</li>
+  </ul>
+
   <h2>Chargeback Policy</h2>
   <p>By completing a purchase, you acknowledge and agree to these Terms of Sale, including the reprint-only remedy for shipping damage described above. If a chargeback is initiated that is inconsistent with these Terms, Turtle Mail reserves the right to dispute it and to submit evidence of your agreement to these Terms, together with delivery and reprint-fulfillment records, in response.</p>
 
@@ -182,6 +201,12 @@ a:hover { text-decoration: underline; }
 
   <hr class="divider">
   <p style="text-align:center; font-size:11px; color:var(--text-muted);">Turtle Mail · turtlemail.app · © 2026 · All Rights Reserved</p>
+
+  <footer class="site-footer-nav">
+    <a href="/index.html">Home</a>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/faq.html">FAQ</a>
+  </footer>
 
   <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
   <div style="display: none; tab-index: -1;" aria-hidden="true">

@@ -234,6 +234,71 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
 #batch-log.show { display: block; }
 .log-line { padding: 6px 0; border-bottom: 1px solid var(--border-gray); }
 .log-line.ok { color: var(--success-green); }
+
+/* ── Batch Delivery view: full-width, takes over the screen once sending begins ── */
+.delivery-view {
+  width: 100%;
+  max-width: 1140px;
+}
+.delivery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 20px;
+}
+.delivery-stats {
+  display: flex;
+  gap: 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+}
+.delivery-stats .stat-value { font-size: 20px; font-weight: 700; }
+.delivery-stats .stat-pending .stat-value { color: var(--text-muted); }
+.delivery-stats .stat-sent .stat-value { color: var(--success-green); }
+.delivery-stats .stat-failed .stat-value { color: var(--error-crimson); }
+.delivery-progress-track {
+  width: 100%; height: 8px; background: var(--bg-charcoal);
+  border: 1px solid var(--border-gray); border-radius: 10px;
+  overflow: hidden; margin-bottom: 24px;
+}
+.delivery-progress-fill {
+  height: 100%; background: var(--electric-cyan); width: 0%;
+  transition: width 0.3s ease; box-shadow: 0 0 10px var(--electric-cyan);
+}
+.delivery-table-wrap {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  max-height: 560px;
+  overflow-y: auto;
+}
+table.delivery-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.delivery-table thead th {
+  position: sticky; top: 0; background: var(--card-dark);
+  text-align: left; padding: 14px 20px;
+  font-family: 'Syncopate', sans-serif; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-gray);
+}
+table.delivery-table td { padding: 14px 20px; border-bottom: 1px solid rgba(30,41,59,0.5); }
+.delivery-status-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.03em;
+}
+.delivery-status-badge .dot { width: 9px; height: 9px; border-radius: 50%; }
+.delivery-status-badge.pending .dot { background: var(--text-muted); }
+.delivery-status-badge.pending { color: var(--text-muted); }
+.delivery-status-badge.sending .dot { background: var(--electric-cyan); box-shadow: 0 0 6px var(--electric-cyan); animation: pulse-dot 1s infinite; }
+.delivery-status-badge.sending { color: var(--electric-cyan); }
+.delivery-status-badge.sent .dot { background: var(--success-green); box-shadow: 0 0 6px var(--success-green); }
+.delivery-status-badge.sent { color: var(--success-green); }
+.delivery-status-badge.failed .dot { background: var(--error-crimson); }
+.delivery-status-badge.failed { color: var(--error-crimson); }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.delivery-detail { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+.delivery-footer-actions {
+  display: flex; justify-content: center; gap: 16px; margin-top: 24px;
+}
 .log-line.fail { color: var(--error-crimson); }
 </style>
 </head>
@@ -402,8 +467,35 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
       Send batch
     </button>
 
-    <div id="batch-log"></div>
     <a href="/index.html" style="display:block; text-align:center; margin-top:18px; font-size:12px; color:var(--text-muted);">← Return to Home</a>
+  </div>
+</div>
+
+<!-- ── Batch Delivery view: takes over the full screen once dispatch begins ── -->
+<div class="delivery-view hidden" id="delivery-view">
+  <h1 class="page-title">Batch Delivery</h1>
+  <div class="delivery-header">
+    <p class="page-sub" style="margin:0;">Sending each package one at a time. This credit block cannot be re-sent once started.</p>
+    <div class="delivery-stats">
+      <div class="stat-pending"><span class="stat-value" id="stat-pending">0</span> pending</div>
+      <div class="stat-sent"><span class="stat-value" id="stat-sent">0</span> sent</div>
+      <div class="stat-failed"><span class="stat-value" id="stat-failed">0</span> failed</div>
+    </div>
+  </div>
+  <div class="delivery-progress-track">
+    <div class="delivery-progress-fill" id="delivery-progress-fill"></div>
+  </div>
+  <div class="delivery-table-wrap">
+    <table class="delivery-table">
+      <thead>
+        <tr><th>#</th><th>Recipient</th><th>Status</th><th>Detail</th></tr>
+      </thead>
+      <tbody id="delivery-table-body"></tbody>
+    </table>
+  </div>
+  <div class="delivery-footer-actions">
+    <a href="/index.html" style="font-size:12px; color:var(--text-muted);">← Return to Home</a>
+    <a href="/dashboard.html" style="font-size:12px; color:var(--electric-cyan);">View Dashboard →</a>
   </div>
 </div>
 
@@ -914,34 +1006,50 @@ async function executeBatchDispatch(){
   }
 
   const btn = document.getElementById('dispatch-btn');
-  btn.disabled = true;
-  btn.textContent = 'Sending…';
-
-  const logEl = document.getElementById('batch-log');
-  logEl.className = 'show';
-  logEl.innerHTML = '';
-
   const accessToken = state.accessToken;
   const sharedMessage = document.getElementById('batch-message').value.trim();
   const fromName = document.getElementById('batch-from-name').value.trim();
 
   if (!sharedMessage && state.recipients.every(r => !r.message)){
     showBanner('A message is required — this is what prints on the packing slip.', 'error');
-    btn.disabled = false;
-    btn.textContent = 'Send batch';
     return;
   }
 
-  let successCount = 0, failCount = 0;
-  state.batchSent = true; // locked now — see refreshDispatchButton; cannot be
-                           // re-enabled by the balance refresh at the end of this function
+  state.batchSent = true; // locked now — see refreshDispatchButton; cannot be re-enabled later
+  btn.disabled = true;
 
-  for (const recipient of state.recipients){
-    const line = document.createElement('div');
-    line.className = 'log-line';
-    line.textContent = `${recipient.name} (${recipient.city}, ${recipient.country})… sending`;
-    logEl.appendChild(line);
-    logEl.scrollTop = logEl.scrollHeight;
+  // ── Switch to the full Batch Delivery view ──────────────────────────
+  document.getElementById('workspace-content').classList.add('hidden');
+  document.getElementById('delivery-view').classList.remove('hidden');
+
+  const tableBody = document.getElementById('delivery-table-body');
+  const total = state.recipients.length;
+  tableBody.innerHTML = state.recipients.map((r, i) => `
+    <tr id="delivery-row-${i}">
+      <td>${i + 1}</td>
+      <td>${r.name}${r.city ? ` (${r.city}, ${r.country})` : ''}</td>
+      <td><span class="delivery-status-badge pending" id="delivery-status-${i}"><span class="dot"></span>Pending</span></td>
+      <td class="delivery-detail" id="delivery-detail-${i}">—</td>
+    </tr>
+  `).join('');
+
+  function updateDeliveryStats(sent, failed){
+    document.getElementById('stat-pending').textContent = total - sent - failed;
+    document.getElementById('stat-sent').textContent = sent;
+    document.getElementById('stat-failed').textContent = failed;
+    document.getElementById('delivery-progress-fill').style.width = `${((sent + failed) / total) * 100}%`;
+  }
+  updateDeliveryStats(0, 0);
+
+  let successCount = 0, failCount = 0;
+
+  for (let i = 0; i < state.recipients.length; i++){
+    const recipient = state.recipients[i];
+    const statusEl = document.getElementById(`delivery-status-${i}`);
+    const detailEl = document.getElementById(`delivery-detail-${i}`);
+
+    statusEl.className = 'delivery-status-badge sending';
+    statusEl.innerHTML = '<span class="dot"></span>Sending';
 
     // Per-row CSV "message" column overrides the shared batch message.
     const message = recipient.message || sharedMessage;
@@ -960,27 +1068,33 @@ async function executeBatchDispatch(){
       });
 
       if (res.status === 403){
-        line.className = 'log-line fail';
-        line.textContent = `${recipient.name} — blocked: this destination can't be shipped to.`;
+        statusEl.className = 'delivery-status-badge failed';
+        statusEl.innerHTML = '<span class="dot"></span>Blocked';
+        detailEl.textContent = "Destination can't be shipped to.";
         failCount++;
+        updateDeliveryStats(successCount, failCount);
         continue;
       }
       if (!res.ok) throw new Error(`status ${res.status}`);
 
       const result = await res.json();
-      line.className = 'log-line ok';
-      line.textContent = `${recipient.name} — sent. Ref: ${result.orderId || '(no reference returned)'}`;
+      statusEl.className = 'delivery-status-badge sent';
+      statusEl.innerHTML = '<span class="dot"></span>Sent';
+      detailEl.textContent = result.orderId || '(no reference returned)';
       successCount++;
     } catch (err){
-      line.className = 'log-line fail';
-      line.textContent = `${recipient.name} — failed. This credit was not spent; you can retry this recipient.`;
+      statusEl.className = 'delivery-status-badge failed';
+      statusEl.innerHTML = '<span class="dot"></span>Failed';
+      detailEl.textContent = 'Credit not spent — retry this recipient later.';
       failCount++;
     }
+    updateDeliveryStats(successCount, failCount);
   }
 
-  btn.textContent = `Done — ${successCount} sent, ${failCount} failed (batch locked)`;
-  // Re-check token balance since successful sends consumed credits. This
-  // refresh no longer re-enables the button — see the batchSent lock above.
+  document.querySelector('.delivery-header .page-sub').textContent =
+    `Done — ${successCount} sent, ${failCount} failed. This batch is locked and cannot be resent.`;
+
+  // Re-check token balance since successful sends consumed credits.
   if (accessToken) validateToken(accessToken);
 }
 
