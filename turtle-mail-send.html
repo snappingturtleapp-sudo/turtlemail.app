@@ -54,6 +54,7 @@ h1.page-title {
   margin: 0 0 4px;
 }
 p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; }
+p.confirm-body-text { font-size: 17px; line-height: 1.6; color: var(--text-white); margin: 0 0 24px; }
 
 .stepper { display: flex; margin-bottom: 28px; border-bottom: 1px solid var(--border-gray); }
 .step-tab {
@@ -162,7 +163,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     <div id="global-banner"></div>
 
     <section class="panel active" id="panel-1">
-      <label>Choose 5 photos</label>
+      <label>Choose 1 to 5 photos</label>
       <p class="price-note" style="margin-top:0;">
         <strong>Please use landscape (horizontal) photos.</strong> If a photo is portrait, rotate it
         in your phone's own photo app first, then upload the rotated version — this keeps the
@@ -175,7 +176,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <p class="price-note" style="margin-top:-4px; margin-bottom:10px;">Or click an individual slot below to replace just one photo.</p>
       <div class="photo-grid" id="photo-grid"></div>
       <button type="button" class="btn-primary" id="check-photos-btn" onclick="checkAllPhotos()" disabled style="margin-top:12px; width:100%;">
-        Check &amp; preview all 5 photos
+        Check &amp; preview photos
       </button>
       <div class="actions">
         <span></span>
@@ -184,7 +185,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     </section>
 
     <section class="panel" id="panel-2">
-      <label>Adjust framing (photo <span id="crop-photo-index">1</span> of 5)</label>
+      <label>Adjust framing (photo <span id="crop-photo-index">1</span> of <span id="crop-photo-total">5</span>)</label>
       <p class="price-note" style="margin-top:0;">
         Drag to reposition, use the handles to resize, or rotate if the photo is sideways. This is
         exactly how each photo will be printed.
@@ -213,7 +214,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
       <div class="actions">
         <button class="btn-ghost" id="back-to-1">Back</button>
-        <button class="btn-primary" id="to-step-3">Confirm all 5 crops</button>
+        <button class="btn-primary" id="to-step-3">Confirm crops</button>
       </div>
     </section>
 
@@ -290,8 +291,11 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   <div id="confirm-flow" class="card hidden">
     <div class="confirm-wrap">
       <h1 class="page-title" id="confirm-title">Confirming your payment…</h1>
-      <p class="page-sub" id="confirm-body">This usually takes a few seconds. Don't close this tab.</p>
+      <p class="confirm-body-text" id="confirm-body">This usually takes a few seconds. Don't close this tab.</p>
       <p class="confirm-status" id="confirm-status"></p>
+      <button class="btn-primary" id="confirm-action-btn" style="margin-top:20px; width:100%;" onclick="window.location.href = window.location.origin + window.location.pathname;">
+        Return to start
+      </button>
     </div>
   </div>
 
@@ -415,23 +419,28 @@ async function stagePhoto(index, file){
   placeholder.textContent = `Ready: ${file.name}`;
 
   const stagedCount = slotStaged.filter(s => s).length;
-  document.getElementById('check-photos-btn').disabled = stagedCount !== 5;
+  document.getElementById('check-photos-btn').disabled = stagedCount < 1;
 }
 
 async function checkAllPhotos(){
   const btn = document.getElementById('check-photos-btn');
   btn.disabled = true;
-  btn.textContent = 'Checking all 5 photos…';
+  btn.textContent = 'Checking your photos…';
 
+  // Only the slots the customer actually filled — 1 to 5, not always 5.
+  const stagedIndices = [];
   for (let i = 0; i < 5; i++){
-    grid.children[i].className = 'slot state-checking';
-    const badge = grid.children[i].querySelector('.badge');
-    badge.style.display = 'block';
-    badge.textContent = 'Checking…';
+    if (slotStaged[i]){
+      stagedIndices.push(i);
+      grid.children[i].className = 'slot state-checking';
+      const badge = grid.children[i].querySelector('.badge');
+      badge.style.display = 'block';
+      badge.textContent = 'Checking…';
+    }
   }
 
   try {
-    const photos = slotStaged.map(s => s.dataUrl);
+    const photos = stagedIndices.map(i => slotStaged[i].dataUrl);
     const res = await fetch(`${API_BASE_URL}/api/process-images`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -440,8 +449,10 @@ async function checkAllPhotos(){
     const result = await res.json();
 
     if (!res.ok || !result.approved){
-      const flaggedSet = new Set(result.flagged_indexes || []);
-      for (let i = 0; i < 5; i++){
+      // flagged_indexes refer to positions within the submitted (staged-only)
+      // array, not the original 5-slot grid — map back to the real slot index.
+      const flaggedSet = new Set((result.flagged_indexes || []).map(i => stagedIndices[i]));
+      stagedIndices.forEach(i => {
         const slotEl = grid.children[i];
         const badge = slotEl.querySelector('.badge');
         const placeholder = slotEl.querySelector('.placeholder');
@@ -459,35 +470,35 @@ async function checkAllPhotos(){
           slotEl.className = 'slot';
           badge.textContent = 'Staged';
         }
-      }
+      });
       showBanner(
         result.error || (flaggedSet.size ? `${flaggedSet.size} photo(s) flagged — swap and check again.` : "These photos couldn't be approved."),
         'error'
       );
-      btn.textContent = 'Check & preview all 5 photos';
+      btn.textContent = 'Check & preview photos';
       btn.disabled = false;
       return;
     }
 
     state.imageResults = result.results;
-    for (let i = 0; i < 5; i++){
+    stagedIndices.forEach((i, resultIdx) => {
       const slotEl = grid.children[i];
       const img = slotEl.querySelector('img');
       const badge = slotEl.querySelector('.badge');
       const placeholder = slotEl.querySelector('.placeholder');
       slotEl.className = 'slot state-approved';
-      img.src = result.results[i].url;
+      img.src = result.results[resultIdx].url;
       img.style.display = 'block';
       placeholder.style.display = 'none';
       badge.textContent = 'Approved';
-    }
-    btn.textContent = 'Photos approved ✓';
+    });
+    btn.textContent = `${stagedIndices.length} photo(s) approved ✓`;
     clearBanner();
     document.getElementById('to-step-2').disabled = false;
   } catch (err){
-    for (let i = 0; i < 5; i++) grid.children[i].className = 'slot state-rejected';
+    stagedIndices.forEach(i => grid.children[i].className = 'slot state-rejected');
     showBanner("Couldn't reach the server to check these photos. Try again.", 'error');
-    btn.textContent = 'Check & preview all 5 photos';
+    btn.textContent = 'Check & preview photos';
     btn.disabled = false;
   }
 }
@@ -510,14 +521,16 @@ document.getElementById('to-step-2').addEventListener('click', () => {
    =================================================================== */
 function initCropStep(){
   state.currentCropIndex = 0;
+  document.getElementById('crop-photo-total').textContent = state.imageResults.length;
   loadCropperForIndex(0);
 }
 
 function loadCropperForIndex(index){
   const url = state.imageResults[index].url;
+  const lastIndex = state.imageResults.length - 1;
   document.getElementById('crop-photo-index').textContent = index + 1;
   document.getElementById('crop-prev-btn').disabled = (index === 0);
-  document.getElementById('crop-next-btn').disabled = (index === 4);
+  document.getElementById('crop-next-btn').disabled = (index === lastIndex);
 
   const imgEl = document.getElementById('cropper-image');
 
@@ -574,13 +587,46 @@ document.getElementById('crop-prev-btn').addEventListener('click', () => {
 });
 document.getElementById('crop-next-btn').addEventListener('click', () => {
   saveCurrentCropData();
-  state.currentCropIndex = Math.min(4, state.currentCropIndex + 1);
+  state.currentCropIndex = Math.min(state.imageResults.length - 1, state.currentCropIndex + 1);
   loadCropperForIndex(state.currentCropIndex);
 });
 
-document.getElementById('to-step-3').addEventListener('click', () => {
+document.getElementById('to-step-3').addEventListener('click', async () => {
   saveCurrentCropData();
-  goToStep(3);
+
+  const btn = document.getElementById('to-step-3');
+  btn.disabled = true;
+  btn.textContent = 'Finalizing your crops…';
+  clearBanner();
+
+  const crops = state.imageResults.map((r, i) => ({
+    url: r.url,
+    cropData: state.cropData[i]
+  }));
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/finalize-crops`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ crops })
+    });
+    if (!res.ok){
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || `Finalizing crops failed with status ${res.status}`);
+    }
+    const data = await res.json();
+    // Replace the uncropped originals with the final, print-ready versions —
+    // everything downstream (review, checkout) already just uses state.imageResults.
+    state.imageResults = data.results;
+
+    btn.disabled = false;
+    btn.textContent = 'Confirm crops';
+    goToStep(3);
+  } catch (err){
+    showBanner(err.message || "Couldn't finalize your crops. Please try again.", 'error');
+    btn.disabled = false;
+    btn.textContent = 'Confirm crops';
+  }
 });
 
 const step2Fields = ['r-name','r-addr1','r-city','r-zip','message'];
@@ -687,6 +733,7 @@ async function pollCheckoutStatus(sessionId, attempt = 0){
   const statusEl = document.getElementById('confirm-status');
   const titleEl = document.getElementById('confirm-title');
   const bodyEl = document.getElementById('confirm-body');
+  const actionBtn = document.getElementById('confirm-action-btn');
   const MAX_ATTEMPTS = 20;
 
   try {
@@ -699,12 +746,14 @@ async function pollCheckoutStatus(sessionId, attempt = 0){
         ? `Payment confirmed — order ${data.orderId} is on its way into production.`
         : 'Payment confirmed — your order is on its way into production.';
       statusEl.textContent = '';
+      actionBtn.textContent = 'Send another package →';
       return;
     }
     if (data.status === 'failed'){
       titleEl.textContent = "Payment didn't go through.";
       bodyEl.textContent = 'No charge was completed. You can go back and try again.';
       statusEl.textContent = '';
+      actionBtn.textContent = 'Try again';
       return;
     }
 
