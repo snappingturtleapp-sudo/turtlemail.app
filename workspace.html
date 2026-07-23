@@ -408,6 +408,7 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
     </button>
 
     <div id="batch-log"></div>
+    <a href="/index.html" style="display:block; text-align:center; margin-top:18px; font-size:12px; color:var(--text-muted);">← Return to Home</a>
   </div>
 </div>
 
@@ -455,7 +456,12 @@ const state = {
   currentCropIndex: 0,
   cropsFinalized: false,
   tokenValid: false,
-  creditsRemaining: 0
+  creditsRemaining: 0,
+  batchSent: false // set true the instant a batch dispatch begins — NEVER
+                    // re-enabled by validateToken()'s balance refresh, since
+                    // that would allow accidentally resending real, possibly
+                    // already-successful, physical orders. Only resets when
+                    // the recipient list is genuinely replaced (new CSV/manual entry).
 };
 
 let cropperInstance = null;
@@ -535,6 +541,7 @@ function syncManualRecipient(){
   } else {
     state.recipients = [];
   }
+  state.batchSent = false; // a new recipient means this is a genuinely new batch
   updateLedger();
 }
 
@@ -561,6 +568,7 @@ function parseCSVFile(file){
     try {
       const rows = parseCSVText(event.target.result);
       state.recipients = rows;
+      state.batchSent = false; // a new CSV means this is a genuinely new batch
       dropZone.textContent = `✓ ${rows.length} recipient(s) loaded from ${file.name}`;
       updateLedger();
     } catch (err){
@@ -882,7 +890,8 @@ function refreshDispatchButton(){
   const ready = state.tokenValid
     && state.recipients.length > 0
     && photosApproved
-    && state.recipients.length <= state.creditsRemaining;
+    && state.recipients.length <= state.creditsRemaining
+    && !state.batchSent;
   btn.disabled = !ready;
 
   if (state.tokenValid && state.recipients.length > state.creditsRemaining){
@@ -929,6 +938,8 @@ async function executeBatchDispatch(){
   }
 
   let successCount = 0, failCount = 0;
+  state.batchSent = true; // locked now — see refreshDispatchButton; cannot be
+                           // re-enabled by the balance refresh at the end of this function
 
   for (const recipient of state.recipients){
     const line = document.createElement('div');
@@ -972,8 +983,9 @@ async function executeBatchDispatch(){
     }
   }
 
-  btn.textContent = `Done — ${successCount} sent, ${failCount} failed`;
-  // Re-check token balance since successful sends consumed credits.
+  btn.textContent = `Done — ${successCount} sent, ${failCount} failed (batch locked)`;
+  // Re-check token balance since successful sends consumed credits. This
+  // refresh no longer re-enables the button — see the batchSent lock above.
   if (accessToken) validateToken(accessToken);
 }
 
