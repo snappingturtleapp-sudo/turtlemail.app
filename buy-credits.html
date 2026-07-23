@@ -149,6 +149,21 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <p class="price-note">Under 100 credits: card payment only. This block does not expire and can be spent gradually through the Batch Order Workspace.</p>
     </div>
 
+    <div style="display:flex; align-items:flex-start; gap:10px; margin-top:22px;">
+      <input type="checkbox" id="purchase-consent-checkbox" onchange="refreshPayButton()" style="margin-top:3px; width:16px; height:16px;">
+      <label for="purchase-consent-checkbox" style="margin:0; font-size:12px; color:var(--text-white); text-transform:none; letter-spacing:normal; font-family:'Inter',sans-serif; font-weight:400; line-height:1.6;">
+        By checking this box and proceeding, I expressly acknowledge and agree to the following:
+        I have purchased a bulk credit block. I understand that this purchase is
+        <strong>non-refundable and final</strong>, regardless of whether I use the included
+        credits, experience user error, or fail to upload my CSV correctly. I understand there
+        are no user registration or account systems on this platform to recover a lost token.
+        I acknowledge that the access token is the <strong>sole and exclusive method</strong> to
+        access and ship my block of packages, and that if I lose, misplace, or fail to record it,
+        my credits and packages cannot be recovered or refunded. See our
+        <a href="/terms.html" target="_blank" style="color:var(--electric-cyan);">Terms of Sale</a> for the complete policy.
+      </label>
+    </div>
+
     <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
     <div style="display: none; tab-index: -1;" aria-hidden="true">
       <label for="website_secondary">Secondary Security Check Item Fields</label>
@@ -168,10 +183,27 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <div class="token-value" id="token-value"></div>
       <button class="copy-btn" onclick="copyToken()">Copy token</button>
       <p class="warning-note">
-        <strong>Save this now.</strong> This token is the only way to access your credit block —
-        there is no account, no login, and no password recovery. If it's lost, contact
-        <a href="mailto:customer_service@turtlemail.app" style="color:var(--electric-cyan);">customer_service@turtlemail.app</a>.
+        <strong>This is the only time this token will be shown.</strong> There is no account,
+        no login, and no password recovery tied to it. Whoever holds this token can spend these
+        credits. If it is lost or stolen, Turtle Mail cannot recover it, cannot issue a refund,
+        and cannot replace it — this applies regardless of whether any credits were ever used.
+        See our <a href="/terms.html" style="color:var(--electric-cyan);">Terms of Sale</a> for
+        the full policy.
       </p>
+      <div style="display:flex; align-items:flex-start; gap:10px; margin-top:18px;">
+        <input type="checkbox" id="token-ack-checkbox" onchange="toggleDoneButton()" style="margin-top:3px; width:16px; height:16px;">
+        <label for="token-ack-checkbox" style="margin:0; font-size:12px; color:var(--text-white); text-transform:none; letter-spacing:normal; font-family:'Inter',sans-serif; font-weight:400;">
+          I have saved this access token in a secure location I control. I understand Turtle Mail
+          cannot recover, refund, or replace it if it is lost, and that this sale is final regardless
+          of whether these credits are ever used.
+        </label>
+      </div>
+      <button id="token-done-btn" disabled onclick="window.location.href='/workspace.html'" style="margin-top:16px;">
+        I've saved it — go to Batch Workspace
+      </button>
+      <button id="token-dashboard-btn" disabled onclick="window.location.href='/dashboard.html'" class="btn-ghost" style="margin-top:10px;">
+        Or just view my Dashboard
+      </button>
     </div>
   </div>
 
@@ -243,20 +275,24 @@ function updateSummary(){
   const qtyEl = document.getElementById('summary-qty');
   const totalEl = document.getElementById('summary-total');
   const perkNote = document.getElementById('perk-note');
-  const payBtn = document.getElementById('pay-btn');
 
   if (!selectedQty){
     qtyEl.textContent = '—';
     totalEl.textContent = '$0.00';
     perkNote.classList.add('hidden');
-    payBtn.disabled = true;
+    refreshPayButton();
     return;
   }
 
   qtyEl.textContent = `${selectedQty} credits`;
   totalEl.textContent = `$${(selectedQty * 25).toFixed(2)}`;
   perkNote.classList.toggle('hidden', selectedQty < 100);
-  payBtn.disabled = false;
+  refreshPayButton();
+}
+
+function refreshPayButton(){
+  const consentChecked = document.getElementById('purchase-consent-checkbox').checked;
+  document.getElementById('pay-btn').disabled = !(selectedQty && selectedQty >= 1 && consentChecked);
 }
 
 function showBanner(msg, type){
@@ -269,6 +305,10 @@ async function startCheckout(){
 
   if (!selectedQty || selectedQty < 1){
     showBanner('Choose a block size or enter a custom amount first.', 'error');
+    return;
+  }
+  if (!document.getElementById('purchase-consent-checkbox').checked){
+    showBanner('Please acknowledge the purchase terms above before continuing.', 'error');
     return;
   }
 
@@ -288,7 +328,11 @@ async function startCheckout(){
     successUrl,
     cancelUrl,
     buyerTimezone,
-    organizationId: orgName || undefined
+    organizationId: orgName || undefined,
+    // The checkbox state only — the actual consent TEXT logged for the
+    // audit trail is the backend's own canonical copy, never trusted from
+    // the client. See BULK_PURCHASE_CONSENT_TEXT in credits_commissions.py.
+    agreedToTerms: true
   };
 
   try {
@@ -364,6 +408,12 @@ async function pollCheckoutStatus(sessionId, attempt = 0){
     statusEl.textContent = 'Having trouble checking status — retrying…';
     if (attempt < MAX_ATTEMPTS) setTimeout(() => pollCheckoutStatus(sessionId, attempt + 1), 4000);
   }
+}
+
+function toggleDoneButton(){
+  const checked = document.getElementById('token-ack-checkbox').checked;
+  document.getElementById('token-done-btn').disabled = !checked;
+  document.getElementById('token-dashboard-btn').disabled = !checked;
 }
 
 function copyToken(){
