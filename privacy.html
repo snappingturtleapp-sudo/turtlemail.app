@@ -21,7 +21,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-charcoal);
-            background-image: url('Turtle_Mail_Background.png');
+            background-image: url('turtlemail.app/Turtle_Mail_Background.png');
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
@@ -106,6 +106,13 @@
         .compliance-link:hover {
             text-decoration: underline;
         }
+        .site-footer-nav {
+            width: 100%; max-width: 800px; margin: 24px auto 0; display: flex;
+            justify-content: center; gap: 18px; flex-wrap: wrap;
+            padding-top: 20px; border-top: 1px solid var(--border-gray);
+        }
+        .site-footer-nav a { font-size: 11px; color: var(--text-muted); text-decoration: none; }
+        .site-footer-nav a:hover { color: var(--electric-cyan); }
     </style>
 </head>
 <body>
@@ -181,6 +188,12 @@
         <p><strong>Inbound Support Portal:</strong> <a href="mailto:customer_service@turtlemail.app" class="compliance-link">customer_service@turtlemail.app</a></p>
         <p><strong>Communications Line:</strong> TBD</p>
     </div>
+
+    <footer class="site-footer-nav">
+        <a href="/index.html">Home</a>
+        <a href="/terms.html">Terms of Sale</a>
+        <a href="/faq.html">FAQ</a>
+    </footer>
 
     <!-- MANDATORY ACTIVE HONEYPOT DECEPTION TRAP -->
     <div style="display: none; tab-index: -1;" aria-hidden="true">
