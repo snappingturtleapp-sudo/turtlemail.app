@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Turtle Mail Batch Delivery</title>
+    <style>
+        body {
+            /* Set the hosted background image and cover the full screen */
+            background-image: url('https://turtlemail.app');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevents scrollbars as elements move off screen */
+            font-family: monospace;
+        }
+
+        /* Fixed banner container at the top of the webpage */
+        .top-banner {
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            background-color: rgba(0, 0, 0, 0.4); /* Subtle dark overlay for contrast */
+        }
+
+        .top-banner img {
+            max-width: 600px; /* Adjust size based on your banner design */
+            height: auto;
+        }
+
+        /* The overall assembly that moves across the screen horizontally */
+        .copter-assembly {
+            position: absolute;
+            top: 45%;               /* Positioned in the middle-lower half of screen */
+            width: 300px;           /* Adjust to your mascot image dimensions */
+            animation: flyAcross 20s linear infinite; 
+        }
+
+        /* The container holding the layered images and managing the bobbing */
+        .copter-container {
+            position: relative;
+            width: 300px;  
+            height: 300px; 
+            animation: bobUpDown 1.8s ease-in-out infinite alternate;
+        }
+
+        /* Stack all 7 mascot images perfectly on top of each other */
+        .copter-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0; /* Hidden by default */
+            /* 70s total loop (10s per image x 7 frames) */
+            animation: multiFrameLoop 70s infinite steps(1); 
+        }
+
+        /* Stagger the start times for each frame by exactly 10 seconds */
+        .frame-1 { animation-delay: 0s; }
+        .frame-2 { animation-delay: -10s; }
+        .frame-3 { animation-delay: -20s; }
+        .frame-4 { animation-delay: -30s; }
+        .frame-5 { animation-delay: -40s; }
+        .frame-6 { animation-delay: -50s; }
+        .frame-7 { animation-delay: -60s; }
+
+        /* The rolling text glued directly underneath the shifting mascot-duo */
+        .soi-text {
+            color: #00ff00; /* Classic retro matrix green */
+            font-size: 26px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+            text-shadow: 2px 2px 4px #000000; /* Makes text pop over background textures */
+            width: 100%;
+        }
+
+        /* 7-Step Visibility Timeline (14.28% blocks equal to 10 seconds each) */
+        @keyframes multiFrameLoop {
+            0%, 14.28% { opacity: 1; }
+            14.29%, 100% { opacity: 0; }
+        }
+
+        /* Moves the assembly horizontally across the browser screen */
+        @keyframes flyAcross {
+            0% {
+                left: -350px; /* Starts hidden off-screen left */
+            }
+            100% {
+                left: 100vw; /* Finishes hidden off-screen right */
+            }
+        }
+
+        /* Vertical bobbing animation mimicking hovering lift */
+        @keyframes bobUpDown {
+            0% {
+                transform: translateY(0px);
+            }
+            100% {
+                transform: translateY(-40px); /* Bounces up by 40 pixels */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Hosted Banner -->
+    <div class="top-banner">
+        <img src="https://turtlemail.app" alt="Turtle Mail Banner">
+    </div>
+
+    <!-- The Flying Mascot Assembly -->
+    <div class="copter-assembly">
+        
+        <!-- The 10-Second Alternating Mascot Container -->
+        <div class="copter-container">
+            <img class="frame-1" src="https://turtlemail.app" alt="Mascot 1">
+            <img class="frame-2" src="https://turtlemail.app" alt="Mascot 2">
+            <img class="frame-3" src="https://turtlemail.app" alt="Mascot 3">
+            <img class="frame-4" src="https://turtlemail.app" alt="Mascot 4">
+            <img class="frame-5" src="https://turtlemail.app" alt="Mascot 5">
+            <img class="frame-6" src="https://turtlemail.app" alt="Mascot 7">
+            <img class="frame-7" src="https://turtlemail.app" alt="Mascot 7">
+        </div>
+
+        <!-- Glued Sound Effect Text -->
+        <div class="soi-text">SOI SOI SOI</div>
+
+    </div>
+
+</body>
+</html>
