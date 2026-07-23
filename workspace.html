@@ -790,6 +790,11 @@ function loadCropperForIndex(index){
         cropperInstance.setAspectRatio(isLandscape ? 1.5 : (2/3));
         if (state.cropData[index]){
           cropperInstance.setData(state.cropData[index]);
+        } else {
+          // Capture Cropper's own sensible default RIGHT NOW, the instant
+          // this photo is shown — guarantees every displayed photo always
+          // has valid crop data, even one never manually touched.
+          state.cropData[index] = cropperInstance.getData();
         }
       }
     });
@@ -829,6 +834,15 @@ document.getElementById('crop-next-btn').addEventListener('click', () => {
 
 document.getElementById('confirm-crops-btn').addEventListener('click', async () => {
   saveCurrentCropData();
+
+  // Safety check: every photo must have been shown at least once (which
+  // captures a default crop automatically) before we send anything.
+  const unvisitedCount = state.cropData.slice(0, state.imageResults.length).filter(d => !d).length;
+  if (unvisitedCount > 0){
+    showBanner(`You still have ${unvisitedCount} photo(s) left to review — use "Next" to see each one before confirming.`, 'error');
+    return;
+  }
+
   const btn = document.getElementById('confirm-crops-btn');
   btn.disabled = true;
   btn.textContent = 'Finalizing your crops…';
