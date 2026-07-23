@@ -264,7 +264,7 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
 
     <div class="form-group">
       <label for="corporate-email">Receipt email (optional)</label>
-      <input type="email" id="corporate-email" placeholder="accounting@yourcompany.com">
+      <input type="email" id="corporate-email" placeholder="accounting@yourcompany.com" autocomplete="off">
     </div>
 
     <div class="form-group">
@@ -282,23 +282,23 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
       <div class="ingestion-content active" id="mode-manual">
         <div class="form-group">
           <label for="manual-name">Recipient name</label>
-          <input type="text" id="manual-name" oninput="syncManualRecipient()">
+          <input type="text" id="manual-name" oninput="syncManualRecipient()" autocomplete="off">
         </div>
         <div class="form-group">
           <label for="manual-street">Street address</label>
-          <input type="text" id="manual-street" oninput="syncManualRecipient()">
+          <input type="text" id="manual-street" oninput="syncManualRecipient()" autocomplete="off">
         </div>
         <div class="form-group">
           <label for="manual-city">City</label>
-          <input type="text" id="manual-city" oninput="syncManualRecipient()">
+          <input type="text" id="manual-city" oninput="syncManualRecipient()" autocomplete="off">
         </div>
         <div class="form-group">
           <label for="manual-state">State</label>
-          <input type="text" id="manual-state" oninput="syncManualRecipient()">
+          <input type="text" id="manual-state" oninput="syncManualRecipient()" autocomplete="off">
         </div>
         <div class="form-group">
           <label for="manual-zip">ZIP / postal code</label>
-          <input type="text" id="manual-zip" oninput="syncManualRecipient()">
+          <input type="text" id="manual-zip" oninput="syncManualRecipient()" autocomplete="off">
         </div>
         <p class="price-note">Manual entry is US-only. Use bulk CSV upload for international recipients.</p>
       </div>
@@ -316,11 +316,6 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
 
     <div class="form-group">
       <label>Photos (1 to 5, sent with every recipient in this batch)</label>
-      <p class="price-note" style="margin-top:0;">
-        <strong>Please use landscape (horizontal) photos.</strong> If a photo is portrait, rotate it
-        in your phone's own photo app first, then upload the rotated version — this keeps the
-        printed crop framed correctly.
-      </p>
       <button type="button" class="tab-btn" id="choose-all-btn" style="width:100%; margin-bottom:10px;">
         Choose up to 5 from your device →
       </button>
@@ -355,11 +350,11 @@ input:focus { border-color: var(--electric-cyan); outline: none; }
       </div>
 
       <div style="display:flex; gap:10px; margin-top:14px;">
-        <button type="button" class="tab-btn" id="crop-prev-btn" style="flex:1;">← Previous</button>
-        <button type="button" class="tab-btn" id="crop-next-btn" style="flex:1;">Next →</button>
+        <button type="button" class="btn-checkout" id="crop-prev-btn" style="flex:1;">← Previous</button>
+        <button type="button" class="btn-checkout" id="crop-next-btn" style="flex:1;">Next →</button>
       </div>
 
-      <button type="button" class="btn-checkout" id="confirm-crops-btn" style="margin-top:14px;">
+      <button type="button" class="tab-btn" id="confirm-crops-btn" style="margin-top:14px;">
         Confirm crops
       </button>
     </div>
@@ -894,7 +889,7 @@ function refreshDispatchButton(){
     && !state.batchSent;
   btn.disabled = !ready;
 
-  if (state.tokenValid && state.recipients.length > state.creditsRemaining){
+  if (state.tokenValid && !state.batchSent && state.recipients.length > state.creditsRemaining){
     showBanner(`This batch needs ${state.recipients.length} credits but only ${state.creditsRemaining} remain on this token.`, 'error');
   } else {
     clearBanner();
