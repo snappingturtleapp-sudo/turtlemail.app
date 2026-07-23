@@ -5,7 +5,6 @@
     <title>Turtle Mail Batch Delivery</title>
     <style>
         body {
-            /* FIXED: Cleared double https://, corrected .png extension, and balanced closing quote */
             background-image: url('https://turtlemail.app/Turtle_Mail_Background.png');
             background-size: cover;
             background-position: center center;
@@ -30,7 +29,6 @@
             height: auto;
         }
 
-        /* Combined horizontal flight animation tracking */
         .copter-assembly {
             position: absolute;
             top: 45%;               
@@ -38,7 +36,6 @@
             animation: flyAcross 20s linear infinite; 
         }
 
-        /* Combined vertical bobbing flight mechanics */
         .copter-container {
             position: relative;
             width: 300px;  
@@ -46,7 +43,7 @@
             animation: bobUpDown 1.8s ease-in-out infinite alternate;
         }
 
-        /* FIXED: Added strict sizing values to force images to stack directly on top of each other */
+        /* Base configuration for all stacked mascot layers */
         .copter-container img {
             position: absolute;
             top: 0;
@@ -55,21 +52,24 @@
             height: 300px;
             opacity: 0; 
             display: block;
-            animation: multiFrameLoop 70s infinite steps(1); 
+            mix-blend-mode: screen; 
+            /* Total animation length is 70 seconds (10s per image) */
+            animation-duration: 70s;
+            animation-iteration-count: infinite;
+            animation-timing-function: steps(1);
         }
 
-        /* Staggering frame layout matrix */
-        .frame-1 { animation-delay: 0s; }
-        .frame-2 { animation-delay: -10s; }
-        .frame-3 { animation-delay: -20s; }
-        .frame-4 { animation-delay: -30s; }
-        .frame-5 { animation-delay: -40s; }
-        .frame-6 { animation-delay: -50s; }
-        .frame-7 { animation-delay: -60s; }
+        /* FIXED: Each frame is tied directly to its own independent, custom visibility block */
+        .frame-1 { animation-name: cycleFrame1; }
+        .frame-2 { animation-name: cycleFrame2; }
+        .frame-3 { animation-name: cycleFrame3; }
+        .frame-4 { animation-name: cycleFrame4; }
+        .frame-5 { animation-name: cycleFrame5; }
+        .frame-6 { animation-name: cycleFrame6; }
+        .frame-7 { animation-name: cycleFrame7; }
 
-        /* Branded text alignment styling */
         .soi-text {
-            color: #00F0FF; /* Electric Cyan overlay to match the glow of your turtle shell */
+            color: #00F0FF; 
             font-size: 26px;
             font-weight: bold;
             text-align: center;
@@ -78,9 +78,39 @@
             width: 100%;
         }
 
-        @keyframes multiFrameLoop {
+        /* TIMELINE STAGES (Each active block is 14.28% of 70s, which equals 10 seconds) */
+        @keyframes cycleFrame1 {
             0%, 14.28% { opacity: 1; }
             14.29%, 100% { opacity: 0; }
+        }
+        @keyframes cycleFrame2 {
+            0%, 14.28% { opacity: 0; }
+            14.29%, 28.57% { opacity: 1; }
+            28.58%, 100% { opacity: 0; }
+        }
+        @keyframes cycleFrame3 {
+            0%, 28.57% { opacity: 0; }
+            28.58%, 42.85% { opacity: 1; }
+            42.86%, 100% { opacity: 0; }
+        }
+        @keyframes cycleFrame4 {
+            0%, 42.85% { opacity: 0; }
+            42.86%, 57.14% { opacity: 1; }
+            57.15%, 100% { opacity: 0; }
+        }
+        @keyframes cycleFrame5 {
+            0%, 57.14% { opacity: 0; }
+            57.15%, 71.42% { opacity: 1; }
+            71.43%, 100% { opacity: 0; }
+        }
+        @keyframes cycleFrame6 {
+            0%, 71.42% { opacity: 0; }
+            71.43%, 85.71% { opacity: 1; }
+            85.72%, 100% { opacity: 0; }
+        }
+        @keyframes cycleFrame7 {
+            0%, 85.71% { opacity: 0; }
+            85.72%, 100% { opacity: 1; }
         }
 
         @keyframes flyAcross {
@@ -96,27 +126,23 @@
 </head>
 <body>
 
-    <!-- Main Navigation Header -->
     <div class="top-banner">
-        <img src="https://turtlemail.app/turtle-mail-banner.png" alt="Turtle Mail Banner">
+        <img src="https://turtlemail.app" alt="Turtle Mail Banner">
     </div>
 
-    <!-- Active Flight Rig -->
     <div class="copter-assembly">
         
-        <!-- Ordered Carousel Array -->
         <div class="copter-container">
-            <img class="frame-1" src="https://turtlemail.app/mascot1.png" alt="Mascot 1">
-            <img class="frame-2" src="https://turtlemail.app/mascot2.png" alt="Mascot 2">
-            <img class="frame-3" src="https://turtlemail.app/mascot3.png" alt="Mascot 3">
-            <img class="frame-4" src="https://turtlemail.app/mascot4.png" alt="Mascot 4">
-            <img class="frame-5" src="https://turtlemail.app/mascot5.png" alt="Mascot 5">
-            <img class="frame-6" src="https://turtlemail.app/mascot6.png" alt="Mascot 6">
-            <img class="frame-7" src="https://turtlemail.app/mascot7.png" alt="Mascot 7">
+            <img class="frame-1" src="https://turtlemail.app" alt="Mascot 1">
+            <img class="frame-2" src="https://turtlemail.app" alt="Mascot 2">
+            <img class="frame-3" src="https://turtlemail.app" alt="Mascot 3">
+            <img class="frame-4" src="https://turtlemail.app" alt="Mascot 4">
+            <img class="frame-5" src="https://turtlemail.app" alt="Mascot 5">
+            <img class="frame-6" src="https://turtlemail.app" alt="Mascot 6">
+            <img class="frame-7" src="https://turtlemail.app" alt="Mascot 7">
         </div>
 
-        <!-- FIXED: Implemented your clean trademark typography string -->
-        <div class="soi-text">TM TM TM TM TM TM TM TM TM</div>
+        <div class="soi-text">TM TM TM TM TM TM TM</div>
 
     </div>
 
