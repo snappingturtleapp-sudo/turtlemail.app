@@ -32,15 +32,15 @@
         .copter-assembly {
             position: absolute;
             top: 45%;               
-            width: 300px;           
+            width: 150px;           
             animation: flyAcross 20s linear infinite; 
         }
 
         .copter-container {
             position: relative;
-            width: 300px;  
-            height: 300px; 
-            animation: bobUpDown 1.8s ease-in-out infinite alternate;
+            width: 150px;  
+            height: 150px; 
+            animation: bobUpDown 2.8s ease-in-out infinite alternate;
         }
 
         /* Base configuration for all stacked mascot layers */
@@ -48,13 +48,13 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 300px;
-            height: 300px;
+            width: 15px;
+            height: 150px;
             opacity: 0; 
             display: block;
             mix-blend-mode: screen; 
             /* Total animation length is 70 seconds (10s per image) */
-            animation-duration: 70s;
+            animation-duration: 100s;
             animation-iteration-count: infinite;
             animation-timing-function: steps(1);
         }
@@ -78,7 +78,7 @@
             width: 100%;
         }
 
-        /* TIMELINE STAGES (Each active block is 14.28% of 70s, which equals 10 seconds) */
+        /* TIMELINE STAGES (Each active block is 14.28% of 100s, which equals 14.25 seconds) */
         @keyframes cycleFrame1 {
             0%, 14.28% { opacity: 1; }
             14.29%, 100% { opacity: 0; }
