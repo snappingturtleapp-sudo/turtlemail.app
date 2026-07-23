@@ -553,6 +553,13 @@ function loadCropperForIndex(index){
         // adjusted it once and navigated away and back.
         if (state.cropData[index]){
           cropperInstance.setData(state.cropData[index]);
+        } else {
+          // Capture Cropper's own sensible default RIGHT NOW, the instant
+          // this photo is shown — not just when the user navigates away.
+          // This guarantees every displayed photo always has valid crop
+          // data, even one the user never manually touched before clicking
+          // "Confirm crops."
+          state.cropData[index] = cropperInstance.getData();
         }
       }
     });
@@ -593,6 +600,15 @@ document.getElementById('crop-next-btn').addEventListener('click', () => {
 
 document.getElementById('to-step-3').addEventListener('click', async () => {
   saveCurrentCropData();
+
+  // Safety check: every photo must have been shown at least once (which
+  // captures a default crop automatically) before we send anything. This
+  // catches clicking "Confirm crops" before reaching every photo.
+  const unvisitedCount = state.cropData.slice(0, state.imageResults.length).filter(d => !d).length;
+  if (unvisitedCount > 0){
+    showBanner(`You still have ${unvisitedCount} photo(s) left to review — use "Next photo" to see each one before confirming.`, 'error');
+    return;
+  }
 
   const btn = document.getElementById('to-step-3');
   btn.disabled = true;
