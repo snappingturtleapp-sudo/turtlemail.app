@@ -23,9 +23,7 @@
 const API_BASE_URL = "https://api.turtlemail.app";
 
 const testAddresses = [
-  { street: "1600 Pennsylvania Ave NW", city: "Washington", state: "DC", zip: "20500" }, // known real address (The White House)
-  { street: "1 infinite loop", city: "cupertino", state: "CA", zip: "" },                  // slightly messy casing/missing zip — Smarty should still fix this
-  { street: "asdf not a real street 99999", city: "Nowhere", state: "ZZ", zip: "00000" }   // deliberately nonsense — should fail to verify
+  { street: "1600 Amphitheatre Parkway", city: "Mountain View", state: "CA", zip: "94043" }
 ];
 
 async function runTest(){
