@@ -523,6 +523,16 @@ const state = {
 
 let cropperInstance = null;
 
+/* ---------- Read ?token= from the URL and auto-enter if present ---------- */
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const tokenFromUrl = params.get('token');
+  if (tokenFromUrl){
+    document.getElementById('gate-token-input').value = tokenFromUrl;
+    attemptGateEntry();
+  }
+});
+
 /* ---------- Access token validation (hard gate) ---------- */
 async function attemptGateEntry(){
   const token = document.getElementById('gate-token-input').value.trim();

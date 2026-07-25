@@ -245,6 +245,7 @@ tr.row-confirmed td.data-cell { color: var(--text-muted); font-style: italic; }
 
 <footer style="width:100%; max-width:1300px; margin:24px auto 0; display:flex; justify-content:center; gap:18px; padding-top:20px; border-top:1px solid var(--border-gray);">
   <a href="/index.html" style="font-size:11px; color:var(--text-muted); text-decoration:none;">Home</a>
+  <a href="/dashboard.html" id="dashboard-link" style="font-size:11px; color:var(--text-muted); text-decoration:none;">Dashboard</a>
 </footer>
 
 <script>
@@ -326,6 +327,7 @@ async function loadBlock(){
     document.getElementById('entry-content').classList.remove('hidden');
     document.getElementById('block-meta').textContent = `Block ${data.block_id}`;
     document.getElementById('stat-unused').textContent = unusedCredits.length;
+    document.getElementById('dashboard-link').href = `/dashboard.html?token=${encodeURIComponent(token)}`;
 
     renderTable();
   } catch (err){
