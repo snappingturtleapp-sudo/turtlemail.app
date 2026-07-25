@@ -253,6 +253,8 @@ tbody tr:hover { background: rgba(0,240,255,0.03); }
               <th>#</th>
               <th>Identifier</th>
               <th>TM Order #</th>
+              <th>Redirect URL</th>
+              <th>Packing Slip</th>
               <th>Used</th>
               <th>Submitted</th>
               <th>Delivered</th>
@@ -313,6 +315,8 @@ const API_BASE_URL = "https://api.turtlemail.app";
          credit_number: 1,
          qr_token: "8F2A1C9K",
          tm_order_number: "TM-1784973692438" | null,
+         destination_url: "https://example.com/promo" | null,
+         packing_slip_url: "https://res.cloudinary.com/.../packingslips/..." | null,
          is_used: true,
          submitted: true,
          delivered: true,
@@ -419,6 +423,8 @@ function renderTable(){
       <td>${c.credit_number}</td>
       <td>${c.qr_token || '—'}</td>
       <td>${c.tm_order_number || '—'}</td>
+      <td>${c.destination_url ? `<a href="${c.destination_url}" target="_blank" style="color:var(--electric-cyan);">Link</a>` : '—'}</td>
+      <td>${c.packing_slip_url ? `<a href="${c.packing_slip_url}" target="_blank" style="color:var(--electric-cyan);">View</a>` : '—'}</td>
       <td>${dot(c.is_used)}</td>
       <td>${dot(c.submitted)}</td>
       <td>${dot(c.delivered)}</td>

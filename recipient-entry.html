@@ -423,12 +423,33 @@ function handleCsvFile(file){
   if (!file) return;
   const reader = new FileReader();
   reader.onload = (event) => {
-    const lines = event.target.result.split(/\r?\n/).filter(l => l.trim().length > 0);
+    // Strip a leading BOM (byte order mark) — Excel commonly adds this
+    // invisible character to the very start of a saved CSV. Left in place,
+    // it silently glues onto the first header ("name" becomes "\ufeffname"),
+    // which then matches nothing — that column comes through blank on
+    // every row, with no visible error at all.
+    const rawText = event.target.result.replace(/^\uFEFF/, '');
+    const lines = rawText.split(/\r?\n/).filter(l => l.trim().length > 0);
     if (lines.length < 2){
       alert('That CSV has no data rows.');
       return;
     }
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^"|"$/g, ''));
+    // Tolerant of common header variations — e.g. "Address"/"Street Address"
+    // both map to 'street', "Zip Code"/"Postal Code" both map to 'zip'.
+    const HEADER_ALIASES = {
+      street: ['street', 'address', 'street address', 'address line 1'],
+      suite: ['suite', 'apt', 'apartment', 'unit', 'address line 2'],
+      zip: ['zip', 'zip code', 'postal code', 'postalcode'],
+      redirect_url: ['redirect_url', 'redirect url', 'qr url', 'qr redirect url'],
+    };
+    function resolveHeader(rawHeader){
+      for (const canonical in HEADER_ALIASES){
+        if (HEADER_ALIASES[canonical].includes(rawHeader)) return canonical;
+      }
+      return rawHeader;
+    }
+
+    const headers = lines[0].split(',').map(h => resolveHeader(h.trim().toLowerCase().replace(/^"|"$/g, '')));
     const csvRows = lines.slice(1).map(line => {
       const cells = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
       const row = {};
@@ -449,7 +470,9 @@ function handleCsvFile(file){
     renderTable(); // reflect the newly-imported draft values into the actual input fields
 
     if (csvIdx < csvRows.length){
-      alert(`Only ${csvIdx} of ${csvRows.length} CSV rows fit — you have that many unused credits available. The rest were not imported.`);
+      alert(`Imported ${csvIdx} row(s). Only ${csvIdx} of ${csvRows.length} CSV rows fit — you have that many unused credits available. The rest were not imported.`);
+    } else {
+      alert(`✓ Imported ${csvIdx} row(s) from ${file.name}. Review the fields below, then confirm each row.`);
     }
   };
   reader.readAsText(file);

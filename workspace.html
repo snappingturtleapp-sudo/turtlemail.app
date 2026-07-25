@@ -598,7 +598,12 @@ const SITE_ORIGIN = "https://turtlemail.app"; // exact origin — never '*' — 
 function openRecipientEntry(){
   if (!state.accessToken) return;
   const url = `/recipient-entry.html?token=${encodeURIComponent(state.accessToken)}`;
-  window.open(url, 'turtlemail-recipient-entry', 'width=1300,height=800,noopener=false');
+  // A fresh, unique window name every time — reusing the same fixed name
+  // right after a previous popup with that name closed itself can confuse
+  // the browser into reopening a stale/half-torn-down context, showing a
+  // blank window instead of a genuinely fresh page load.
+  const windowName = 'turtlemail-recipient-entry-' + Date.now();
+  window.open(url, windowName, 'width=1300,height=800,noopener=false');
 }
 
 window.addEventListener('message', (event) => {
