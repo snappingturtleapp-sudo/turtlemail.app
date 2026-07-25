@@ -278,6 +278,7 @@ tbody tr:hover { background: rgba(0,240,255,0.03); }
 <footer class="site-footer-nav">
   <a href="/index.html">Home</a>
   <a href="/workspace.html" id="workspace-link">Batch Workspace</a>
+  <a href="/manage-redirect-urls.html" id="redirect-urls-link">Manage Redirect URLs</a>
   <a href="/privacy.html">Privacy</a>
   <a href="/terms.html">Terms of Sale</a>
   <a href="/faq.html">FAQ</a>
@@ -361,6 +362,7 @@ async function loadDashboard(isRefresh = false){
     document.getElementById('token-gate').className = 'hidden';
     document.getElementById('dashboard-content').className = '';
     document.getElementById('workspace-link').href = `/workspace.html?token=${encodeURIComponent(token)}`;
+    document.getElementById('redirect-urls-link').href = `/manage-redirect-urls.html?token=${encodeURIComponent(token)}`;
 
     document.getElementById('block-meta').textContent =
       `Block ${data.block_id}${data.sales_rep_id ? ' · Rep ' + data.sales_rep_id : ' · No sales rep (below 100-credit threshold, or self-serve)'}`;

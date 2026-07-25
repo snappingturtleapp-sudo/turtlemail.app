@@ -120,13 +120,24 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
   <footer style="width:100%; margin:24px auto 0; display:flex; justify-content:center; gap:18px; padding-top:20px; border-top:1px solid var(--border-gray);">
     <a href="/index.html" style="font-size:11px; color:var(--text-muted); text-decoration:none;">Home</a>
-    <a href="/workspace.html" style="font-size:11px; color:var(--text-muted); text-decoration:none;">Batch Workspace</a>
+    <a href="/workspace.html" id="workspace-link" style="font-size:11px; color:var(--text-muted); text-decoration:none;">Batch Workspace</a>
+    <a href="/dashboard.html" id="dashboard-link" style="font-size:11px; color:var(--text-muted); text-decoration:none;">Dashboard</a>
   </footer>
 </div>
 
 <script>
 const API_BASE_URL = "https://api.turtlemail.app";
 let currentToken = null;
+
+/* ---------- Read ?token= from the URL and auto-load if present ---------- */
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const tokenFromUrl = params.get('token');
+  if (tokenFromUrl){
+    document.getElementById('token-input').value = tokenFromUrl;
+    loadUrls();
+  }
+});
 
 /* ---------- Load existing approved URLs (also validates the token) ---------- */
 async function loadUrls(){
@@ -146,6 +157,8 @@ async function loadUrls(){
     currentToken = token;
     document.getElementById('token-gate').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
+    document.getElementById('workspace-link').href = `/workspace.html?token=${encodeURIComponent(token)}`;
+    document.getElementById('dashboard-link').href = `/dashboard.html?token=${encodeURIComponent(token)}`;
     renderUrlList(data.urls || []);
   } catch (err){
     errEl.textContent = err.message || "Couldn't load this block.";
