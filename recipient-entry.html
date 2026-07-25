@@ -231,6 +231,16 @@ if (!hasOpener){
   document.getElementById('opener-banner').classList.remove('hidden');
 }
 
+/* ---------- Read ?token= from the URL and auto-load if present ---------- */
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const tokenFromUrl = params.get('token');
+  if (tokenFromUrl){
+    document.getElementById('token-input').value = tokenFromUrl;
+    loadBlock();
+  }
+});
+
 /* ---------- Token gate ---------- */
 async function loadBlock(){
   const token = document.getElementById('token-input').value.trim();

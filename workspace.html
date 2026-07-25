@@ -339,44 +339,14 @@ table.delivery-table td { padding: 14px 20px; border-bottom: 1px solid rgba(30,4
 
     <div class="form-group">
       <label>Recipients</label>
-      <div class="tab-row">
-        <button type="button" class="tab-btn active" onclick="switchIngestionMode('manual')">Manual entry</button>
-        <button type="button" class="tab-btn" onclick="switchIngestionMode('bulk')">Bulk CSV upload</button>
-      </div>
-
-      <div class="ingestion-content active" id="mode-manual">
-        <div class="form-group">
-          <label for="manual-name">Recipient name</label>
-          <input type="text" id="manual-name" oninput="syncManualRecipient()" autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label for="manual-street">Street address</label>
-          <input type="text" id="manual-street" oninput="syncManualRecipient()" autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label for="manual-city">City</label>
-          <input type="text" id="manual-city" oninput="syncManualRecipient()" autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label for="manual-state">State</label>
-          <input type="text" id="manual-state" oninput="syncManualRecipient()" autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label for="manual-zip">ZIP / postal code</label>
-          <input type="text" id="manual-zip" oninput="syncManualRecipient()" autocomplete="off">
-        </div>
-        <p class="price-note">Manual entry is US-only. Use bulk CSV upload for international recipients.</p>
-      </div>
-
-      <div class="ingestion-content" id="mode-bulk">
-        <div class="drop-zone" id="csv-drop-zone">Drag &amp; drop a recipient CSV here, or click to browse</div>
-        <input type="file" id="csv-file-input" accept=".csv" style="display:none;">
-        <p class="price-note">
-          Expected columns (first row = header): <strong>name, street, city, state, zip, country, message</strong>.
-          Country is a 2-letter code (US, GB, DE, ...) — defaults to US if left blank. The message column
-          is optional — leave it blank on any row to use the shared message below instead.
-        </p>
-      </div>
+      <p class="price-note" style="margin-top:0;">
+        Enter recipient details in a secure popup — nothing you type there ever touches our servers.
+        It only ever shows credits from this block that haven't been used yet.
+      </p>
+      <button type="button" class="btn-checkout" id="open-entry-btn" onclick="openRecipientEntry()" disabled style="width:100%;">
+        Open Recipient Entry →
+      </button>
+      <p class="price-note" id="recipient-status" style="text-align:center;">Load a valid access token above first.</p>
     </div>
 
     <div class="form-group">
@@ -592,6 +562,8 @@ async function validateToken(token){
     statusEl.textContent = `Valid — ${data.credits_remaining} of ${data.total_credits} credits remaining.`;
     const creditsAvailableEl = document.getElementById('credits-available');
     if (creditsAvailableEl) creditsAvailableEl.textContent = `${data.credits_remaining}`;
+    document.getElementById('open-entry-btn').disabled = false;
+    document.getElementById('recipient-status').textContent = 'No recipients confirmed yet.';
   } catch (err){
     statusEl.className = 'token-status show bad';
     statusEl.textContent = "Couldn't reach the server to check this token.";
@@ -600,91 +572,41 @@ async function validateToken(token){
   refreshDispatchButton();
 }
 
-/* ---------- Manual / bulk tab switching ---------- */
-function switchIngestionMode(mode){
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.ingestion-content').forEach(c => c.classList.remove('active'));
-  if (mode === 'manual'){
-    document.querySelector("button[onclick*='manual']").classList.add('active');
-    document.getElementById('mode-manual').classList.add('active');
-    syncManualRecipient();
-  } else {
-    document.querySelector("button[onclick*='bulk']").classList.add('active');
-    document.getElementById('mode-bulk').classList.add('active');
-    state.recipients = [];
-    updateLedger();
-  }
+/* ---------- Recipient Entry popup: launch + secure postMessage receiver ---------- */
+const SITE_ORIGIN = "https://turtlemail.app"; // exact origin — never '*' — for all postMessage checks
+
+function openRecipientEntry(){
+  if (!state.accessToken) return;
+  const url = `/recipient-entry.html?token=${encodeURIComponent(state.accessToken)}`;
+  window.open(url, 'turtlemail-recipient-entry', 'width=1300,height=800,noopener=false');
 }
 
-function syncManualRecipient(){
-  const name = document.getElementById('manual-name').value.trim();
-  const street = document.getElementById('manual-street').value.trim();
-  const city = document.getElementById('manual-city').value.trim();
-  const st = document.getElementById('manual-state').value.trim();
-  const zip = document.getElementById('manual-zip').value.trim();
+window.addEventListener('message', (event) => {
+  // Verify the message genuinely came from our own origin before trusting
+  // anything in it — the popup's own security precaution, mirrored here.
+  if (event.origin !== SITE_ORIGIN) return;
+  if (!event.data || event.data.type !== 'turtlemail-recipient-rows') return;
 
-  if (name || street || city || st || zip){
-    state.recipients = [{ name: name || 'Recipient', street, city, state: st, zip, country: 'US' }];
-  } else {
-    state.recipients = [];
-  }
-  state.batchSent = false; // a new recipient means this is a genuinely new batch
+  const rows = event.data.rows || [];
+  state.recipients = rows.map(r => ({
+    name: r.name || 'Recipient',
+    street: r.street || '',
+    address_line_2: r.suite || '',   // Prodigi's real schema supports this as address.line2
+    city: r.city || '',
+    state: r.state || '',
+    zip: r.zip || '',
+    country: (r.country || 'US').toUpperCase(),
+    phone: r.phone || '',            // NOT YET wired into the actual /api/send payload or
+    email: r.email || '',            // Prodigi submission — carried here for a follow-up step,
+    redirect_url: r.redirect_url || '' // once the backend side is confirmed and updated to accept them.
+  }));
+
+  state.batchSent = false; // a freshly confirmed set of recipients is a genuinely new batch
+  document.getElementById('recipient-status').textContent =
+    `${state.recipients.length} recipient(s) confirmed and loaded.`;
   updateLedger();
-}
-
-/* ---------- CSV drop zone (client-side parsing only) ---------- */
-const dropZone = document.getElementById('csv-drop-zone');
-const csvInput = document.getElementById('csv-file-input');
-dropZone.addEventListener('click', () => csvInput.click());
-csvInput.addEventListener('change', e => { if (e.target.files[0]) parseCSVFile(e.target.files[0]); });
-['dragenter','dragover'].forEach(n => dropZone.addEventListener(n, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
-['dragleave','drop'].forEach(n => dropZone.addEventListener(n, () => dropZone.classList.remove('dragover')));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  if (e.dataTransfer.files[0]) parseCSVFile(e.dataTransfer.files[0]);
 });
 
-function parseCSVFile(file){
-  if (!file.name.toLowerCase().endsWith('.csv')){
-    showBanner('Please upload a .csv file.', 'error');
-    return;
-  }
-  dropZone.textContent = `Reading ${file.name}…`;
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    try {
-      const rows = parseCSVText(event.target.result);
-      state.recipients = rows;
-      state.batchSent = false; // a new CSV means this is a genuinely new batch
-      dropZone.textContent = `✓ ${rows.length} recipient(s) loaded from ${file.name}`;
-      updateLedger();
-    } catch (err){
-      dropZone.textContent = 'Drag & drop a recipient CSV here, or click to browse';
-      showBanner("Couldn't read that CSV — check it has a header row with name, street, city, state, zip, country.", 'error');
-    }
-  };
-  reader.readAsText(file);
-}
-
-function parseCSVText(text){
-  const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
-  if (lines.length < 2) throw new Error('No data rows');
-  const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^"|"$/g, ''));
-  return lines.slice(1).map(line => {
-    const cells = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-    const row = {};
-    headers.forEach((h, i) => { row[h] = cells[i] || ''; });
-    return {
-      name: row.name || 'Recipient',
-      street: row.street || '',
-      city: row.city || '',
-      state: row.state || '',
-      zip: row.zip || '',
-      country: (row.country || 'US').toUpperCase(),
-      message: row.message || '' // optional per-row override of the shared batch message
-    };
-  });
-}
 
 /* ---------- Ledger / pricing preview ---------- */
 function updateLedger(){
