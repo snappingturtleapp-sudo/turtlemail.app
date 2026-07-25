@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Recipient Entry | Turtle Mail</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-midnight: #0D1B2A;
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --error-crimson: #EF4444;
+  --success-green: #22C55E;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-charcoal);
+  background-image: url('Turtle_Mail_Background.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text-white);
+  margin: 0;
+  padding: 30px 20px;
+  min-height: 100vh;
+}
+.wrapper { width: 100%; max-width: 1300px; margin: 0 auto; }
+
+.card {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 28px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-bottom: 20px;
+}
+
+h1.page-title {
+  font-family: 'Syncopate', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 20px; }
+
+#token-gate label {
+  display: block; font-size: 11px; color: var(--electric-cyan); margin-bottom: 10px;
+  font-weight: 700; font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.05em;
+}
+#token-gate input {
+  width: 100%; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray);
+  border-radius: 6px; padding: 13px 14px; color: var(--text-white); font-size: 14px; font-family: 'Inter', sans-serif;
+}
+#token-gate input:focus { border-color: var(--electric-cyan); outline: none; }
+#token-gate button, .btn-primary {
+  margin-top: 14px; background-color: var(--electric-cyan); color: var(--bg-charcoal);
+  border: none; border-radius: 6px; padding: 13px 22px; font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-ghost {
+  background: transparent; border: 1px solid var(--electric-cyan); color: var(--electric-cyan);
+  border-radius: 6px; padding: 11px 18px; font-size: 12px; cursor: pointer;
+  font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.summary-row { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.summary-row .stat { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+.summary-row .stat b { color: var(--electric-cyan); font-size: 18px; }
+
+.csv-drop {
+  border: 1px dashed var(--border-gray); border-radius: 8px; padding: 18px; text-align: center;
+  font-size: 13px; color: var(--text-muted); margin-bottom: 20px; cursor: pointer;
+}
+.csv-drop:hover { border-color: var(--electric-cyan); color: var(--electric-cyan); }
+
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead th {
+  text-align: left; padding: 8px 10px; font-family: 'Syncopate', sans-serif; font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted);
+  border-bottom: 1px solid var(--border-gray); white-space: nowrap; position: sticky; top: 0; background: var(--card-dark);
+}
+tbody td { padding: 6px 8px; border-bottom: 1px solid rgba(30,41,59,0.5); vertical-align: middle; }
+tbody td input {
+  width: 100%; min-width: 90px; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray);
+  border-radius: 4px; padding: 7px 8px; color: var(--text-white); font-size: 12px; font-family: 'Inter', sans-serif;
+}
+tbody td input:focus { border-color: var(--electric-cyan); outline: none; }
+.credit-id { font-family: 'JetBrains Mono', monospace; color: var(--electric-cyan); font-weight: 700; white-space: nowrap; }
+.confirm-btn {
+  background: transparent; border: 1px solid var(--success-green); color: var(--success-green);
+  border-radius: 4px; padding: 7px 12px; font-size: 11px; cursor: pointer; white-space: nowrap;
+  font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.confirm-btn:hover { background: rgba(34,197,94,0.1); }
+tr.row-confirmed td.data-cell { color: var(--text-muted); font-style: italic; }
+.confirmed-badge {
+  display: inline-flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; color: var(--success-green);
+}
+.confirmed-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success-green); box-shadow: 0 0 6px var(--success-green); }
+
+#error-banner, #loading-banner, #opener-banner {
+  padding: 14px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px;
+}
+#error-banner { background: rgba(239,68,68,0.08); border: 1px solid var(--error-crimson); color: var(--error-crimson); }
+#loading-banner { background: rgba(0,240,255,0.06); border: 1px solid var(--electric-cyan); color: var(--electric-cyan); }
+#opener-banner { background: rgba(239,68,68,0.06); border: 1px solid var(--error-crimson); color: var(--error-crimson); }
+
+.hidden { display: none !important; }
+.footer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 12px; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <div class="card" id="token-gate">
+    <h1 class="page-title">Recipient Entry</h1>
+    <p class="page-sub">
+      Enter recipient details for your unused Turtle Mail credits. Nothing you type here is ever
+      stored on our servers — this page hands confirmed rows directly to your Batch Workspace tab,
+      then clears itself completely.
+    </p>
+    <label for="token-input">Access token</label>
+    <input type="password" id="token-input" placeholder="Paste your access token" autocomplete="off">
+    <button onclick="loadBlock()">Load unused credits</button>
+  </div>
+
+  <div id="opener-banner" class="hidden">
+    This page isn't connected to a Batch Workspace tab, so confirmed rows can't be sent anywhere yet.
+    You can still fill in and confirm rows below — open this page from the "Open Recipient Entry"
+    button in Workspace to actually send data through.
+  </div>
+
+  <div id="entry-content" class="hidden">
+
+    <div class="card">
+      <h1 class="page-title">Recipient Entry</h1>
+      <p class="page-sub" id="block-meta">Loading block details…</p>
+      <div class="summary-row">
+        <div class="stat"><b id="stat-unused">—</b> unused credits available</div>
+        <div class="stat"><b id="stat-confirmed">0</b> confirmed and ready</div>
+      </div>
+
+      <div class="csv-drop" id="csv-drop" onclick="document.getElementById('csv-file-input').click()">
+        Click to import a CSV — fills rows top to bottom in order. Each row must still be confirmed individually below.
+      </div>
+      <input type="file" id="csv-file-input" accept=".csv" style="display:none;" onchange="handleCsvFile(this.files[0])">
+
+      <div id="loading-banner" class="hidden">Loading…</div>
+      <div id="error-banner" class="hidden"></div>
+
+      <div class="table-scroll">
+        <table id="entry-table">
+          <thead>
+            <tr>
+              <th>Credit</th>
+              <th>Name</th>
+              <th>Title</th>
+              <th>Company</th>
+              <th>Street</th>
+              <th>Suite</th>
+              <th>City</th>
+              <th>State</th>
+              <th>Zip</th>
+              <th>Country</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>QR Redirect URL</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="entry-body"></tbody>
+        </table>
+      </div>
+
+      <div class="footer-actions">
+        <button class="btn-ghost" onclick="window.close()">Cancel — close without sending</button>
+        <button class="btn-primary" id="send-btn" onclick="sendToWorkspace()" disabled>
+          Send confirmed rows to Workspace →
+        </button>
+      </div>
+    </div>
+
+    <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+      <label for="website_secondary">Secondary Security Check Item Fields</label>
+      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+    </div>
+  </div>
+</div>
+
+<footer style="width:100%; max-width:1300px; margin:24px auto 0; display:flex; justify-content:center; gap:18px; padding-top:20px; border-top:1px solid var(--border-gray);">
+  <a href="/index.html" style="font-size:11px; color:var(--text-muted); text-decoration:none;">Home</a>
+</footer>
+
+<script>
+/* ===================================================================
+   CONFIG
+   =================================================================== */
+const API_BASE_URL = "https://api.turtlemail.app";
+const SITE_ORIGIN = "https://turtlemail.app"; // exact origin used for all postMessage security checks
+
+/* ===================================================================
+   State — everything lives here, in memory, for this window's
+   lifetime only. Nothing in this file ever writes recipient data to
+   any server. The only network call this page makes is the initial
+   GET to /api/dashboard, which returns zero recipient PII — only
+   credit-status booleans, exactly like dashboard.html.
+   =================================================================== */
+let unusedCredits = [];          // [{credit_number, qr_token}, ...] — from /api/dashboard, unused only
+let confirmedRows = {};          // keyed by qr_token -> confirmed recipient data object
+
+/* ---------- Popup-opener check ---------- */
+const hasOpener = !!(window.opener && !window.opener.closed);
+if (!hasOpener){
+  document.getElementById('opener-banner').classList.remove('hidden');
+}
+
+/* ---------- Token gate ---------- */
+async function loadBlock(){
+  const token = document.getElementById('token-input').value.trim();
+  if (!token) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/dashboard?access_token=${encodeURIComponent(token)}`);
+    if (!res.ok){
+      throw new Error(res.status === 404 ? 'Token not recognized, or this block is not yet paid.' : `Server error (${res.status})`);
+    }
+    const data = await res.json();
+
+    unusedCredits = data.credits.filter(c => !c.is_used);
+
+    document.getElementById('token-gate').classList.add('hidden');
+    document.getElementById('entry-content').classList.remove('hidden');
+    document.getElementById('block-meta').textContent = `Block ${data.block_id}`;
+    document.getElementById('stat-unused').textContent = unusedCredits.length;
+
+    renderTable();
+  } catch (err){
+    alert(err.message || "Couldn't load this block. Check the token and try again.");
+  }
+}
+
+/* ---------- Render the entry table (one row per unused credit) ---------- */
+const FIELD_NAMES = ['name','title','company','street','suite','city','state','zip','country','phone','email','redirect_url'];
+
+function renderTable(){
+  const tbody = document.getElementById('entry-body');
+  tbody.innerHTML = unusedCredits.map((c, i) => {
+    if (confirmedRows[c.qr_token]){
+      return `
+        <tr class="row-confirmed" id="row-${i}">
+          <td class="credit-id">TM-${c.credit_number}</td>
+          <td colspan="12" class="data-cell">Confirmed — details cleared from view</td>
+          <td><span class="confirmed-badge"><span class="dot"></span>Confirmed</span></td>
+        </tr>`;
+    }
+    return `
+      <tr id="row-${i}">
+        <td class="credit-id">TM-${c.credit_number}</td>
+        ${FIELD_NAMES.map(f => `<td><input type="text" id="f-${i}-${f}" autocomplete="off"></td>`).join('')}
+        <td><button class="confirm-btn" onclick="confirmRow(${i})">Confirm</button></td>
+      </tr>`;
+  }).join('');
+}
+
+/* ---------- Confirm a single row: capture data, then clear it from view ---------- */
+function confirmRow(i){
+  const c = unusedCredits[i];
+  const rowData = {};
+  FIELD_NAMES.forEach(f => {
+    rowData[f] = document.getElementById(`f-${i}-${f}`).value.trim();
+  });
+
+  if (!rowData.name || !rowData.street || !rowData.city || !rowData.zip){
+    alert('Name, street, city, and zip are required before confirming this row.');
+    return;
+  }
+
+  confirmedRows[c.qr_token] = { credit_number: c.credit_number, qr_token: c.qr_token, ...rowData };
+
+  document.getElementById('stat-confirmed').textContent = Object.keys(confirmedRows).length;
+  document.getElementById('send-btn').disabled = Object.keys(confirmedRows).length === 0;
+
+  renderTable(); // redraws this row as "Confirmed", fields gone from the DOM entirely
+}
+
+/* ---------- CSV import: fills UNCONFIRMED rows top to bottom, in order ---------- */
+function handleCsvFile(file){
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const lines = event.target.result.split(/\r?\n/).filter(l => l.trim().length > 0);
+    if (lines.length < 2){
+      alert('That CSV has no data rows.');
+      return;
+    }
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^"|"$/g, ''));
+    const csvRows = lines.slice(1).map(line => {
+      const cells = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+      const row = {};
+      headers.forEach((h, i) => { row[h] = cells[i] || ''; });
+      return row;
+    });
+
+    let csvIdx = 0;
+    for (let i = 0; i < unusedCredits.length && csvIdx < csvRows.length; i++){
+      if (confirmedRows[unusedCredits[i].qr_token]) continue; // never overwrite an already-confirmed row
+      const row = csvRows[csvIdx];
+      FIELD_NAMES.forEach(f => {
+        const el = document.getElementById(`f-${i}-${f}`);
+        if (el) el.value = row[f] || '';
+      });
+      csvIdx++;
+    }
+
+    if (csvIdx < csvRows.length){
+      alert(`Only ${csvIdx} of ${csvRows.length} CSV rows fit — you have that many unused credits available. The rest were not imported.`);
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ---------- Hand confirmed rows to Workspace, then self-clear ---------- */
+function sendToWorkspace(){
+  const rows = Object.values(confirmedRows);
+  if (rows.length === 0) return;
+
+  if (!hasOpener){
+    alert("This page isn't connected to a Batch Workspace tab — open it from Workspace's \"Open Recipient Entry\" button instead.");
+    return;
+  }
+
+  // Exact target origin specified — never '*'. Workspace's receiving
+  // handler must independently verify event.origin matches this same
+  // value before trusting anything in the message.
+  window.opener.postMessage(
+    { type: 'turtlemail-recipient-rows', rows },
+    SITE_ORIGIN
+  );
+
+  // Self-clear: wipe in-memory state and close. Nothing from this
+  // session persists anywhere once this window is gone.
+  confirmedRows = {};
+  unusedCredits = [];
+  window.close();
+}
+
+/* ===================================================================
+   IDENTICAL HONEYPOT + RATE LIMITER (verbatim, per site-wide rule)
+   =================================================================== */
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
+        if (landingClickTimestamps.length > 20) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+function interceptBillboardBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
+</script>
+</body>
+</html>
