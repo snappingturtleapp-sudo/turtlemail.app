@@ -236,6 +236,15 @@ const SITE_ORIGIN = "https://turtlemail.app"; // exact origin used for all postM
    =================================================================== */
 let unusedCredits = [];          // [{credit_number, qr_token}, ...] — from /api/dashboard, unused only
 let confirmedRows = {};          // keyed by qr_token -> confirmed recipient data object
+let draftRows = {};              // keyed by row index i -> {field: value} — keeps IN-PROGRESS
+                                  // (not yet confirmed) data alive across table re-renders. Without
+                                  // this, confirming any one row would wipe every other row's
+                                  // typed-in or CSV-imported data, since renderTable() rebuilds
+                                  // every input element from scratch on every call.
+
+function escapeAttr(str){
+  return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 /* ---------- Popup-opener check ---------- */
 const hasOpener = !!(window.opener && !window.opener.closed);
@@ -292,13 +301,19 @@ function renderTable(){
           <td><span class="confirmed-badge"><span class="dot"></span>Confirmed</span></td>
         </tr>`;
     }
+    const draft = draftRows[i] || {};
     return `
       <tr id="row-${i}">
         <td class="credit-id">TM-${c.credit_number}</td>
-        ${FIELD_NAMES.map(f => `<td><input type="text" id="f-${i}-${f}" autocomplete="off"></td>`).join('')}
+        ${FIELD_NAMES.map(f => `<td><input type="text" id="f-${i}-${f}" autocomplete="off" value="${escapeAttr(draft[f] || '')}" oninput="updateDraft(${i}, '${f}', this.value)"></td>`).join('')}
         <td><button class="confirm-btn" onclick="confirmRow(${i})">Confirm</button></td>
       </tr>`;
   }).join('');
+}
+
+function updateDraft(i, field, value){
+  if (!draftRows[i]) draftRows[i] = {};
+  draftRows[i][field] = value;
 }
 
 /* ---------- Manual horizontal scroll (mouse-wheel/trackpad horizontal scroll is easy to miss) ---------- */
@@ -320,6 +335,7 @@ function confirmRow(i){
   }
 
   confirmedRows[c.qr_token] = { credit_number: c.credit_number, qr_token: c.qr_token, ...rowData };
+  delete draftRows[i]; // this row is locked in now — no draft to preserve anymore
 
   document.getElementById('stat-confirmed').textContent = Object.keys(confirmedRows).length;
   document.getElementById('send-btn').disabled = Object.keys(confirmedRows).length === 0;
@@ -349,12 +365,13 @@ function handleCsvFile(file){
     for (let i = 0; i < unusedCredits.length && csvIdx < csvRows.length; i++){
       if (confirmedRows[unusedCredits[i].qr_token]) continue; // never overwrite an already-confirmed row
       const row = csvRows[csvIdx];
+      if (!draftRows[i]) draftRows[i] = {};
       FIELD_NAMES.forEach(f => {
-        const el = document.getElementById(`f-${i}-${f}`);
-        if (el) el.value = row[f] || '';
+        draftRows[i][f] = row[f] || '';
       });
       csvIdx++;
     }
+    renderTable(); // reflect the newly-imported draft values into the actual input fields
 
     if (csvIdx < csvRows.length){
       alert(`Only ${csvIdx} of ${csvRows.length} CSV rows fit — you have that many unused credits available. The rest were not imported.`);
