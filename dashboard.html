@@ -252,6 +252,7 @@ tbody tr:hover { background: rgba(0,240,255,0.03); }
             <tr>
               <th>#</th>
               <th>Identifier</th>
+              <th>TM Order #</th>
               <th>Used</th>
               <th>Submitted</th>
               <th>Delivered</th>
@@ -311,6 +312,7 @@ const API_BASE_URL = "https://api.turtlemail.app";
        {
          credit_number: 1,
          qr_token: "8F2A1C9K",
+         tm_order_number: "TM-1784973692438" | null,
          is_used: true,
          submitted: true,
          delivered: true,
@@ -416,6 +418,7 @@ function renderTable(){
     <tr class="${c.is_used ? '' : 'unused-row'}">
       <td>${c.credit_number}</td>
       <td>${c.qr_token || '—'}</td>
+      <td>${c.tm_order_number || '—'}</td>
       <td>${dot(c.is_used)}</td>
       <td>${dot(c.submitted)}</td>
       <td>${dot(c.delivered)}</td>
