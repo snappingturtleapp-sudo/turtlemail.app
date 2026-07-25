@@ -86,6 +86,24 @@ p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 20px; }
 }
 .csv-drop:hover { border-color: var(--electric-cyan); color: var(--electric-cyan); }
 
+.bulk-url-row {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;
+  padding: 14px; background: rgba(0,240,255,0.03); border: 1px solid var(--border-gray); border-radius: 8px;
+}
+.bulk-url-row label { margin: 0; font-size: 11px; white-space: nowrap; }
+.bulk-url-row select {
+  flex: 1; min-width: 200px; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray);
+  border-radius: 6px; padding: 10px 12px; color: var(--text-white); font-size: 13px; font-family: 'Inter', sans-serif;
+}
+.bulk-url-row button {
+  background: transparent; border: 1px solid var(--electric-cyan); color: var(--electric-cyan);
+  border-radius: 6px; padding: 10px 16px; font-size: 12px; cursor: pointer; white-space: nowrap;
+  font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.bulk-url-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+.bulk-url-note { font-size: 12px; color: var(--text-muted); width: 100%; margin: 0; }
+.bulk-url-note a { color: var(--electric-cyan); }
+
 .table-scroll { overflow-x: auto; scrollbar-width: auto; }
 .table-scroll::-webkit-scrollbar { height: 12px; }
 .table-scroll::-webkit-scrollbar-track { background: var(--bg-charcoal); border-radius: 6px; }
@@ -169,6 +187,15 @@ tr.row-confirmed td.data-cell { color: var(--text-muted); font-style: italic; }
       </div>
       <input type="file" id="csv-file-input" accept=".csv" style="display:none;" onchange="handleCsvFile(this.files[0])">
 
+      <div class="bulk-url-row" id="bulk-url-row">
+        <label for="bulk-url-select">Redirect URL for this batch</label>
+        <select id="bulk-url-select">
+          <option value="">Turtle Mail default (no URL selected)</option>
+        </select>
+        <button onclick="bulkApplyUrl()">Apply to all unconfirmed rows</button>
+        <p class="bulk-url-note" id="bulk-url-note"></p>
+      </div>
+
       <div id="loading-banner" class="hidden">Loading…</div>
       <div id="error-banner" class="hidden"></div>
 
@@ -241,6 +268,10 @@ let draftRows = {};              // keyed by row index i -> {field: value} — k
                                   // this, confirming any one row would wipe every other row's
                                   // typed-in or CSV-imported data, since renderTable() rebuilds
                                   // every input element from scratch on every call.
+let currentToken = null;         // stashed once the block loads — needed to (re)fetch the approved
+                                  // URL list without asking the customer to paste their token again
+let approvedUrls = [];           // this block's currently-approved redirect URLs — powers the
+                                  // upcoming bulk-apply control and the per-row dropdown
 
 function escapeAttr(str){
   return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -274,7 +305,22 @@ async function loadBlock(){
     }
     const data = await res.json();
 
+    currentToken = token;
     unusedCredits = data.credits.filter(c => !c.is_used);
+
+    // Fetch this block's currently-approved redirect URLs too. Non-fatal
+    // if this specific call fails — the entry table itself doesn't depend
+    // on it, only the (not yet built) URL-selection controls will.
+    try {
+      const urlRes = await fetch(`${API_BASE_URL}/api/qr-urls/list?access_token=${encodeURIComponent(token)}`);
+      if (urlRes.ok){
+        const urlData = await urlRes.json();
+        approvedUrls = urlData.urls || [];
+      }
+    } catch (urlErr){
+      console.warn("Couldn't load approved redirect URLs (non-fatal):", urlErr);
+    }
+    populateBulkUrlControl();
 
     document.getElementById('token-gate').classList.add('hidden');
     document.getElementById('entry-content').classList.remove('hidden');
@@ -314,6 +360,31 @@ function renderTable(){
 function updateDraft(i, field, value){
   if (!draftRows[i]) draftRows[i] = {};
   draftRows[i][field] = value;
+}
+
+/* ---------- Bulk-apply a redirect URL to every unconfirmed row at once ---------- */
+function populateBulkUrlControl(){
+  const select = document.getElementById('bulk-url-select');
+  const note = document.getElementById('bulk-url-note');
+
+  select.innerHTML = '<option value="">Turtle Mail default (no URL selected)</option>' +
+    approvedUrls.map(u => `<option value="${escapeAttr(u)}">${u}</option>`).join('');
+
+  if (approvedUrls.length === 0){
+    note.innerHTML = `No approved URLs yet for this block. <a href="/manage-redirect-urls.html?token=${encodeURIComponent(currentToken)}" target="_blank">Add one →</a>`;
+  } else {
+    note.textContent = '';
+  }
+}
+
+function bulkApplyUrl(){
+  const chosen = document.getElementById('bulk-url-select').value;
+  for (let i = 0; i < unusedCredits.length; i++){
+    if (confirmedRows[unusedCredits[i].qr_token]) continue; // never touch an already-confirmed row
+    if (!draftRows[i]) draftRows[i] = {};
+    draftRows[i]['redirect_url'] = chosen;
+  }
+  renderTable();
 }
 
 /* ---------- Manual horizontal scroll (mouse-wheel/trackpad horizontal scroll is easy to miss) ---------- */
