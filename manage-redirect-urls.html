@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Manage Redirect URLs | Turtle Mail</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-midnight: #0D1B2A;
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --error-crimson: #EF4444;
+  --success-green: #22C55E;
+  --pending-amber: #F59E0B;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-charcoal);
+  background-image: url('Turtle_Mail_Background.png');
+  background-size: cover; background-position: center center; background-repeat: no-repeat; background-attachment: fixed;
+  color: var(--text-white); margin: 0; padding: 30px 20px; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+}
+.wrapper { width: 100%; max-width: 700px; }
+.card {
+  background-color: rgba(32, 50, 67, 0.95); border: 1px solid var(--border-gray); border-radius: 12px;
+  padding: 28px; backdrop-filter: blur(8px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); margin-bottom: 20px;
+}
+h1.page-title { font-family: 'Syncopate', sans-serif; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 4px; }
+p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 20px; }
+
+label {
+  display: block; font-size: 11px; color: var(--electric-cyan); margin-bottom: 10px;
+  font-weight: 700; font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.05em;
+}
+input[type="text"], input[type="password"], input[type="url"] {
+  width: 100%; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray);
+  border-radius: 6px; padding: 13px 14px; color: var(--text-white); font-size: 14px; font-family: 'Inter', sans-serif;
+  margin-bottom: 14px;
+}
+input:focus { border-color: var(--electric-cyan); outline: none; }
+button {
+  background-color: var(--electric-cyan); color: var(--bg-charcoal); border: none; border-radius: 6px;
+  padding: 13px 22px; font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: 'Syncopate', sans-serif; text-transform: uppercase; letter-spacing: 0.08em; width: 100%;
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.status-line { padding: 12px 14px; border-radius: 8px; font-size: 13px; margin-top: 14px; }
+.status-approved { background: rgba(34,197,94,0.08); border: 1px solid var(--success-green); color: var(--success-green); }
+.status-pending { background: rgba(245,158,11,0.08); border: 1px solid var(--pending-amber); color: var(--pending-amber); }
+.status-rejected { background: rgba(239,68,68,0.08); border: 1px solid var(--error-crimson); color: var(--error-crimson); }
+.status-error { background: rgba(239,68,68,0.08); border: 1px solid var(--error-crimson); color: var(--error-crimson); }
+
+.url-list { list-style: none; margin: 0; padding: 0; }
+.url-list li {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 10px 12px;
+  border-bottom: 1px solid rgba(30,41,59,0.5); word-break: break-all;
+  display: flex; align-items: center; gap: 8px;
+}
+.url-list li .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success-green); flex-shrink: 0; }
+.empty-note { font-size: 13px; color: var(--text-muted); }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <div class="card" id="token-gate">
+    <h1 class="page-title">Manage Redirect URLs</h1>
+    <p class="page-sub">
+      Submit a destination URL to use for this block's QR codes. Every URL is screened with Google
+      Safe Browsing before it can be used — most known-safe destinations are approved instantly,
+      unfamiliar ones may take until the next nightly check.
+    </p>
+    <label for="token-input">Access token</label>
+    <input type="password" id="token-input" placeholder="Paste your access token" autocomplete="off">
+    <button onclick="loadUrls()">Load this block's URLs</button>
+    <div id="gate-error" class="status-line status-error hidden"></div>
+  </div>
+
+  <div id="main-content" class="hidden">
+
+    <div class="card">
+      <h1 class="page-title">Approved URLs for this block</h1>
+      <p class="page-sub" id="block-meta"></p>
+      <ul class="url-list" id="url-list"></ul>
+      <p class="empty-note hidden" id="empty-note">No URLs approved yet — submit one below.</p>
+    </div>
+
+    <div class="card">
+      <h1 class="page-title">Submit a new URL</h1>
+      <p class="page-sub">
+        This becomes available to select for any recipient in this block once approved. If you don't
+        set one for a recipient, packages default to the standard Turtle Mail QR code.
+      </p>
+      <label for="new-url-input">Destination URL</label>
+      <input type="url" id="new-url-input" placeholder="https://yourcompany.com/promo">
+      <button onclick="submitUrl()" id="submit-btn">Submit for review</button>
+      <div id="submit-status" class="status-line hidden"></div>
+    </div>
+
+    <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+    <div style="display: none; tab-index: -1;" aria-hidden="true">
+      <label for="website_secondary">Secondary Security Check Item Fields</label>
+      <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+    </div>
+  </div>
+
+  <footer style="width:100%; margin:24px auto 0; display:flex; justify-content:center; gap:18px; padding-top:20px; border-top:1px solid var(--border-gray);">
+    <a href="/index.html" style="font-size:11px; color:var(--text-muted); text-decoration:none;">Home</a>
+    <a href="/workspace.html" style="font-size:11px; color:var(--text-muted); text-decoration:none;">Batch Workspace</a>
+  </footer>
+</div>
+
+<script>
+const API_BASE_URL = "https://api.turtlemail.app";
+let currentToken = null;
+
+/* ---------- Load existing approved URLs (also validates the token) ---------- */
+async function loadUrls(){
+  const token = document.getElementById('token-input').value.trim();
+  if (!token) return;
+
+  const errEl = document.getElementById('gate-error');
+  errEl.classList.add('hidden');
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/qr-urls/list?access_token=${encodeURIComponent(token)}`);
+    if (!res.ok){
+      throw new Error(res.status === 404 ? 'Token not recognized, or this block is not yet paid.' : `Server error (${res.status})`);
+    }
+    const data = await res.json();
+
+    currentToken = token;
+    document.getElementById('token-gate').classList.add('hidden');
+    document.getElementById('main-content').classList.remove('hidden');
+    renderUrlList(data.urls || []);
+  } catch (err){
+    errEl.textContent = err.message || "Couldn't load this block.";
+    errEl.classList.remove('hidden');
+  }
+}
+
+function renderUrlList(urls){
+  const listEl = document.getElementById('url-list');
+  const emptyEl = document.getElementById('empty-note');
+  if (urls.length === 0){
+    listEl.innerHTML = '';
+    emptyEl.classList.remove('hidden');
+    return;
+  }
+  emptyEl.classList.add('hidden');
+  listEl.innerHTML = urls.map(u => `<li><span class="dot"></span>${u}</li>`).join('');
+}
+
+/* ---------- Submit a new URL for screening ---------- */
+async function submitUrl(){
+  const urlInput = document.getElementById('new-url-input');
+  const url = urlInput.value.trim();
+  if (!url) return;
+
+  const btn = document.getElementById('submit-btn');
+  const statusEl = document.getElementById('submit-status');
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+  statusEl.classList.add('hidden');
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/qr-urls/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accessToken: currentToken, url })
+    });
+    const data = await res.json();
+
+    statusEl.classList.remove('hidden', 'status-approved', 'status-pending', 'status-rejected');
+    if (data.status === 'approved'){
+      statusEl.className = 'status-line status-approved';
+      statusEl.textContent = '✓ Approved — this URL is ready to use for this block.';
+      urlInput.value = '';
+      // Refresh the visible list so the new URL shows up immediately.
+      const listRes = await fetch(`${API_BASE_URL}/api/qr-urls/list?access_token=${encodeURIComponent(currentToken)}`);
+      const listData = await listRes.json();
+      renderUrlList(listData.urls || []);
+    } else if (data.status === 'pending'){
+      statusEl.className = 'status-line status-pending';
+      statusEl.textContent = 'Submitted — this URL is under review and will be available after the next safety check if it passes.';
+    } else if (data.status === 'rejected'){
+      statusEl.className = 'status-line status-rejected';
+      statusEl.textContent = 'This URL did not pass our safety check and cannot be used.';
+    } else {
+      statusEl.className = 'status-line status-error';
+      statusEl.textContent = data.error || "Couldn't submit this URL — try again.";
+    }
+  } catch (err){
+    statusEl.classList.remove('hidden');
+    statusEl.className = 'status-line status-error';
+    statusEl.textContent = "Couldn't reach the server — try again.";
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Submit for review';
+}
+
+/* ===================================================================
+   IDENTICAL HONEYPOT + RATE LIMITER (verbatim, per site-wide rule)
+   =================================================================== */
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
+        if (landingClickTimestamps.length > 20) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+function interceptBillboardBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
+</script>
+</body>
+</html>
