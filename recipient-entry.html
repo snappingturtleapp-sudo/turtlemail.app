@@ -86,7 +86,15 @@ p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 20px; }
 }
 .csv-drop:hover { border-color: var(--electric-cyan); color: var(--electric-cyan); }
 
-.table-scroll { overflow-x: auto; }
+.table-scroll { overflow-x: auto; scrollbar-width: auto; }
+.table-scroll::-webkit-scrollbar { height: 12px; }
+.table-scroll::-webkit-scrollbar-track { background: var(--bg-charcoal); border-radius: 6px; }
+.table-scroll::-webkit-scrollbar-thumb { background: var(--electric-cyan); border-radius: 6px; }
+.scroll-nav { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 8px; }
+.scroll-nav button {
+  background: transparent; border: 1px solid var(--electric-cyan); color: var(--electric-cyan);
+  border-radius: 6px; padding: 6px 14px; font-size: 13px; cursor: pointer;
+}
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
 thead th {
   text-align: left; padding: 8px 10px; font-family: 'Syncopate', sans-serif; font-size: 9px;
@@ -164,7 +172,11 @@ tr.row-confirmed td.data-cell { color: var(--text-muted); font-style: italic; }
       <div id="loading-banner" class="hidden">Loading…</div>
       <div id="error-banner" class="hidden"></div>
 
-      <div class="table-scroll">
+      <div class="scroll-nav">
+        <button onclick="scrollTable(-300)">← Scroll left</button>
+        <button onclick="scrollTable(300)">Scroll right →</button>
+      </div>
+      <div class="table-scroll" id="table-scroll-wrap">
         <table id="entry-table">
           <thead>
             <tr>
@@ -287,6 +299,11 @@ function renderTable(){
         <td><button class="confirm-btn" onclick="confirmRow(${i})">Confirm</button></td>
       </tr>`;
   }).join('');
+}
+
+/* ---------- Manual horizontal scroll (mouse-wheel/trackpad horizontal scroll is easy to miss) ---------- */
+function scrollTable(amount){
+  document.getElementById('table-scroll-wrap').scrollBy({ left: amount, behavior: 'smooth' });
 }
 
 /* ---------- Confirm a single row: capture data, then clear it from view ---------- */
