@@ -207,9 +207,10 @@ async function submitUrl(){
       const listRes = await fetch(`${API_BASE_URL}/api/qr-urls/list?access_token=${encodeURIComponent(currentToken)}`);
       const listData = await listRes.json();
       renderUrlList(listData.urls || []);
-    } else if (data.status === 'pending'){
+    } else if (data.status === 'pending_review' || data.status === 'pending'){
       statusEl.className = 'status-line status-pending';
-      statusEl.textContent = 'Submitted — this URL is under review and will be available after the next safety check if it passes.';
+      statusEl.textContent = "✓ Submitted — this passed our automated safety check and is now awaiting content review by our team. You'll see it move to Approved once reviewed.";
+      urlInput.value = '';
     } else if (data.status === 'rejected'){
       statusEl.className = 'status-line status-rejected';
       statusEl.textContent = 'This URL did not pass our safety check and cannot be used.';
