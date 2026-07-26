@@ -332,30 +332,28 @@ table.delivery-table td { padding: 14px 20px; border-bottom: 1px solid rgba(30,4
   <div class="control-panel">
 
     <div class="form-group">
-      <label for="corporate-email">Receipt email (optional)</label>
+      <label for="corporate-email">Opt-in to receive email updates regarding this order</label>
       <input type="email" id="corporate-email" placeholder="accounting@yourcompany.com" autocomplete="off">
     </div>
 
     <div class="form-group">
-      <label for="po-number">Purchase order (PO) number (optional)</label>
+      <label for="po-number">Add a Purchase Order (PO) number to this order</label>
       <input type="text" id="po-number" placeholder="PO-2026-XYZ">
     </div>
 
     <div class="form-group">
-      <label>Recipients</label>
-      <p class="price-note" style="margin-top:0;">
-        Enter recipient details in a secure popup — nothing you type there ever touches our servers.
-        It only ever shows credits from this block that haven't been used yet.
-      </p>
-      <button type="button" class="btn-checkout" id="open-entry-btn" onclick="openRecipientEntry()" disabled style="width:100%;">
-        Open Recipient Entry →
-      </button>
-      <p class="price-note" id="recipient-status" style="text-align:center;">Load a valid access token above first.</p>
+      <label for="batch-message">Message (printed on the packing slip)</label>
+      <textarea id="batch-message" rows="4" style="width:100%; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray); border-radius: 6px; padding: 13px 14px; color: var(--text-white); font-size: 14px; font-family: 'Inter', sans-serif; resize: vertical;" maxlength="500" placeholder="This message is sent to every recipient in this batch, unless a CSV row overrides it with its own 'message' column."></textarea>
     </div>
 
     <div class="form-group">
-      <label>Photos (1 to 5, sent with every recipient in this batch)</label>
-      <button type="button" class="tab-btn" id="choose-all-btn" style="width:100%; margin-bottom:10px;">
+      <label for="batch-from-name">Signature Line (optional)</label>
+      <input type="text" id="batch-from-name" placeholder="e.g. The Acme Team — leave blank to omit a signature line">
+    </div>
+
+    <div class="form-group">
+      <label>Photos (1 to 5, sent with every recipient in this batch) — start here</label>
+      <button type="button" class="btn-checkout" id="choose-all-btn" style="width:100%; margin-bottom:10px;">
         Choose up to 5 from your device →
       </button>
       <input type="file" id="multi-photo-input" accept="image/*" multiple style="display:none;">
@@ -399,13 +397,14 @@ table.delivery-table td { padding: 14px 20px; border-bottom: 1px solid rgba(30,4
     </div>
 
     <div class="form-group">
-      <label for="batch-message">Message (printed on the packing slip)</label>
-      <textarea id="batch-message" rows="4" style="width:100%; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray); border-radius: 6px; padding: 13px 14px; color: var(--text-white); font-size: 14px; font-family: 'Inter', sans-serif; resize: vertical;" maxlength="500" placeholder="This message is sent to every recipient in this batch, unless a CSV row overrides it with its own 'message' column."></textarea>
-    </div>
-
-    <div class="form-group">
-      <label for="batch-from-name">Sign as (optional)</label>
-      <input type="text" id="batch-from-name" placeholder="e.g. The Acme Team — leave blank to omit a signature line">
+      <label>Recipients</label>
+      <p class="price-note" style="margin-top:0;" id="recipients-gate-note">
+        Confirm your photos above first — recipients can be added once photos are checked and cropped.
+      </p>
+      <button type="button" class="tab-btn" id="open-entry-btn" onclick="openRecipientEntry()" disabled style="width:100%;">
+        Add Recipients →
+      </button>
+      <p class="price-note" id="recipient-status" style="text-align:center;">Load a valid access token above first.</p>
     </div>
 
   </div>
@@ -580,10 +579,10 @@ async function validateToken(token){
     statusEl.textContent = `Valid — ${data.credits_remaining} of ${data.total_credits} credits remaining.`;
     const creditsAvailableEl = document.getElementById('credits-available');
     if (creditsAvailableEl) creditsAvailableEl.textContent = `${data.credits_remaining}`;
-    document.getElementById('open-entry-btn').disabled = false;
     document.getElementById('recipient-status').textContent = 'No recipients confirmed yet.';
     document.getElementById('dashboard-link').href = `/dashboard.html?token=${encodeURIComponent(token)}`;
     document.getElementById('redirect-urls-link').href = `/manage-redirect-urls.html?token=${encodeURIComponent(token)}`;
+    refreshAddRecipientsGate();
   } catch (err){
     statusEl.className = 'token-status show bad';
     statusEl.textContent = "Couldn't reach the server to check this token.";
@@ -910,6 +909,7 @@ document.getElementById('confirm-crops-btn').addEventListener('click', async () 
     state.cropsFinalized = true;
     btn.textContent = 'Crops confirmed ✓';
     refreshDispatchButton();
+    refreshAddRecipientsGate();
   } catch (err){
     showBanner(err.message || "Couldn't finalize your crops. Please try again.", 'error');
     btn.disabled = false;
@@ -918,6 +918,24 @@ document.getElementById('confirm-crops-btn').addEventListener('click', async () 
 });
 
 /* ---------- Dispatch readiness ---------- */
+/* ---------- Gate: Add Recipients only unlocks once photos are confirmed ---------- */
+function refreshAddRecipientsGate(){
+  const btn = document.getElementById('open-entry-btn');
+  const note = document.getElementById('recipients-gate-note');
+  const photosApproved = Array.isArray(state.imageResults) && state.imageResults.length >= 1 && state.cropsFinalized;
+
+  if (state.tokenValid && photosApproved){
+    btn.disabled = false;
+    note.textContent = 'Enter recipient details in a secure popup — nothing you type there ever touches our servers.';
+  } else if (!state.tokenValid){
+    btn.disabled = true;
+    note.textContent = 'Load a valid access token above first.';
+  } else {
+    btn.disabled = true;
+    note.textContent = 'Confirm your photos above first — recipients can be added once photos are checked and cropped.';
+  }
+}
+
 function refreshDispatchButton(){
   const btn = document.getElementById('dispatch-btn');
   const photosApproved = Array.isArray(state.imageResults) && state.imageResults.length >= 1 && state.cropsFinalized;
