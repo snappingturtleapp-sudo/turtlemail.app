@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<title>Developer API Documentation | Turtle Mail</title>
+<meta name="robots" content="index, follow">
+<title>How Turtle Mail Works | Turtle Mail</title>
 <link rel="preconnect" href="https://googleapis.com">
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
-<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg-midnight: #0D1B2A;
@@ -17,6 +17,8 @@
   --text-muted: #86868b;
   --electric-cyan: #00F0FF;
   --border-gray: #1E293B;
+  --success-green: #22C55E;
+  --pending-amber: #F59E0B;
 }
 body {
   font-family: 'Inter', sans-serif;
@@ -28,75 +30,185 @@ body {
   background-attachment: fixed;
   color: var(--text-white);
   margin: 0;
-  padding: 20px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-height: 100vh;
   box-sizing: border-box;
 }
-.construction-container {
+.policy-container {
   width: 100%;
-  max-width: 600px;
-  background-color: rgba(32, 50, 67, 0.95);
+  max-width: 820px;
+  background-color: rgba(13, 27, 42, 0.95);
   border: 1px solid var(--border-gray);
   border-radius: 12px;
   padding: 45px;
-  text-align: center;
   backdrop-filter: blur(8px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-.tag {
-  font-family: 'Syncopate', sans-serif;
-  font-size: 12px;
-  color: var(--electric-cyan);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 h1 {
   font-family: 'Syncopate', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0 0 20px 0;
-  letter-spacing: -0.01em;
-}
-.description {
-  font-size: 14px;
-  line-height: 1.7;
-  color: rgba(230, 242, 255, 0.8);
-  margin-bottom: 30px;
-}
-.btn-return {
-  display: inline-block;
-  background-color: var(--electric-cyan);
-  color: var(--bg-charcoal);
-  border: none;
-  border-radius: 6px;
-  padding: 14px 28px;
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: none;
-  font-family: 'Syncopate', sans-serif;
+  font-size: 18px;
+  color: var(--electric-cyan);
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  text-align: center;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
+p.subhead { text-align: center; font-size: 13px; color: var(--text-muted); margin: 0 0 30px; }
+h2 {
+  font-family: 'Syncopate', sans-serif;
+  font-size: 13px;
+  color: var(--electric-cyan);
+  letter-spacing: 0.04em;
+  margin-top: 40px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-gray);
+  text-transform: uppercase;
+}
+h3 { font-size: 14px; color: var(--text-white); margin-top: 24px; margin-bottom: 10px; }
+p, li { font-size: 14px; line-height: 1.65; color: rgba(230, 242, 255, 0.9); }
+ol, ul { padding-left: 22px; margin-bottom: 16px; }
+li { margin-bottom: 8px; }
+strong { color: var(--electric-cyan); }
+.note {
+  background-color: rgba(0, 240, 255, 0.05);
+  border: 1px solid var(--electric-cyan);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin: 16px 0;
+  font-size: 13px;
+}
+.warn {
+  background-color: rgba(245, 158, 11, 0.06);
+  border: 1px solid var(--pending-amber);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin: 16px 0;
+  font-size: 13px;
+}
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-charcoal);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--electric-cyan);
+}
+a.compliance-link { color: var(--electric-cyan); text-decoration: none; }
+.toc { background: var(--card-dark); border: 1px solid var(--border-gray); border-radius: 8px; padding: 20px 20px 20px 40px; margin-bottom: 20px; }
+.toc a { color: var(--text-white); text-decoration: none; }
+.toc a:hover { color: var(--electric-cyan); }
+.site-footer-nav {
+  width: 100%; max-width: 820px; margin: 24px auto 0; display: flex;
+  justify-content: center; gap: 18px; flex-wrap: wrap;
+  padding-top: 20px; border-top: 1px solid var(--border-gray);
+}
+.site-footer-nav a { font-size: 11px; color: var(--text-muted); text-decoration: none; }
+.site-footer-nav a:hover { color: var(--electric-cyan); }
 </style>
 </head>
 <body>
 
-<div class="construction-container">
-  <div class="tag">Under Construction</div>
-  <h1>Developer API Documentation</h1>
-  <p class="description">Technical specs for firing print jobs programmatically from your CRM on a pipeline state update, bypassing the workspace UI entirely, are coming soon for enterprise integrators.</p>
-  <a href="/index.html" class="btn-return">Back to Home</a>
+<div class="policy-container">
+  <h1>How Turtle Mail Works</h1>
+  <p class="subhead">A complete walkthrough — from your first photo to a confirmed delivery.</p>
 
-  <p style="margin-top:20px; font-size:11px;">
-    <a href="/privacy.html" style="color: rgba(230,242,255,0.5); text-decoration:none;">Privacy</a> &middot;
-    <a href="/terms.html" style="color: rgba(230,242,255,0.5); text-decoration:none;">Terms of Sale</a> &middot;
-    <a href="/faq.html" style="color: rgba(230,242,255,0.5); text-decoration:none;">FAQ</a>
-  </p>
+  <div class="toc">
+    <ol>
+      <li><a href="#solo">Sending One Package (Instant)</a></li>
+      <li><a href="#buy">Buying a Credit Block (Batch)</a></li>
+      <li><a href="#workspace">The Batch Order Workspace</a></li>
+      <li><a href="#recipients">Adding Recipients</a></li>
+      <li><a href="#urls">QR Redirect URLs</a></li>
+      <li><a href="#dashboard">Checking Order Status</a></li>
+      <li><a href="#claims">Reporting a Damaged or Missing Package</a></li>
+      <li><a href="#tips">Good Habits</a></li>
+    </ol>
+  </div>
+
+  <h2 id="solo">1. Sending One Package (Instant)</h2>
+  <p>The fastest path if you just want to send a single package right now.</p>
+  <ol>
+    <li>From the home page, choose <strong>"Send a Package."</strong></li>
+    <li>Choose 1 to 5 photos from your device. Each one is automatically checked for prohibited content before you can continue.</li>
+    <li>For each approved photo, an interactive tool lets you drag, resize, and rotate the crop area — this is exactly what will be printed, so use the live preview to check it looks right.</li>
+    <li>Enter the recipient's name and address, your message (this is printed on the packing slip), and, if you'd like, a signature line.</li>
+    <li>Pay by card. Your card is only <em>authorized</em> at this point, not charged — you're only actually billed once the order is confirmed accepted for production.</li>
+    <li>Stay on the confirmation page until it shows "You're all set" — this can take anywhere from a few seconds to a little over a minute.</li>
+  </ol>
+  <div class="note">This flow does not currently support a custom QR redirect URL — packages sent this way use Turtle Mail's own default QR code. If you want a custom destination, use the Batch Order Workspace instead, even for a single recipient — see Section 3.</div>
+
+  <h2 id="buy">2. Buying a Credit Block (Batch)</h2>
+  <p>Use this if you're sending to more than one recipient, or if you want a custom QR redirect URL even for a single package.</p>
+  <ol>
+    <li>From the home page, choose <strong>"Enter Batch Order Workspace"</strong> then <strong>"Buy a credit block."</strong></li>
+    <li>Choose how many credits to buy — any quantity, including exactly 1. Pricing is $25 per credit for US/UK destinations, $100 per credit everywhere else.</li>
+    <li>Complete payment.</li>
+  </ol>
+  <div class="warn">
+    <strong>Save your access token immediately.</strong> There is no account, login, or password with Turtle Mail — your access token is the <em>only</em> way to use these credits. If it's lost, it cannot be recovered or reissued, and any unused credits on that block are lost with it. Save it somewhere secure before you close that page.
+  </div>
+
+  <h2 id="workspace">3. The Batch Order Workspace</h2>
+  <p>Paste your access token into the Batch Order Workspace to begin. The page is ordered the way it needs to be used:</p>
+  <ol>
+    <li><strong>Fill in the optional fields first</strong> — an email for order updates, a PO number, your message, and a signature line. None of these are required.</li>
+    <li><strong>Choose and confirm your photos.</strong> This step must be completed before anything else becomes available — 1 to 5 photos, checked for prohibited content, then cropped using the same interactive tool as the solo flow.</li>
+    <li>Once your photos are confirmed, the <strong>"Add Recipients"</strong> button becomes active.</li>
+  </ol>
+
+  <h2 id="recipients">4. Adding Recipients</h2>
+  <p>Clicking "Add Recipients" opens a secure popup window. Nothing you type here is ever sent to or stored on our servers except at the moment you actually send your batch — everything happens directly in your browser.</p>
+  <ul>
+    <li>The popup shows one row per <strong>unused</strong> credit remaining on your block — you can never enter more recipients than you have paid credits for.</li>
+    <li>Fill in each row directly, or click <strong>"Click to import a CSV"</strong> to fill many rows at once from a spreadsheet.</li>
+    <li>Click <strong>"Confirm"</strong> on each row once it's correct. Once confirmed, that row's details are cleared from view — this is intentional, and matches how the data is handled everywhere else in Turtle Mail.</li>
+    <li>Once you've confirmed everything you want to send, click <strong>"Send confirmed rows to Workspace."</strong> The popup will close automatically and your confirmed recipients will appear back in the main Workspace window.</li>
+  </ul>
+  <div class="note">
+    <strong>If you use a spreadsheet program (like Excel) to build your CSV:</strong> save it as a plain <code>.csv</code> file. If you ever have trouble importing one, check that the file's headers exactly match: name, title, company, street, suite, city, state, zip, country, phone, email, redirect_url.
+  </div>
+  <div class="warn">
+    <strong>You are responsible for the accuracy of every address you enter.</strong> Turtle Mail cannot verify that a recipient still lives at the address you provide, and is not responsible for a package that cannot be delivered because a recipient has moved.
+  </div>
+  <p>Back in the Workspace, review your recipients and message, then click <strong>Send Batch</strong>. A confirmation is required before sending — <strong>this action cannot be undone once started.</strong> A live progress screen shows each recipient's status as your batch actually sends.</p>
+
+  <h2 id="urls">5. QR Redirect URLs</h2>
+  <p>Every packing slip includes a printed QR code. By default, it points to Turtle Mail's own page — but you can set a custom destination for your entire block, or for individual recipients.</p>
+  <ol>
+    <li>From the Workspace, go to <strong>"Manage Redirect URLs."</strong></li>
+    <li>Submit the URL you'd like to use. It's checked automatically for safety, then reviewed by a person before it becomes usable — this isn't instant, so submit any URLs you plan to use well ahead of when you need them.</li>
+    <li>Once approved, use the dropdown in Recipient Entry to apply it to your whole batch at once, or override it for individual recipients.</li>
+  </ol>
+  <div class="warn">
+    <strong>Any URL that fails review remains visible, permanently, marked "Rejected," for as long as that credit block exists</strong> — visible to anyone holding that block's access token. Submit accordingly. We'd recommend always having at least one backup URL approved and ready, in case one you're using ever needs to be replaced.
+  </div>
+
+  <h2 id="dashboard">6. Checking Order Status</h2>
+  <p>Paste your access token into the Dashboard to see a live, per-credit status table: whether it's been used, submitted to production, its estimated delivery, any damage claim on file, and whether its QR code has been scanned.</p>
+  <div class="note">
+    <strong>"Delivered" is always an estimate, not a confirmation.</strong> Our fulfillment and postal partners do not provide a real-time signal back to us the moment a package is actually handed to a recipient — the date shown is calculated from the shipment date, not verified after the fact.
+  </div>
+
+  <h2 id="claims">7. Reporting a Damaged or Missing Package</h2>
+  <p>If a package arrives damaged, or never arrives at all:</p>
+  <ul>
+    <li>Use the <strong>damage claim form</strong>, available from the home page.</li>
+    <li>You'll need the order's <strong>TM order number</strong> (visible on your Dashboard once the package has shipped).</li>
+    <li>A claim can be submitted within <strong>48 hours of the order's estimated delivery date</strong> — not before, and not after.</li>
+    <li>Only one reprint is issued per order.</li>
+  </ul>
+
+  <h2 id="tips">8. Good Habits</h2>
+  <ul>
+    <li><strong>Allow popups from turtlemail.app</strong> — Recipient Entry depends on a popup window; if your browser blocks it, look for a popup-blocked notification near your address bar.</li>
+    <li><strong>Don't click "Add Recipients" repeatedly</strong> if nothing seems to happen — check your taskbar first. If a popup is already open, even minimized, clicking again will simply bring it back to the front rather than opening a new one.</li>
+    <li><strong>Bookmark your Dashboard link once your token is entered</strong> — the URL itself carries your token, letting you return directly without retyping it.</li>
+    <li><strong>Keep your access token somewhere safe</strong> — a password manager or a secure note. There is no recovery if it's lost.</li>
+  </ul>
 
   <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
   <div style="display: none; tab-index: -1;" aria-hidden="true">
@@ -104,6 +216,13 @@ h1 {
     <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
   </div>
 </div>
+
+<footer class="site-footer-nav">
+  <a href="/index.html">Home</a>
+  <a href="/faq.html">FAQ</a>
+  <a href="/privacy.html">Privacy</a>
+  <a href="/terms.html">Terms of Sale</a>
+</footer>
 
 <script>
 let landingClickTimestamps = [];
