@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow">
-    <title>Corporate Privacy Architecture & Compliance Policy | Turtle Mail</title>
+    <title>Privacy Policy | Turtle Mail</title>
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Inter:wght@400;600;700&family=Syncopate:wght@700&display=swap" rel="stylesheet">
@@ -122,55 +122,63 @@
         <img src="Turtle_Mail_Favicon.png" alt="Turtle Mail Architecture Logo" class="logo-icon">
     </div>
     
-    <h1>Corporate Privacy Architecture</h1>
-    
-    <p>We operate a strict, registration-free checkout workspace to maximize global data compliance. This document outlines how recipient parameters flow through our processing infrastructure.</p>
+    <h1>Turtle Mail Privacy Policy</h1>
+    <p style="text-align:center; margin-top:-20px; margin-bottom:30px; font-size:12px; color:var(--text-muted);">Effective Date: July 2026 · turtlemail.app/privacy</p>
 
-    <h2>What We Collect</h2>
-    <p>When an enterprise partner initiates a bulk campaign or a manual domestic checkout, we capture the final recipient names and physical delivery addresses exclusively to facilitate shipping and logistics.</p>
+    <p>Turtle Mail is built on a minimal data philosophy. We collect only what is necessary to fulfill your order. We do not sell your data. We do not build user profiles. We do not run advertising.</p>
+
+    <h2>Introduction</h2>
+    <p>Turtle Mail ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains what information we collect, why we collect it, and how it is used when you use turtlemail.app and its associated tools.</p>
+
+    <h2>How Recipient Data Actually Works</h2>
+    <p>This is the most important thing to understand about how Turtle Mail is built: recipient names and delivery addresses are used only to build the shipping request sent to our print partner, Prodigi — they are never written to Turtle Mail's own database. Whether you're sending one package or managing a large batch, recipient details live only in your own browser or on your own device until the moment an order is actually placed. We do not maintain a central address book, and we cannot look up a recipient's information in our system after the fact.</p>
+
+    <h2>Information You Provide</h2>
+    <ul>
+        <li><strong>Recipient details:</strong> Name and delivery address, entered by you at the time of sending. Used only to build the Prodigi shipping request. Not stored in our database.</li>
+        <li><strong>Your message:</strong> The note printed on the packing slip. This is not a private messaging service — whatever you enter here is printed on a physical document and is not covered by the privacy protections described elsewhere in this policy. You are solely responsible for what you choose to include. Stored temporarily for order processing and deleted within 30 days of payment.</li>
+        <li><strong>Access token:</strong> Generated when you purchase a credit block. There is no account, login, or password — the token itself is your only means of access. If it is lost, we cannot recover it or the credits tied to it.</li>
+        <li><strong>Receipt email and PO number (optional):</strong> Provided only if you choose to. Used solely to send you an order confirmation or to help you match a purchase to your own internal records. Never used for marketing.</li>
+        <li><strong>QR redirect URL (optional):</strong> Every packing slip includes a printed QR code. Setting a custom destination for it — reviewed and screened with Google Safe Browsing before approval — is available through the Batch Order Workspace, even for a single recipient. The instant single-package send flow does not currently offer this option; those packages use Turtle Mail's own default QR code. Any submitted URL that fails review remains visible, marked as rejected, for the life of the credit block it was submitted to.</li>
+        <li><strong>Damage claim details:</strong> If you report a damaged or non-arriving package, we collect a description and, optionally, a photo of the damage to review your claim.</li>
+        <li><strong>Payment information:</strong> Processed securely through Stripe. We never see or store your full card number. Stripe returns a masked sender identifier derived from your cardholder name and transaction ID, which we store for order management and dispute resolution (e.g., "Michelle B. (#3A4F)").</li>
+    </ul>
 
     <h2>Information Collected Automatically</h2>
     <ul>
-        <li><strong>Photographs:</strong> Selected by you from your camera roll. Transmitted to our image host Cloudinary for temporary storage, then to our print partner Prodigi for fulfillment. All photo assets are permanently deleted from Cloudinary within 30 days of the date of payment.</li>
-        <li><strong>Push notification token:</strong> Generated by your device when you grant notification permission. Stored to enable delivery confirmation notifications.</li>
-        <li><strong>Masked sender identifier:</strong> A privacy-preserving identifier derived from your cardholder first name, last initial, and the last 4 characters of your payment transaction ID (e.g., "Alex C. (#3A4F)"). Stored in our order database for support and dispute resolution purposes.</li>
-        <li><strong>Content moderation data:</strong> Photographs you select are submitted as low-resolution thumbnails to Google Cloud Vision SafeSearch for automated content moderation before printing. Google processes these images according to their own privacy policy. Images are not retained by Google after moderation.</li>
+        <li><strong>Photographs:</strong> Selected by you from your device. Transmitted to our image host Cloudinary for temporary storage, then to Prodigi for fulfillment. All photo assets are permanently deleted from Cloudinary within 30 days of the date of payment.</li>
+        <li><strong>Content moderation data:</strong> Photographs you select are submitted to Google Cloud Vision's SafeSearch feature for automated content moderation before printing. Google processes this data according to their own privacy policy.</li>
     </ul>
 
     <h2>How We Use Your Information</h2>
-    <p>We leverage incoming transactional metrics strictly to run our automated systems, executing the following functions:</p>
     <ul>
         <li>To process and fulfill your photo mail orders through our print partner Prodigi</li>
-        <li>To process payments through Stripe</li>
-        <li>To validate delivery addresses through Smarty API</li>
+        <li>To process payments and calculate applicable tax through Stripe</li>
         <li>To screen photographs for prohibited content via Google Cloud Vision</li>
-        <li>To send you a push notification when your order is delivered</li>
-        <li>To maintain order records for damage claim processing and dispute resolution</li>
-        <li>To improve and maintain the app</li>
+        <li>To screen QR redirect URLs you submit via Google Safe Browsing</li>
+        <li>To process damage claims and, where warranted, arrange a reprint</li>
+        <li>To maintain minimal order records for support and dispute resolution</li>
+        <li>To improve and maintain the service</li>
     </ul>
 
     <h2>How We Share Your Information</h2>
-    <p>We do not sell your personal information. We share your information only with the following service providers who are necessary to deliver the service:</p>
+    <p>We do not sell your personal information. We share information only with the service providers necessary to deliver the service:</p>
     <ul>
-        <li><strong>Prodigi:</strong> Print and mail fulfillment. Receives recipient addresses and photo files solely to print and mail your order.</li>
-        <li><strong>Stripe:</strong> Payment processing. Handles all payment transactions and tax calculation. Stripe's privacy policy governs their handling of payment data.</li>
-        <li><strong>Cloudinary:</strong> Temporary image hosting. Stores your photos between upload and Prodigi submission. Photos are deleted within 30 days of payment.</li>
-        <li><strong>Smarty:</strong> USPS address validation. Receives recipient addresses for standardization and verification.</li>
-        <li><strong>Google Cloud Vision:</strong> Content moderation. Receives low-resolution photo thumbnails for SafeSearch screening before printing.</li>
-        <li><strong>Expo:</strong> Push notification delivery. Receives your device push token to deliver order status notifications.</li>
+        <li><strong>Prodigi:</strong> Print and mail fulfillment. Receives the recipient address and photo files solely to print and ship your order. Prodigi ships under blind, white-label conditions — your recipient never sees Prodigi's name or branding, only Turtle Mail's.</li>
+        <li><strong>Stripe:</strong> Payment processing and tax calculation. Stripe's own privacy policy governs their handling of payment data.</li>
+        <li><strong>Cloudinary:</strong> Temporary image and packing-slip hosting. Files are deleted within 30 days of payment.</li>
+        <li><strong>Google Cloud Vision:</strong> Content moderation. Receives photo data for SafeSearch screening before printing.</li>
+        <li><strong>Google Safe Browsing:</strong> Reviews any custom QR redirect URL you submit for known malicious content before it can be used.</li>
     </ul>
     <p>We may disclose your information if required by law or to protect the rights, property, or safety of Turtle Mail, our users, or the public.</p>
 
-        <h2>Data Storage and Retention</h2>
+    <h2>Data Storage and Retention</h2>
     <ul>
-        <li><strong>Recipient addresses:</strong> Stored locally on your device only. Never stored on our servers beyond what is required to submit a specific order.</li>
-        <li><strong>Photo assets:</strong> Deleted from Cloudinary within 30 days of the date of payment. One reprint is permitted per order within this window. After deletion, reprints are not possible.</li>
-        <li><strong>Order records:</strong> Retained in our database for legal compliance, damage claim processing, and dispute resolution. Records contain order ID, masked sender identifier, recipient name and address, and order status.</li>
-        <li><strong>Push tokens:</strong> Retained until delivery is confirmed or the order record is archived.</li>
+        <li><strong>Recipient names and addresses:</strong> Never stored in our database. Used transiently to build the Prodigi shipping request only.</li>
+        <li><strong>Photo assets:</strong> Deleted from Cloudinary within 30 days of the date of payment. One reprint is permitted per order within this window, where warranted. After deletion, reprints are not possible.</li>
+        <li><strong>Order records:</strong> Retained for legal compliance, damage claim processing, and dispute resolution. Records contain an order reference, masked sender identifier, message, shipping status, and tracking information — not the recipient's name or address.</li>
+        <li><strong>Access tokens:</strong> Remain valid for as long as unused credits remain on the associated block. There is no password recovery; you are responsible for keeping your token secure.</li>
     </ul>
-
-    <h2>Your Address Book Security</h2>
-    <p>Your address book is stored exclusively on your device and is protected by a 4-digit PIN secured with SHA-256 hashing, optional Face ID or Touch ID biometric authentication, automatic lock when the app is minimized, and rate limiting with lockout after failed attempts.</p>
 
     <h2>Children's Privacy</h2>
     <p>Turtle Mail is not intended for use by anyone under the age of 18. We do not knowingly collect personal information from minors. If you believe a minor has used our service please contact us immediately.</p>
@@ -179,14 +187,13 @@
     <p>You have the right to access, correct, or request deletion of your personal information. To exercise these rights please contact us at <a href="mailto:privacy@turtlemail.app" class="compliance-link">privacy@turtlemail.app</a>. We will respond within 30 days.</p>
 
     <h2>Changes to This Policy</h2>
-    <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting a notice in the app or on our website. Your continued use of Turtle Mail after changes are posted constitutes your acceptance of the updated policy.</p>
+    <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting a notice on our website. Your continued use of Turtle Mail after changes are posted constitutes your acceptance of the updated policy.</p>
 
     <div class="contact-block">
-        <h2>Data Compliance Framework</h2>
-        <p><strong>Corporate Node:</strong> Turtle Mail, 411 Walnut St, GCS, FL 32043</p>
-        <p><strong>Digital Gateway:</strong> <a href="https://turtlemail.app" class="compliance-link">https://turtlemail.app</a></p>
-        <p><strong>Inbound Support Portal:</strong> <a href="mailto:customer_service@turtlemail.app" class="compliance-link">customer_service@turtlemail.app</a></p>
-        <p><strong>Communications Line:</strong> TBD</p>
+        <h2>Contact</h2>
+        <p><strong>Turtle Mail:</strong> 411 Walnut St, GCS, FL 32043</p>
+        <p><strong>Website:</strong> <a href="https://turtlemail.app" class="compliance-link">https://turtlemail.app</a></p>
+        <p><strong>Support:</strong> <a href="mailto:customer_service@turtlemail.app" class="compliance-link">customer_service@turtlemail.app</a></p>
     </div>
 
     <footer class="site-footer-nav">
