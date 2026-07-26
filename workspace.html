@@ -594,15 +594,28 @@ async function validateToken(token){
 /* ---------- Recipient Entry popup: launch + secure postMessage receiver ---------- */
 const SITE_ORIGIN = "https://turtlemail.app"; // exact origin — never '*' — for all postMessage checks
 
+let recipientEntryWindowRef = null; // tracks the currently-open popup, if any
+
 function openRecipientEntry(){
   if (!state.accessToken) return;
+
+  // If a popup is already open — even minimized, even sitting behind other
+  // windows — just bring it back to the front instead of opening a
+  // duplicate. This is exactly what happens when someone navigates away,
+  // does something else, and clicks "Add Recipients" again out of habit
+  // without realizing one was already open.
+  if (recipientEntryWindowRef && !recipientEntryWindowRef.closed){
+    recipientEntryWindowRef.focus();
+    return;
+  }
+
   const url = `/recipient-entry.html?token=${encodeURIComponent(state.accessToken)}`;
-  // A fresh, unique window name every time — reusing the same fixed name
-  // right after a previous popup with that name closed itself can confuse
-  // the browser into reopening a stale/half-torn-down context, showing a
-  // blank window instead of a genuinely fresh page load.
+  // A fresh, unique window name every time a genuinely NEW popup is opened —
+  // reusing the same fixed name right after a previous popup with that name
+  // closed itself can confuse the browser into reopening a stale/half-torn-down
+  // context, showing a blank window instead of a genuinely fresh page load.
   const windowName = 'turtlemail-recipient-entry-' + Date.now();
-  window.open(url, windowName, 'width=1300,height=800,noopener=false');
+  recipientEntryWindowRef = window.open(url, windowName, 'width=1300,height=800,noopener=false');
 }
 
 window.addEventListener('message', (event) => {
