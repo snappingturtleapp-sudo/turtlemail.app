@@ -3,10 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- B2B HIGH-INTENT SEO METADATA INFUSED -->
-<title>On-Demand Global Print Fulfillment & Logistics Engine | Turtle Mail</title>
-<meta name="description" content="Frictionless corporate print-on-demand and turnkey batch media routing. Secure session commerce with automated corporate tax invoices and address-verified global logistics.">
-<meta name="keywords" content="on-demand global print fulfillment, API-driven print logistics, automated supply chain, enterprise-grade data printing, secure session commerce, B2B custom media fulfillment, turnkey batch media routing, logistics delivery, automated corporate tax invoices, address-verified global logistics">
+<meta name="robots" content="index, follow">
+<title>Turtle Mail — Real Photos, Really Mailed</title>
+<meta name="description" content="Send real, physically printed photographs by mail — one package or a bulk business batch — with no account required. $25 per package, domestic and international delivery.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Turtle Mail",
+  "url": "https://turtlemail.app",
+  "description": "Turtle Mail is a B2B and consumer print-on-demand mail service. Send real, physically printed photographs and a personal message by mail — individually or in bulk via CSV batch upload — with no account registration required.",
+  "provider": {
+    "@type": "Organization",
+    "name": "General Adjuster Incorporated"
+  },
+  "areaServed": ["US", "GB"],
+  "offers": {
+    "@type": "Offer",
+    "price": "25.00",
+    "priceCurrency": "USD",
+    "description": "Per credit, US/UK destinations. $100 per credit for all other destinations."
+  }
+}
+</script>
 <link rel="preconnect" href="https://googleapis.com">
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
@@ -60,8 +79,17 @@ body {
   line-height: 1.6;
   color: var(--text-white);
   font-weight: 600;
-  margin-bottom: 35px;
+  margin-bottom: 12px;
   max-width: 650px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero-sub {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin-bottom: 35px;
+  max-width: 560px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -72,6 +100,7 @@ body {
   margin-bottom: 40px;
   text-align: left;
 }
+@media (max-width: 560px) { .value-matrix { grid-template-columns: 1fr; } }
 .matrix-card {
   background-color: rgba(18, 18, 20, 0.5);
   border: 1px solid var(--border-gray);
@@ -85,6 +114,7 @@ body {
   font-weight: 700;
   margin-bottom: 8px;
   letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 .matrix-desc { font-size: 13px; line-height: 1.5; color: rgba(230, 242, 255, 0.8); }
 .btn-launch {
@@ -108,6 +138,7 @@ body {
   transition: all 0.2s;
 }
 .btn-launch:hover { opacity: 0.95; transform: translateY(-1px); }
+.price-note { font-size: 12px; color: var(--text-muted); margin-top: 14px; }
 
 .site-nav {
   width: 100%;
@@ -148,7 +179,7 @@ body {
 </style>
 </head>
 
-  <body>
+<body>
 <nav class="site-nav">
   <a href="/turtle-mail-send.html">Send a Package</a>
   <a href="/workspace.html">Enter Batch Order Workspace</a>
@@ -156,60 +187,60 @@ body {
 </nav>
 <div class="billboard-container">
   <div class="header-logo-container">
-    <img src="Turtle_Mail_Digital_Secure_Delivered_Logo.png" alt="Turtle Mail Digital Secure Delivered" class="header-logo-img">
+    <img src="Turtle_Mail_Digital_Secure_Delivered_Logo.png" alt="Turtle Mail" class="header-logo-img">
   </div>
-  
+
   <p class="hero-tagline">
-    Stop burning high-value marketing budgets on skippable digital clicks. Deliver premium, permanent, 100-year archival heirloom artifacts directly into the hands of enterprise decision-makers.
+    Real photographs, printed and mailed — the one marketing touch that doesn't get lost in a crowded inbox.
+  </p>
+  <p class="hero-sub">
+    Send a single package, or upload a spreadsheet and reach an entire event's worth of contacts at once. No account required, for either.
   </p>
 
   <div class="value-matrix">
     <div class="matrix-card">
-      <div class="matrix-label">Impossible to Delete Unseen</div>
-      <div class="matrix-desc">A physical package can't be filtered, archived, or swiped away without a glance. Whether it lands on a desk or in a hand, it gets seen first — then it's up to you to earn the rest.</div>
+      <div class="matrix-label">Gets Noticed</div>
+      <div class="matrix-desc">A physical package can't be filtered, archived, or swiped away unseen. It has to be picked up first — then it's up to your message to earn the rest.</div>
     </div>
     <div class="matrix-card">
-      <div class="matrix-label">Turnkey Bulk Logistics</div>
-      <div class="matrix-desc">Drop your spreadsheet data blocks directly following a convention to execute instant high-throughput post-event fulfillment.</div>
+      <div class="matrix-label">Bulk-Ready</div>
+      <div class="matrix-desc">Upload a single spreadsheet of recipients and send a personalized, physical package to your entire list in one batch — no manual, one-at-a-time entry required.</div>
     </div>
     <div class="matrix-card">
-      <div class="matrix-label">Session-Isolated Gating</div>
-      <div class="matrix-desc">Maximum internal auditing compliance. We hold zero persistent data records or corporate contact databases on static systems.</div>
+      <div class="matrix-label">No Account, No PII Stored</div>
+      <div class="matrix-desc">There's no sign-up or login for either a single order or a business batch. Recipient names and addresses are used only to ship your order — never stored in our own systems.</div>
     </div>
     <div class="matrix-card">
-      <div class="matrix-label">Automated B2B Syncing</div>
-      <div class="matrix-desc">Programmatic invoicing parameters instantly emit localized Tax documentation directly back to your administrative dashboard.</div>
+      <div class="matrix-label">Built for Business Records</div>
+      <div class="matrix-desc">Add a PO number to your batch order for your own company's accounting process, and track every credit's status from a single, private dashboard.</div>
     </div>
   </div>
 
-  <!-- ACTIVE LANDING DECEPTION HONEYPOT TRAP -->
-  <div style="display: none; tab-index: -1;" aria-hidden="true">
-    <label for="website_secondary">Secondary Security Check Item Fields</label>
-    <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
-  </div>
+  <a href="/turtle-mail-send.html" class="btn-launch">Send Your First Package</a>
+  <p class="price-note">$25 per package, US &amp; UK · $100 international · up to 5 photos</p>
+</div>
 
-  <button class="btn-launch" onclick="executeSafeLandingNavigation()">
-    Send a Package
-  </button>
 <footer class="site-footer-nav">
-  <a href="/about.html">About</a>
+  <a href="/docs.html">How It Works</a>
+  <a href="/results.html">Why Physical Works</a>
   <a href="/faq.html">FAQ</a>
-  <a href="/terms.html">Terms</a>
   <a href="/privacy.html">Privacy</a>
-  <a href="/docs.html">Developer Docs</a>
-  <a href="/results.html">Case Studies</a>
+  <a href="/terms.html">Terms of Sale</a>
 </footer>
+
+<!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+<div style="display: none; tab-index: -1;" aria-hidden="true">
+  <label for="website_secondary">Secondary Security Check Item Fields</label>
+  <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
 </div>
 
 <script>
-// FRONTEND RATE LIMITER DEFENSE: Detects automated rapid script refresh patterns
 let landingClickTimestamps = [];
 document.addEventListener("DOMContentLoaded", () => {
-    // Monitor user interaction cadence natively to evaluate automation risks
     window.addEventListener("click", () => {
         const now = Date.now();
         landingClickTimestamps.push(now);
-        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000); // 5-second tracking track
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
         if (landingClickTimestamps.length > 20) {
             alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
             window.location.href = "https://turtlemail.app";
@@ -217,19 +248,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// HONEYPOT INTERCEPTION ENGINE: Automatically trips if a bot fills the hidden field
 function interceptBillboardBotAttack() {
     const triggerVal = document.getElementById("website_secondary").value;
     if (triggerVal) {
         console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
         window.location.href = "https://turtlemail.app";
     }
-}
-
-// Secure navigation conduit checking states before forwarding users to Page 2
-function executeSafeLandingNavigation() {
-    interceptBillboardBotAttack();
-    window.location.href = "/turtle-mail-send.html";
 }
 </script>
 </body>
