@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>Frequently Asked Questions | Turtle Mail</title>
+<meta name="description" content="How to mail a real printed photo without an app, how much it costs, how bulk business mailings work, and how Turtle Mail keeps recipient data private.">
 <link rel="preconnect" href="https://googleapis.com">
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link href="https://googleapis.com/css2?family=Inter:wght@400;600;700&family=Syncopate:wght@700&display=swap" rel="stylesheet">
@@ -28,81 +29,119 @@ body {
   background-attachment: fixed;
   color: var(--text-white);
   margin: 0;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  padding: 40px 20px;
   min-height: 100vh;
   box-sizing: border-box;
 }
-.construction-container {
-  width: 100%;
-  max-width: 600px;
+.wrap { width: 100%; max-width: 760px; margin: 0 auto; }
+.card {
   background-color: rgba(32, 50, 67, 0.95);
   border: 1px solid var(--border-gray);
   border-radius: 12px;
   padding: 45px;
-  text-align: center;
   backdrop-filter: blur(8px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-.tag {
-  font-family: 'Syncopate', sans-serif;
-  font-size: 12px;
-  color: var(--electric-cyan);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 h1 {
   font-family: 'Syncopate', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0 0 20px 0;
-  letter-spacing: -0.01em;
-}
-.description {
-  font-size: 14px;
-  line-height: 1.7;
-  color: rgba(230, 242, 255, 0.8);
-  margin-bottom: 30px;
-}
-.btn-return {
-  display: inline-block;
-  background-color: var(--electric-cyan);
-  color: var(--bg-charcoal);
-  border: none;
-  border-radius: 6px;
-  padding: 14px 28px;
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: none;
-  font-family: 'Syncopate', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  margin: 0 0 8px;
 }
+p.sub { font-size: 13px; color: var(--text-muted); margin: 0 0 36px; }
+.q-block { margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--border-gray); }
+.q-block:last-of-type { border-bottom: none; }
+h2 {
+  font-size: 17px;
+  color: var(--electric-cyan);
+  margin: 0 0 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+p.a { font-size: 14.5px; line-height: 1.7; color: rgba(230, 242, 255, 0.88); margin: 0 0 10px; }
+a { color: var(--electric-cyan); }
+.site-footer-nav {
+  width: 100%; max-width: 760px; margin: 24px auto 0; display: flex;
+  justify-content: center; gap: 18px; flex-wrap: wrap;
+  padding-top: 20px; border-top: 1px solid var(--border-gray);
+}
+.site-footer-nav a { font-size: 11px; color: var(--text-muted); text-decoration: none; }
+.site-footer-nav a:hover { color: var(--electric-cyan); }
 </style>
 </head>
 <body>
 
-<div class="construction-container">
-  <div class="tag">Under Construction</div>
-  <h1>Frequently Asked Questions</h1>
-  <p class="description">Common questions about ordering, delivery timelines, pricing, and how our no-account system works are being compiled here.</p>
-  <a href="/index.html" class="btn-return">Back to Home</a>
+<div class="wrap">
+  <div class="card">
+    <h1>Frequently Asked Questions</h1>
+    <p class="sub">Real questions about ordering, pricing, delivery, privacy, and how Turtle Mail actually works.</p>
 
-  <p style="margin-top:20px; font-size:11px;">
-    <a href="/privacy.html" style="color: rgba(230,242,255,0.5); text-decoration:none;">Privacy</a> &middot;
-    <a href="/terms.html" style="color: rgba(230,242,255,0.5); text-decoration:none;">Terms of Sale</a> &middot;
-    <a href="/faq.html" style="color: rgba(230,242,255,0.5); text-decoration:none;">FAQ</a>
-  </p>
+    <div class="q-block">
+      <h2>How do I mail a physical photo without an app?</h2>
+      <p class="a">Turtle Mail works entirely from your web browser — there's nothing to download. Visit turtlemail.app, choose up to five photos, write a short message, enter a recipient's address, and pay. A real, professionally printed photo package is mailed directly to them, typically within 10-15 business days.</p>
+    </div>
+
+    <div class="q-block">
+      <h2>Can I send a printed photo without creating an account?</h2>
+      <p class="a">Yes. Turtle Mail is deliberately accountless — there's no sign-up, no password, and no login of any kind, for either a single package or a business batch order. A single order is simply paid for and sent in one motion.</p>
+    </div>
+
+    <div class="q-block">
+      <h2>How much does it cost to print and mail a photo?</h2>
+      <p class="a">A single package — up to five photos and one personal message card — is $25 flat for US and UK delivery, or $100 flat for other international destinations. There are no subscriptions and no hidden fees; the price is the same regardless of how many photos you include, up to five.</p>
+    </div>
+
+    <div class="q-block">
+      <h2>Can a business send physical mail to hundreds of prospects at once?</h2>
+      <p class="a">Yes — this is Turtle Mail's core B2B capability. A business can purchase a block of credits and upload a single spreadsheet (CSV file) containing every recipient's details at once. The system automatically processes the entire batch, sending a personalized, physically printed package to each recipient, without any manual, one-at-a-time data entry.</p>
+    </div>
+
+    <div class="q-block">
+      <h2>What is the QR code on the packing slip, and can I customize where it leads?</h2>
+      <p class="a">Every package includes a scannable QR code. By default, it leads to Turtle Mail's own page, but business senders can request a custom destination — a specific product page, video, or offer — which is reviewed for safety before it goes live. This turns a physical package into a bridge back to a digital call to action.</p>
+    </div>
+
+    <div class="q-block">
+      <h2>Do you store my recipient's name and address?</h2>
+      <p class="a">No. Recipient information is used only long enough to build the actual shipping request sent to our print partner — it is never written into our own database. This is true for both single orders and bulk business batches, regardless of scale.</p>
+    </div>
+
+    <div class="q-block">
+      <h2>How long does delivery take?</h2>
+      <p class="a">Production and delivery typically take 10 to 15 business days from the date of your order. Our fulfillment partner does not provide real-time delivery confirmation, so any estimated delivery date is calculated from the ship date, not independently verified — this is also the basis for our damage-claim filing window.</p>
+    </div>
+
+    <div class="q-block">
+      <h2>What happens if my package arrives damaged?</h2>
+      <p class="a">You can submit a damage claim within 48 hours of your order's estimated delivery date. A real person reviews every claim, and a free reprint is issued where warranted — there is no charge for a valid claim. Only one reprint is issued per order.</p>
+    </div>
+
+    <div class="q-block">
+      <h2>Can I add a purchase order (PO) number for my company's records?</h2>
+      <p class="a">Yes — but only through the batch order workspace, not the single instant-send flow. If you need a PO number attached to your order for your company's reimbursement or accounting process, purchase a credit block (even a block of just one) and enter your PO number there. The single-package "Send a Package" flow does not currently include a PO number field.</p>
+    </div>
+
+    <div class="q-block">
+      <h2>What's the difference between Turtle Mail and a regular online greeting card or postcard service?</h2>
+      <p class="a">Turtle Mail prints real, physical 4x6 lustre photographs — not a folded card or a low-resolution postcard print — accompanied by a personal message card, mailed in a real envelope. It's built specifically around the idea that a genuine printed photograph is a keepsake, not a disposable greeting.</p>
+    </div>
+
+  </div>
 
   <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
   <div style="display: none; tab-index: -1;" aria-hidden="true">
     <label for="website_secondary">Secondary Security Check Item Fields</label>
     <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
   </div>
+
+  <footer class="site-footer-nav">
+    <a href="/index.html">Home</a>
+    <a href="/docs.html">How It Works</a>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html">Terms of Sale</a>
+    <a href="/faq.html">FAQ</a>
+  </footer>
 </div>
 
 <script>
