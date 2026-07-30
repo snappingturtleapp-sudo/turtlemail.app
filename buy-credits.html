@@ -148,6 +148,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     <label for="org-name">Organization (optional — for rep-assisted purchases)</label>
     <input type="text" id="org-name" placeholder="Leave blank for a self-serve purchase">
 
+    <label for="po-number">Purchase Order (PO) number (optional)</label>
+    <input type="text" id="po-number" placeholder="For your company's accounting records" maxlength="30">
+
+    <label for="invoice-email">Email a formal invoice (optional)</label>
+    <input type="email" id="invoice-email" placeholder="Leave blank if you don't need a formal invoice">
+
     <div class="summary-card">
       <div class="price-line"><span>Credits</span><span id="summary-qty">—</span></div>
       <div class="price-line"><span>Price per credit</span><span>$25.00</span></div>
@@ -336,6 +342,8 @@ async function startCheckout(){
   try { buyerTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e) { buyerTimezone = undefined; }
 
   const orgName = document.getElementById('org-name').value.trim();
+  const poNumber = document.getElementById('po-number').value.trim();
+  const invoiceEmail = document.getElementById('invoice-email').value.trim();
 
   const payload = {
     totalCredits: selectedQty,
@@ -343,6 +351,8 @@ async function startCheckout(){
     cancelUrl,
     buyerTimezone,
     organizationId: orgName || undefined,
+    poNumber: poNumber || undefined,
+    invoiceEmail: invoiceEmail || undefined,
     // The checkbox state only — the actual consent TEXT logged for the
     // audit trail is the backend's own canonical copy, never trusted from
     // the client. See BULK_PURCHASE_CONSENT_TEXT in credits_commissions.py.
