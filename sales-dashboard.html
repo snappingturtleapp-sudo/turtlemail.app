@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Sales Rep Dashboard | Turtle Mail</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-midnight: #0D1B2A;
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --success-green: #22C55E;
+  --pending-red: #EF4444;
+  --off-gray: #4B5563;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-charcoal);
+  background-image: url('Turtle_Mail_Background.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text-white);
+  margin: 0;
+  padding: 40px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.wrapper { width: 100%; max-width: 680px; }
+.card {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 36px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+h1.page-title {
+  font-family: 'Syncopate', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; }
+label {
+  display: block; font-size: 11px; color: var(--electric-cyan);
+  margin-bottom: 10px; font-weight: 700; font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+input[type="text"] {
+  width: 100%; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray);
+  border-radius: 6px; padding: 13px 14px; color: var(--text-white);
+  font-size: 14px; font-family: 'JetBrains Mono', monospace; margin-bottom: 16px;
+}
+input:focus { border-color: var(--electric-cyan); outline: none; }
+button {
+  font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 12px;
+  padding: 14px 24px; border-radius: 6px; border: none; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.05em; width: 100%;
+  background-color: var(--electric-cyan); color: var(--bg-charcoal);
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+.hidden { display: none !important; }
+.banner { padding: 12px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; }
+.banner.error { background: rgba(239,68,68,0.08); border: 1px solid var(--pending-red); color: var(--pending-red); }
+
+.welcome { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.total-earned { font-family: 'JetBrains Mono', monospace; font-size: 36px; color: var(--electric-cyan); font-weight: 800; margin: 10px 0; }
+.total-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.renewal-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.renewal-light { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; }
+.renewal-light.off { background: var(--off-gray); }
+.renewal-light.red { background: var(--pending-red); box-shadow: 0 0 12px rgba(239,68,68,0.5); }
+.renewal-light.green { background: var(--success-green); box-shadow: 0 0 12px rgba(34,197,94,0.5); }
+.renewal-text { font-size: 14px; }
+.renewal-text strong { display: block; font-size: 15px; margin-bottom: 2px; }
+
+.agreement-box { background: rgba(0,240,255,0.04); border: 1px solid var(--border-gray); border-radius: 8px; padding: 18px; font-size: 13px; line-height: 1.7; color: var(--text-muted); }
+.agreement-box a { color: var(--electric-cyan); }
+.agreement-checkbox-row { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0; }
+.agreement-checkbox-row label { margin: 0; font-size: 13px; color: var(--text-white); text-transform: none; font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: normal; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 6px; border-bottom: 1px solid var(--border-gray); }
+td { padding: 10px 6px; border-bottom: 1px solid var(--border-gray); }
+.rate-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+.rate-badge.qualifying { background: rgba(0,240,255,0.1); color: var(--electric-cyan); }
+.rate-badge.recurring { background: rgba(148,163,184,0.1); color: var(--text-muted); }
+.empty-state { text-align: center; color: var(--text-muted); font-size: 13px; padding: 30px 0; }
+
+.site-footer-nav {
+  width: 100%; max-width: 680px; margin: 24px auto 0; display: flex;
+  justify-content: center; gap: 18px; flex-wrap: wrap;
+  padding-top: 20px; border-top: 1px solid var(--border-gray);
+}
+.site-footer-nav a { font-size: 11px; color: var(--text-muted); text-decoration: none; }
+.site-footer-nav a:hover { color: var(--electric-cyan); }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <div class="card" id="token-gate">
+    <h1 class="page-title">Sales Rep Dashboard</h1>
+    <p class="page-sub">Enter your private access token to view your commissions and renewal status.</p>
+    <div id="gate-banner"></div>
+    <label for="token-input">Access Token</label>
+    <input type="text" id="token-input" placeholder="Paste your access token">
+    <button onclick="loadDashboard()">View My Dashboard →</button>
+  </div>
+
+  <div class="hidden" id="dashboard-content">
+    <div class="card">
+      <p class="welcome" id="rep-name"></p>
+      <p class="total-label">Total Commissions Earned</p>
+      <p class="total-earned" id="total-earned">$0.00</p>
+    </div>
+
+    <div class="card">
+      <h1 class="page-title">Contract Status</h1>
+      <div class="renewal-row">
+        <div class="renewal-light off" id="renewal-light"></div>
+        <div class="renewal-text" id="renewal-text">
+          <strong>Checking...</strong>
+        </div>
+      </div>
+      <div class="agreement-box">
+        Independent contractor agreements run January 1 through December 31 each year and must be
+        renewed annually. Starting November 1st, you can request next year's agreement below.
+        <br><br>
+        <strong>To renew:</strong> check the box below to request your agreement, then
+        <a href="/independent-contractor-agreement.pdf" target="_blank">download and review the agreement here</a>.
+        Sign and date it, then email the signed copy to
+        <strong>sales@turtlemail.app</strong>. Once we countersign it, your light above will turn green
+        and you're confirmed for the upcoming year.
+        <div class="agreement-checkbox-row">
+          <input type="checkbox" id="renewal-checkbox" onchange="requestRenewal()">
+          <label for="renewal-checkbox">Request my independent contractor agreement for next year</label>
+        </div>
+        <span id="renewal-request-status"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h1 class="page-title">Commission History</h1>
+      <p class="page-sub">Every purchase you're credited with, most recent first.</p>
+      <div id="commissions-table"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer-nav">
+  <a href="/index.html">Home</a>
+  <a href="/docs.html">How It Works</a>
+  <a href="/privacy.html">Privacy</a>
+  <a href="/terms.html">Terms of Sale</a>
+</footer>
+
+<!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+<div style="display: none; tab-index: -1;" aria-hidden="true">
+  <label for="website_secondary">Secondary Security Check Item Fields</label>
+  <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+</div>
+
+<script>
+const API_BASE_URL = "https://api.turtlemail.app";
+let currentAccessToken = null;
+
+function showGateBanner(msg){
+  document.getElementById('gate-banner').innerHTML = `<div class="banner error">${msg}</div>`;
+}
+
+async function loadDashboard(){
+  const token = document.getElementById('token-input').value.trim();
+  if (!token){ showGateBanner('Please enter your access token.'); return; }
+  currentAccessToken = token;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/sales-reps/dashboard?accessToken=${encodeURIComponent(token)}`);
+    if (!res.ok){
+      showGateBanner('That access token was not recognized.');
+      return;
+    }
+    const data = await res.json();
+    renderDashboard(data);
+    document.getElementById('token-gate').classList.add('hidden');
+    document.getElementById('dashboard-content').classList.remove('hidden');
+  } catch (e){
+    showGateBanner('Could not reach the server. Please try again.');
+  }
+}
+
+function renderDashboard(data){
+  document.getElementById('rep-name').textContent = `Welcome, ${data.full_name}`;
+  document.getElementById('total-earned').textContent = `$${(data.total_earned_cents / 100).toFixed(2)}`;
+
+  const light = document.getElementById('renewal-light');
+  const text = document.getElementById('renewal-text');
+  light.className = `renewal-light ${data.renewal_state}`;
+  if (data.renewal_state === 'off'){
+    text.innerHTML = '<strong>Not yet time to renew.</strong> Renewal opens November 1st each year.';
+  } else if (data.renewal_state === 'red'){
+    text.innerHTML = '<strong>Renewal needed for next year.</strong> Request and sign your agreement below.';
+  } else {
+    text.innerHTML = "<strong>You're all set for next year.</strong> Your agreement has been countersigned.";
+  }
+
+  const tableDiv = document.getElementById('commissions-table');
+  if (!data.commissions || data.commissions.length === 0){
+    tableDiv.innerHTML = '<p class="empty-state">No commissions recorded yet.</p>';
+    return;
+  }
+
+  const rows = data.commissions.map(c => {
+    const date = new Date(c.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    const badge = c.is_qualifying_sale
+      ? '<span class="rate-badge qualifying">30% Qualifying</span>'
+      : '<span class="rate-badge recurring">10% Recurring</span>';
+    return `<tr>
+      <td>${c.company_name || '(unnamed)'}</td>
+      <td>${badge}</td>
+      <td>$${(c.commission_amount_cents / 100).toFixed(2)}</td>
+      <td>${date}</td>
+    </tr>`;
+  }).join('');
+
+  tableDiv.innerHTML = `
+    <table>
+      <thead><tr><th>Company</th><th>Type</th><th>Commission</th><th>Date</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+async function requestRenewal(){
+  const checkbox = document.getElementById('renewal-checkbox');
+  const statusEl = document.getElementById('renewal-request-status');
+  if (!checkbox.checked) return;
+
+  checkbox.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/sales-reps/request-renewal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accessToken: currentAccessToken })
+    });
+    if (res.ok){
+      statusEl.textContent = ' ✓ Request recorded — don\'t forget to sign and email the agreement.';
+      statusEl.style.color = 'var(--success-green)';
+    } else {
+      statusEl.textContent = ' Something went wrong — please try again.';
+      statusEl.style.color = 'var(--pending-red)';
+    }
+  } catch (e){
+    statusEl.textContent = ' Could not reach the server.';
+    statusEl.style.color = 'var(--pending-red)';
+  }
+  checkbox.disabled = false;
+}
+
+// Same one-token-in-URL convenience already used elsewhere on the site.
+(function autoFillTokenFromUrl(){
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('accessToken');
+  if (token){
+    document.getElementById('token-input').value = token;
+    loadDashboard();
+  }
+})();
+
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
+        if (landingClickTimestamps.length > 20) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+function interceptBillboardBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
+</script>
+</body>
+</html>
