@@ -145,8 +145,13 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     <label for="custom-qty">Or enter a custom amount</label>
     <input type="number" id="custom-qty" min="1" placeholder="e.g. 250" oninput="handleCustomQty()">
 
-    <label for="org-name">Organization (optional — for rep-assisted purchases)</label>
+    <label for="org-name">Remit-to Name — the name that should appear on your invoice</label>
     <input type="text" id="org-name" placeholder="Leave blank for a self-serve purchase">
+
+    <label for="rep-select">Did a sales representative refer you?</label>
+    <select id="rep-select">
+      <option value="">— No, I found Turtle Mail on my own —</option>
+    </select>
 
     <label for="po-number">Purchase Order (PO) number (optional)</label>
     <input type="text" id="po-number" placeholder="For your company's accounting records" maxlength="30">
@@ -331,6 +336,12 @@ async function startCheckout(){
     showBanner('Please acknowledge the purchase terms above before continuing.', 'error');
     return;
   }
+  const invoiceEmailCheck = document.getElementById('invoice-email').value.trim();
+  const orgNameCheck = document.getElementById('org-name').value.trim();
+  if (invoiceEmailCheck && !orgNameCheck){
+    showBanner('A Remit-to Name is required to generate a formal invoice — please fill it in above, or leave the invoice email blank.', 'error');
+    return;
+  }
 
   const btn = document.getElementById('pay-btn');
   btn.disabled = true;
@@ -344,6 +355,7 @@ async function startCheckout(){
   const orgName = document.getElementById('org-name').value.trim();
   const poNumber = document.getElementById('po-number').value.trim();
   const invoiceEmail = document.getElementById('invoice-email').value.trim();
+  const selectedRepId = document.getElementById('rep-select').value;
 
   const payload = {
     totalCredits: selectedQty,
@@ -353,6 +365,7 @@ async function startCheckout(){
     organizationId: orgName || undefined,
     poNumber: poNumber || undefined,
     invoiceEmail: invoiceEmail || undefined,
+    soldByRepId: selectedRepId || undefined,
     // The checkbox state only — the actual consent TEXT logged for the
     // audit trail is the backend's own canonical copy, never trusted from
     // the client. See BULK_PURCHASE_CONSENT_TEXT in credits_commissions.py.
@@ -380,6 +393,28 @@ async function startCheckout(){
     btn.textContent = 'Continue to payment →';
   }
 }
+
+/* ---------- Populate the rep dropdown, auto-select via ?ref= link ---------- */
+(async function loadActiveReps(){
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/sales-reps/active`);
+    const data = await res.json();
+    const select = document.getElementById('rep-select');
+    const refParam = new URLSearchParams(window.location.search).get('ref');
+
+    (data.reps || []).forEach(rep => {
+      const opt = document.createElement('option');
+      opt.value = rep.rep_id;
+      opt.textContent = rep.full_name;
+      if (refParam && rep.referral_code && refParam.toUpperCase() === rep.referral_code.toUpperCase()) {
+        opt.selected = true;
+      }
+      select.appendChild(opt);
+    });
+  } catch (e) {
+    console.warn('Could not load sales reps (non-fatal):', e);
+  }
+})();
 
 /* ---------- Post-payment confirmation + token reveal ---------- */
 (function handleReturnFromStripe(){
