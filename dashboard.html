@@ -223,7 +223,7 @@ tbody tr:hover { background: rgba(0,240,255,0.03); }
         <div class="chip"><div class="num" id="stat-total">—</div><div class="label">Total Credits</div></div>
         <div class="chip"><div class="num" id="stat-remaining">—</div><div class="label">Remaining</div></div>
         <div class="chip"><div class="num" id="stat-submitted">—</div><div class="label">Submitted</div></div>
-        <div class="chip"><div class="num" id="stat-delivered">—</div><div class="label">Delivered</div></div>
+        <div class="chip"><div class="num" id="stat-shipped">—</div><div class="label">Shipped</div></div>
         <div class="chip"><div class="num" id="stat-claims">—</div><div class="label">Damage Claims</div></div>
         <div class="chip"><div class="num" id="stat-reprints">—</div><div class="label">Reprints Sent</div></div>
         <div class="chip"><div class="num" id="stat-scanned">—</div><div class="label">QR Scanned</div></div>
@@ -237,7 +237,7 @@ tbody tr:hover { background: rgba(0,240,255,0.03); }
           <option value="all">All credits</option>
           <option value="used">Used only</option>
           <option value="unused">Unused only</option>
-          <option value="delivered">Delivered only</option>
+          <option value="shipped">Shipped only</option>
           <option value="claims">Damage claims only</option>
         </select>
         <button class="refresh-btn" onclick="loadDashboard(true)">↻ Refresh</button>
@@ -257,7 +257,7 @@ tbody tr:hover { background: rgba(0,240,255,0.03); }
               <th>Packing Slip</th>
               <th>Used</th>
               <th>Submitted</th>
-              <th>Delivered</th>
+              <th>Shipped</th>
               <th>Damage Claim</th>
               <th>Reprint Sent</th>
               <th>QR Scanned</th>
@@ -294,9 +294,7 @@ tbody tr:hover { background: rgba(0,240,255,0.03); }
 const API_BASE_URL = "https://api.turtlemail.app";
 
 /* ===================================================================
-   NOT YET BUILT — this page assumes a route that does not exist yet.
-
-   ASSUMED: GET /api/dashboard?access_token=...
+   CONFIRMED BUILT AND LIVE — GET /api/dashboard?access_token=...
    (query-param style, matching the existing convention used by
    /api/credits/status and /api/checkout-status — NOT a /dashboard/<token>
    path route, since this is a static frontend page with no server-side
@@ -304,7 +302,7 @@ const API_BASE_URL = "https://api.turtlemail.app";
      https://turtlemail.app/dashboard.html?token=<access_token>
    which this page reads and forwards as the access_token query param.)
 
-   ASSUMED RESPONSE SHAPE:
+   CONFIRMED REAL RESPONSE SHAPE:
    {
      block_id: "...",
      total_credits: 500,
@@ -319,7 +317,7 @@ const API_BASE_URL = "https://api.turtlemail.app";
          packing_slip_url: "https://res.cloudinary.com/.../packingslips/..." | null,
          is_used: true,
          submitted: true,
-         delivered: true,
+         shipped: true,
          damage_claim: false,
          reprint_sent: false,
          qr_scanned: true
@@ -328,12 +326,17 @@ const API_BASE_URL = "https://api.turtlemail.app";
      ]
    }
 
+   NOTE ON "shipped": this field is TRUE the moment Prodigi's 'Complete'
+   webhook fires — confirmed directly with Prodigi that this means the
+   order has SHIPPED, never a genuine delivery confirmation. Prodigi has
+   no true "Delivered" signal at all. This field was originally named
+   "delivered" here and in the backend response, which incorrectly
+   implied a confirmation that doesn't exist — corrected on [31 July 2026] to "shipped" to accurately reflect what the underlying data
+   actually represents.
+
    404 if the access_token is invalid or the block is unpaid, matching
    cc.get_block_status()'s existing behavior on every other route that
    takes access_token.
-
-   ⚠️ REMINDER: the actual Flask route for this does not exist in app.py
-   yet — see the note requested alongside this file.
    =================================================================== */
 
 let ledgerData = null; // full response from the dashboard endpoint, cached for filtering/search
@@ -376,7 +379,7 @@ async function loadDashboard(isRefresh = false){
     document.getElementById('stat-total').textContent = data.total_credits;
     document.getElementById('stat-remaining').textContent = data.credits_remaining;
     document.getElementById('stat-submitted').textContent = data.credits.filter(c => c.submitted).length;
-    document.getElementById('stat-delivered').textContent = data.credits.filter(c => c.delivered).length;
+    document.getElementById('stat-shipped').textContent = data.credits.filter(c => c.shipped).length;
     document.getElementById('stat-claims').textContent = data.credits.filter(c => c.damage_claim).length;
     document.getElementById('stat-reprints').textContent = data.credits.filter(c => c.reprint_sent).length;
     document.getElementById('stat-scanned').textContent = data.credits.filter(c => c.qr_scanned).length;
@@ -414,7 +417,7 @@ function renderTable(){
 
   if (filter === 'used') rows = rows.filter(c => c.is_used);
   else if (filter === 'unused') rows = rows.filter(c => !c.is_used);
-  else if (filter === 'delivered') rows = rows.filter(c => c.delivered);
+  else if (filter === 'shipped') rows = rows.filter(c => c.shipped);
   else if (filter === 'claims') rows = rows.filter(c => c.damage_claim);
 
   const tbody = document.getElementById('ledger-body');
@@ -427,7 +430,7 @@ function renderTable(){
       <td>${c.packing_slip_url ? `<a href="${c.packing_slip_url}" target="_blank" style="color:var(--electric-cyan);">View</a>` : '—'}</td>
       <td>${dot(c.is_used)}</td>
       <td>${dot(c.submitted)}</td>
-      <td>${dot(c.delivered)}</td>
+      <td>${dot(c.shipped)}</td>
       <td>${dot(c.damage_claim)}</td>
       <td>${dot(c.reprint_sent)}</td>
       <td>${dot(c.qr_scanned)}</td>
