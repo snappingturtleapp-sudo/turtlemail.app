@@ -112,6 +112,15 @@
             100% { transform: translateY(-40px); }
         }
     </style>
+
+    <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+  <div style="display: none; tab-index: -1;" aria-hidden="true">
+    <label for="website_secondary">Secondary Security Check Item Fields</label>
+    <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+  </div>
+
+
+
 </head>
 <body>
 
@@ -134,22 +143,6 @@
         <div class="soi-text">TM</div>
 
     </div>
-
-/* ===================================================================
-   IDENTICAL HONEYPOT + RATE LIMITER (verbatim, per site-wide rule)
-   =================================================================== */
-let landingClickTimestamps = [];
-document.addEventListener("DOMContentLoaded", () => {
-    window.addEventListener("click", () => {
-        const now = Date.now();
-        landingClickTimestamps.push(now);
-        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
-        if (landingClickTimestamps.length > 20) {
-            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
-            window.location.href = "https://turtlemail.app";
-        }
-    });
-});
 
 
 </body>
