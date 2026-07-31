@@ -175,6 +175,7 @@ tbody tr:hover { background: rgba(0,240,255,0.03); }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
 .dot.on { background: var(--success-green); box-shadow: 0 0 6px var(--success-green); }
 .dot.off { background: var(--border-gray); }
+.dot.red { background: var(--error-crimson); box-shadow: 0 0 6px var(--error-crimson); }
 .status-cell { display: flex; align-items: center; gap: 8px; }
 
 .unused-row { opacity: 0.45; }
@@ -401,6 +402,15 @@ function dot(value){
   return `<span class="dot ${value ? 'on' : 'off'}"></span>`;
 }
 
+function lightDot(state){
+  // Three real states, computed live server-side — never a stored flag:
+  // green = genuinely shipped, red = unshipped for 7+ days (an alert was
+  // sent), off = still within a normal, unremarkable waiting window.
+  if (state === 'green') return `<span class="dot on"></span>`;
+  if (state === 'red') return `<span class="dot red"></span>`;
+  return `<span class="dot off"></span>`;
+}
+
 function renderTable(){
   if (!ledgerData) return;
   const search = document.getElementById('search-box').value.trim().toLowerCase();
@@ -430,7 +440,7 @@ function renderTable(){
       <td>${c.packing_slip_url ? `<a href="${c.packing_slip_url}" target="_blank" style="color:var(--electric-cyan);">View</a>` : '—'}</td>
       <td>${dot(c.is_used)}</td>
       <td>${dot(c.submitted)}</td>
-      <td>${dot(c.shipped)}</td>
+      <td>${lightDot(c.light_state)}</td>
       <td>${dot(c.damage_claim)}</td>
       <td>${dot(c.reprint_sent)}</td>
       <td>${dot(c.qr_scanned)}</td>
