@@ -190,6 +190,9 @@ td { padding: 8px; border-bottom: 1px solid rgba(30,41,59,0.5); font-family: 'Je
       <input type="file" accept=".csv" style="margin-top:10px;" onchange="loadSampleRecipients()">
 
       <label>Choose 1-5 photos (this part is 100% real — try it!)</label>
+      <button class="btn-ghost" onclick="document.getElementById('demo-multi-photo-input').click()">Choose all 5 from your device →</button>
+      <input type="file" id="demo-multi-photo-input" accept="image/*" multiple style="display:none;" onchange="loadDemoPhotosMulti(event)">
+      <p style="font-size:11px; color:var(--text-muted); margin: 8px 0 12px;">Or click an individual slot below to replace just one photo.</p>
       <div class="demo-photo-grid" id="demo-photo-grid"></div>
       <button id="demo-crop-start-btn" disabled onclick="startDemoCropStep()">Frame Your Photos →</button>
 
@@ -453,10 +456,12 @@ const demoPhotos = []; // { dataUrl, cropData } per slot, only for filled slots
 let demoCropper = null;
 let demoOrientation = 'landscape';
 let demoCropIndex = 0;
+let demoSlotElements = []; // real slot DOM elements, indexed 0-4 — lets bulk multi-select update the correct thumbnail
 
 function buildPhotoSlots(){
   const photoGrid = document.getElementById('demo-photo-grid');
   photoGrid.innerHTML = '';
+  demoSlotElements = [];
   for (let i = 0; i < 5; i++) {
     const slot = document.createElement('div');
     slot.className = 'demo-photo-slot';
@@ -469,6 +474,7 @@ function buildPhotoSlots(){
     slot.addEventListener('click', () => hiddenInput.click());
     hiddenInput.addEventListener('change', (e) => { if (e.target.files[0]) loadDemoPhotoIntoSlot(i, e.target.files[0], slot); });
     photoGrid.appendChild(slot);
+    demoSlotElements.push(slot);
   }
 }
 buildPhotoSlots();
@@ -481,6 +487,15 @@ function loadDemoPhotoIntoSlot(index, file, slotEl){
     document.getElementById('demo-crop-start-btn').disabled = demoPhotos.filter(Boolean).length === 0;
   };
   reader.readAsDataURL(file);
+}
+
+function loadDemoPhotosMulti(event){
+  // Matches the real checkout.html's "Choose all 5 from your device"
+  // button — fills each empty slot in order, up to whatever was actually
+  // selected (capped at 5, same real-world limit as production).
+  const files = Array.from(event.target.files).slice(0, 5);
+  files.forEach((file, i) => loadDemoPhotoIntoSlot(i, file, demoSlotElements[i]));
+  event.target.value = ''; // allows re-selecting the same files again if needed
 }
 
 function startDemoCropStep(){
