@@ -135,5 +135,22 @@
 
     </div>
 
+/* ===================================================================
+   IDENTICAL HONEYPOT + RATE LIMITER (verbatim, per site-wide rule)
+   =================================================================== */
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
+        if (landingClickTimestamps.length > 20) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+
 </body>
 </html>
