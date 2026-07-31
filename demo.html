@@ -249,6 +249,12 @@ td { padding: 8px; border-bottom: 1px solid rgba(30,41,59,0.5); font-family: 'Je
 
   </div>
 
+  <!-- IDENTICAL HONEYPOT + RATE LIMITER TRAP (verbatim, per site-wide rule) -->
+  <div style="display: none; tab-index: -1;" aria-hidden="true">
+    <label for="website_secondary">Secondary Security Check Item Fields</label>
+    <input type="text" id="website_secondary" name="website_secondary" autocomplete="off" oninput="interceptBillboardBotAttack()">
+  </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
@@ -596,6 +602,27 @@ function renderRepDashboard(){
 
 setMode('prospect');
 updateCompanyStatus();
+
+let landingClickTimestamps = [];
+document.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("click", () => {
+        const now = Date.now();
+        landingClickTimestamps.push(now);
+        landingClickTimestamps = landingClickTimestamps.filter(t => now - t < 5000);
+        if (landingClickTimestamps.length > 50) {
+            alert("Rapid interaction threshold exceeded. Protective security cooldown active.");
+            window.location.href = "https://turtlemail.app";
+        }
+    });
+});
+
+function interceptBillboardBotAttack() {
+    const triggerVal = document.getElementById("website_secondary").value;
+    if (triggerVal) {
+        console.warn("⚠️ Bot screening triggered on static landing node. Evacuating browser context.");
+        window.location.href = "https://turtlemail.app";
+    }
+}
 </script>
 </body>
 </html>
