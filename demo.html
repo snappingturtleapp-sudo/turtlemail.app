@@ -187,7 +187,7 @@ td { padding: 8px; border-bottom: 1px solid rgba(30,41,59,0.5); font-family: 'Je
 
       <label>Load recipients</label>
       <button class="btn-ghost" onclick="loadSampleRecipients()">Load Sample Recipient List</button>
-      <input type="file" accept=".csv" style="margin-top:10px;" onchange="loadSampleRecipients()">
+      <input type="file" accept=".csv" style="margin-top:10px;" onchange="loadRealCSV(event)">
 
       <label>Choose 1-5 photos (this part is 100% real — try it!)</label>
       <button class="btn-ghost" onclick="document.getElementById('demo-multi-photo-input').click()">Choose all 5 from your device →</button>
@@ -430,6 +430,35 @@ function loadSampleRecipients(){
   renderRecipientList();
   demoRecipientsLoaded = true;
   updateSendBatchButton();
+}
+
+function loadRealCSV(event){
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const lines = e.target.result.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length === 0) {
+      alert('That CSV appears to be empty.');
+      return;
+    }
+
+    // Assume the first row is a header (name, address, etc.) — same
+    // convention as the real Batch Order Workspace's own CSV import.
+    const dataRows = lines.slice(1).length > 0 ? lines.slice(1) : lines;
+
+    demoState.recipients = dataRows.slice(0, 20).map(line => { // cap at 20 for a readable live demo
+      const fields = line.split(',').map(f => f.trim().replace(/^"|"$/g, ''));
+      const display = fields.slice(0, 2).filter(Boolean).join(' — ') || line;
+      return { name: display, status: 'pending' };
+    });
+
+    renderRecipientList();
+    demoRecipientsLoaded = true;
+    updateSendBatchButton();
+  };
+  reader.readAsText(file);
 }
 
 function renderRecipientList(){
