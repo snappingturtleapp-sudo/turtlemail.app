@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Turtle Mail — DEMO MODE (Unplugged)</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<style>
+:root {
+  --bg-charcoal: #121214;
+  --card-dark: #203243;
+  --text-white: #E6F2FF;
+  --text-muted: #86868b;
+  --electric-cyan: #00F0FF;
+  --border-gray: #1E293B;
+  --error-crimson: #EF4444;
+  --success-green: #22C55E;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  /* Deliberately NO background image — "unplugged" from the real, live app.
+     A plain, dark, quiet screen is the whole point. */
+  background-color: var(--bg-charcoal);
+  color: var(--text-white);
+  margin: 0;
+  padding: 0 20px 60px;
+  min-height: 100vh;
+}
+.demo-banner {
+  position: sticky; top: 0; z-index: 100;
+  background: repeating-linear-gradient(45deg, #3a2a00, #3a2a00 12px, #241a00 12px, #241a00 24px);
+  color: #FFD166;
+  text-align: center;
+  padding: 12px 16px;
+  font-family: 'Syncopate', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 2px solid #FFD166;
+}
+.wrapper { width: 100%; max-width: 720px; margin: 0 auto; padding-top: 30px; }
+.card {
+  background-color: rgba(32, 50, 67, 0.95);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 20px;
+}
+h1.page-title {
+  font-family: 'Syncopate', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+p.page-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 20px; }
+label {
+  display: block; font-size: 11px; color: var(--electric-cyan);
+  margin-bottom: 8px; font-weight: 700; font-family: 'Syncopate', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.05em; margin-top: 18px;
+}
+label:first-child { margin-top: 0; }
+input[type="text"], input[type="file"] {
+  width: 100%; background-color: var(--bg-charcoal); border: 1px solid var(--border-gray);
+  border-radius: 6px; padding: 12px 14px; color: var(--text-white);
+  font-size: 14px; font-family: 'Inter', sans-serif;
+}
+button {
+  font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 12px;
+  padding: 13px 22px; border-radius: 6px; border: none; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.05em; width: 100%; margin-top: 18px;
+  background-color: var(--electric-cyan); color: var(--bg-charcoal);
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-ghost { background: transparent; border: 1px solid var(--electric-cyan); color: var(--electric-cyan); }
+.hidden { display: none !important; }
+.mode-toggle { display: flex; gap: 10px; margin-bottom: 24px; }
+.mode-toggle button { margin-top: 0; }
+.mode-toggle .inactive { background: transparent; border: 1px solid var(--border-gray); color: var(--text-muted); }
+
+.token-reveal {
+  background: rgba(0,240,255,0.06); border: 2px solid var(--electric-cyan);
+  border-radius: 8px; padding: 20px; margin-top: 18px;
+}
+.token-value {
+  font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--electric-cyan);
+  word-break: break-all; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 6px;
+  margin: 8px 0;
+}
+
+.recipient-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px; border: 1px solid var(--border-gray); border-radius: 6px;
+  margin-bottom: 8px; font-size: 13px; transition: opacity 0.5s;
+}
+.recipient-row.sent { opacity: 0.35; }
+.recipient-status { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.recipient-status.pending { color: var(--text-muted); }
+.recipient-status.sent { color: var(--success-green); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.dot.pending { background: var(--border-gray); }
+.dot.sent { background: var(--success-green); box-shadow: 0 0 6px var(--success-green); }
+
+.photo-slot {
+  aspect-ratio: 1/1; border: 1.5px dashed var(--border-gray); border-radius: 6px;
+  background: rgba(18,18,20,0.5); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; overflow: hidden; margin-bottom: 12px;
+}
+.photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+.cropper-wrap { width: 100%; max-height: 380px; overflow: hidden; background: var(--bg-charcoal); border: 1px solid var(--border-gray); border-radius: 8px; margin-top: 14px; }
+.cropper-wrap img { display: block; max-width: 100%; }
+.crop-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.crop-toolbar button { flex: 1; min-width: 110px; margin-top: 0; padding: 10px 8px; font-size: 11px; }
+
+.summary-card { background: rgba(18,18,20,0.5); border: 1px solid var(--border-gray); border-radius: 8px; padding: 18px; margin-top: 16px; }
+.price-line { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+.price-total { border-top: 1px solid var(--border-gray); padding-top: 10px; font-size: 20px; font-weight: 800; color: var(--electric-cyan); }
+
+.chip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 8px; }
+.chip { background: rgba(18,18,20,0.5); border: 1px solid var(--border-gray); border-radius: 8px; padding: 16px; text-align: center; }
+.chip .num { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: var(--electric-cyan); }
+.chip .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px; }
+th { text-align: left; padding: 8px; font-size: 10px; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-gray); }
+td { padding: 8px; border-bottom: 1px solid rgba(30,41,59,0.5); font-family: 'JetBrains Mono', monospace; }
+.rate-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(0,240,255,0.1); color: var(--electric-cyan); }
+</style>
+</head>
+<body>
+
+<div class="demo-banner">⚠ DEMO MODE — UNPLUGGED — no real payment, no real mail, nothing saved ⚠</div>
+
+<div class="wrapper">
+
+  <div class="mode-toggle">
+    <button id="btn-prospect" onclick="setMode('prospect')">Prospect / Buyer View</button>
+    <button id="btn-rep" class="inactive" onclick="setMode('rep')">Sales Rep View</button>
+  </div>
+
+  <!-- ============ PROSPECT / BUYER SIDE ============ -->
+  <div id="prospect-view">
+
+    <div class="card" id="buy-card">
+      <h1 class="page-title">Buy a Credit Block (Demo)</h1>
+      <p class="page-sub">Nothing here is real — no card is charged, no data leaves this browser tab.</p>
+      <label>Choose a block size</label>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn-ghost" style="width:auto; flex:1;" onclick="selectDemoQty(100)">100 credits</button>
+        <button class="btn-ghost" style="width:auto; flex:1;" onclick="selectDemoQty(250)">250 credits</button>
+        <button class="btn-ghost" style="width:auto; flex:1;" onclick="selectDemoQty(500)">500 credits</button>
+      </div>
+      <div class="summary-card hidden" id="buy-summary">
+        <div class="price-line"><span>Credits</span><span id="summary-qty">—</span></div>
+        <div class="price-line price-total"><span>Total</span><span id="summary-total">$0.00</span></div>
+      </div>
+      <button id="pay-btn" disabled onclick="fakeCheckout()">Continue to Payment (Demo)</button>
+      <div id="buy-status" style="font-size:12px; color:var(--text-muted); margin-top:10px;"></div>
+
+      <div class="token-reveal hidden" id="buyer-token-reveal">
+        <label style="margin:0;">Your demo access token</label>
+        <div class="token-value" id="buyer-token-value"></div>
+        <button onclick="goToWorkspace()">Enter Batch Workspace →</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="workspace-card">
+      <h1 class="page-title">Batch Order Workspace (Demo)</h1>
+      <p class="page-sub">Access token: <span id="workspace-token-display" style="color:var(--electric-cyan);"></span></p>
+
+      <label>Load recipients</label>
+      <button class="btn-ghost" onclick="loadSampleRecipients()">Load Sample Recipient List</button>
+      <input type="file" accept=".csv" style="margin-top:10px;" onchange="loadSampleRecipients()">
+
+      <label>Choose &amp; crop a photo (this part is 100% real — try it!)</label>
+      <div class="photo-slot" id="photo-slot" onclick="document.getElementById('photo-input').click()">
+        <span style="color:var(--text-muted); font-size:12px;">Click to choose a photo</span>
+      </div>
+      <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="loadDemoPhoto(event)">
+      <div class="cropper-wrap hidden" id="cropper-wrap">
+        <img id="cropper-image" src="" alt="">
+      </div>
+      <div class="crop-toolbar hidden" id="crop-toolbar">
+        <button onclick="demoCropper.rotate(-90)">↺ Rotate Left</button>
+        <button onclick="demoCropper.rotate(90)">↻ Rotate Right</button>
+        <button onclick="toggleDemoOrientation()">⇄ Switch Axis</button>
+        <button onclick="demoCropper.reset()">Reset</button>
+      </div>
+
+      <button id="send-batch-btn" disabled onclick="startSendingAnimation()" style="margin-top:20px;">Send Batch (Demo)</button>
+
+      <div id="recipient-list" style="margin-top:16px;"></div>
+    </div>
+
+  </div>
+
+  <!-- ============ SALES REP SIDE ============ -->
+  <div id="rep-view" class="hidden">
+
+    <div class="card" id="rep-gate-card">
+      <h1 class="page-title">Sales Rep Dashboard (Demo)</h1>
+      <p class="page-sub">Enter any text as your demo access token — nothing is checked or stored.</p>
+      <label>Access Token</label>
+      <input type="text" id="rep-token-input" placeholder="Type anything...">
+      <button onclick="loadRepDemoDashboard()">View My Dashboard →</button>
+    </div>
+
+    <div class="card hidden" id="rep-dashboard-card">
+      <p style="font-size:20px; font-weight:800;">Welcome, Demo Rep</p>
+      <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Total Commissions Earned (Demo)</p>
+      <p style="font-family:'JetBrains Mono',monospace; font-size:32px; color:var(--electric-cyan); font-weight:800;" id="rep-total">$0.00</p>
+
+      <table>
+        <thead><tr><th>Company</th><th>Type</th><th>Commission</th><th>Date</th></tr></thead>
+        <tbody id="rep-commission-table"><tr><td colspan="4" style="color:var(--text-muted);">No demo sales yet — make one in the Prospect / Buyer view.</td></tr></tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script>
+/* ===================================================================
+   ALL STATE LIVES ONLY IN MEMORY — a plain JS object, nothing more.
+   No localStorage, no sessionStorage, no server call, ever. The instant
+   this tab is closed or refreshed, every trace of this demo is gone.
+   =================================================================== */
+const demoState = {
+  selectedQty: null,
+  buyerToken: null,
+  recipients: [],
+  demoSales: [], // { company, rate, amount, date } — feeds the rep view
+};
+
+const SAMPLE_RECIPIENTS = [
+  'Ridgeline Robotics — Austin, TX',
+  'Cascade Precision Devices — Portland, OR',
+  'Alder Point Manufacturing — Nashville, TN',
+  'Summit Defense Systems — Colorado Springs, CO',
+  'Brightwater Medical — Raleigh, NC',
+  'Foundry Chip Works — Boise, ID',
+];
+
+function setMode(mode){
+  document.getElementById('prospect-view').classList.toggle('hidden', mode !== 'prospect');
+  document.getElementById('rep-view').classList.toggle('hidden', mode !== 'rep');
+  document.getElementById('btn-prospect').className = mode === 'prospect' ? '' : 'inactive';
+  document.getElementById('btn-rep').className = mode === 'rep' ? '' : 'inactive';
+  if (mode === 'rep' && document.getElementById('rep-dashboard-card').classList.contains('hidden') === false){
+    renderRepDashboard(); // refresh in case a new demo sale happened since last viewed
+  }
+}
+
+function selectDemoQty(qty){
+  demoState.selectedQty = qty;
+  document.getElementById('buy-summary').classList.remove('hidden');
+  document.getElementById('summary-qty').textContent = `${qty} credits`;
+  document.getElementById('summary-total').textContent = `$${(qty * 25).toFixed(2)}`;
+  document.getElementById('pay-btn').disabled = false;
+}
+
+function fakeCheckout(){
+  const btn = document.getElementById('pay-btn');
+  const statusEl = document.getElementById('buy-status');
+  btn.disabled = true;
+  btn.textContent = 'Processing (demo)…';
+  statusEl.textContent = '';
+
+  setTimeout(() => {
+    demoState.buyerToken = 'demo_' + Math.random().toString(36).slice(2, 12);
+    document.getElementById('buyer-token-value').textContent = demoState.buyerToken;
+    document.getElementById('buyer-token-reveal').classList.remove('hidden');
+    btn.textContent = 'Continue to Payment (Demo)';
+
+    // Record a fictitious 30% qualifying commission for the rep view.
+    const companyNames = ['Ridgeline Robotics', 'Cascade Precision Devices', 'Summit Defense Systems', 'Brightwater Medical'];
+    const company = companyNames[Math.floor(Math.random() * companyNames.length)];
+    const amount = demoState.selectedQty * 25 * 0.30;
+    demoState.demoSales.push({
+      company, rate: '30% Qualifying', amount,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    });
+  }, 1400);
+}
+
+function goToWorkspace(){
+  document.getElementById('buy-card').classList.add('hidden');
+  document.getElementById('workspace-card').classList.remove('hidden');
+  document.getElementById('workspace-token-display').textContent = demoState.buyerToken;
+}
+
+function loadSampleRecipients(){
+  demoState.recipients = SAMPLE_RECIPIENTS.map(name => ({ name, status: 'pending' }));
+  renderRecipientList();
+  document.getElementById('send-batch-btn').disabled = false;
+}
+
+function renderRecipientList(){
+  const container = document.getElementById('recipient-list');
+  container.innerHTML = demoState.recipients.map(r => `
+    <div class="recipient-row ${r.status === 'sent' ? 'sent' : ''}">
+      <span>${r.name}</span>
+      <span class="recipient-status ${r.status}"><span class="dot ${r.status}"></span>${r.status === 'sent' ? 'Sent ✓' : 'Pending'}</span>
+    </div>
+  `).join('');
+}
+
+async function startSendingAnimation(){
+  const btn = document.getElementById('send-batch-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  for (let i = 0; i < demoState.recipients.length; i++){
+    await new Promise(resolve => setTimeout(resolve, 1200 + Math.random() * 900));
+    demoState.recipients[i].status = 'sent';
+    renderRecipientList();
+  }
+
+  btn.textContent = 'Batch Complete ✓';
+}
+
+/* ---------- Cropper.js — this part is genuinely real, not faked ---------- */
+let demoCropper = null;
+let demoOrientation = 'landscape';
+
+function loadDemoPhoto(event){
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = document.getElementById('cropper-image');
+    document.getElementById('cropper-wrap').classList.remove('hidden');
+    document.getElementById('crop-toolbar').classList.remove('hidden');
+    if (demoCropper) demoCropper.destroy();
+    img.src = e.target.result;
+    img.onload = () => {
+      demoCropper = new Cropper(img, {
+        viewMode: 1,
+        autoCropArea: 1,
+        aspectRatio: demoOrientation === 'landscape' ? 1.5 : (2/3),
+        preview: '#photo-slot',
+      });
+    };
+  };
+  reader.readAsDataURL(file);
+}
+
+function toggleDemoOrientation(){
+  demoOrientation = demoOrientation === 'landscape' ? 'portrait' : 'landscape';
+  if (demoCropper) demoCropper.setAspectRatio(demoOrientation === 'landscape' ? 1.5 : (2/3));
+}
+
+/* ---------- Sales Rep side ---------- */
+function loadRepDemoDashboard(){
+  document.getElementById('rep-gate-card').classList.add('hidden');
+  document.getElementById('rep-dashboard-card').classList.remove('hidden');
+  renderRepDashboard();
+}
+
+function renderRepDashboard(){
+  const total = demoState.demoSales.reduce((sum, s) => sum + s.amount, 0);
+  document.getElementById('rep-total').textContent = `$${total.toFixed(2)}`;
+
+  const tbody = document.getElementById('rep-commission-table');
+  if (demoState.demoSales.length === 0){
+    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted);">No demo sales yet — make one in the Prospect / Buyer view.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = demoState.demoSales.slice().reverse().map(s => `
+    <tr>
+      <td>${s.company}</td>
+      <td><span class="rate-badge">${s.rate}</span></td>
+      <td>$${s.amount.toFixed(2)}</td>
+      <td>${s.date}</td>
+    </tr>
+  `).join('');
+}
+
+setMode('prospect');
+</script>
+</body>
+</html>
