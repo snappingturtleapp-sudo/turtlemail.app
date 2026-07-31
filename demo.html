@@ -191,7 +191,7 @@ td { padding: 8px; border-bottom: 1px solid rgba(30,41,59,0.5); font-family: 'Je
 
       <label>Choose 1-5 photos (this part is 100% real — try it!)</label>
       <button class="btn-ghost" onclick="document.getElementById('demo-multi-photo-input').click()">Choose all 5 from your device →</button>
-      <input type="file" id="demo-multi-photo-input" accept="image/*" multiple style="display:none;" onchange="loadDemoPhotosMulti(event)">
+      <input type="file" id="demo-multi-photo-input" accept="image/jpeg,image/png" multiple style="display:none;" onchange="loadDemoPhotosMulti(event)">
       <p style="font-size:11px; color:var(--text-muted); margin: 8px 0 12px;">Or click an individual slot below to replace just one photo.</p>
       <div class="demo-photo-grid" id="demo-photo-grid"></div>
       <button id="demo-crop-start-btn" disabled onclick="startDemoCropStep()">Frame Your Photos →</button>
@@ -468,7 +468,7 @@ function buildPhotoSlots(){
     slot.innerHTML = `<span class="placeholder">Photo ${i + 1}</span>`;
     const hiddenInput = document.createElement('input');
     hiddenInput.type = 'file';
-    hiddenInput.accept = 'image/*';
+    hiddenInput.accept = 'image/jpeg,image/png';
     hiddenInput.style.display = 'none';
     slot.appendChild(hiddenInput);
     slot.addEventListener('click', () => hiddenInput.click());
@@ -480,6 +480,14 @@ function buildPhotoSlots(){
 buildPhotoSlots();
 
 function loadDemoPhotoIntoSlot(index, file, slotEl){
+  // The file dialog's accept filter is a helpful hint, not a guarantee —
+  // some OS/browser combinations still allow other files through (this is
+  // exactly how a HEIC photo previously slipped past it). This explicit
+  // check is the real, reliable safeguard.
+  if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
+    alert(`"${file.name}" isn't a JPEG or PNG file (this demo can't display HEIC or other formats without a server). Please choose a .jpg or .png photo instead.`);
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e) => {
     demoPhotos[index] = { dataUrl: e.target.result, cropData: null };
