@@ -155,6 +155,11 @@ td { padding: 8px; border-bottom: 1px solid rgba(30,41,59,0.5); font-family: 'Je
     <div class="card" id="buy-card">
       <h1 class="page-title">Buy a Credit Block (Demo)</h1>
       <p class="page-sub">Nothing here is real — no card is charged, no data leaves this browser tab.</p>
+
+      <label>Which company is buying?</label>
+      <select id="company-select" onchange="updateCompanyStatus()" style="width:100%; background-color:var(--bg-charcoal); border:1px solid var(--border-gray); border-radius:6px; padding:12px 14px; color:var(--text-white); font-size:14px; font-family:'Inter',sans-serif;"></select>
+      <p id="company-status" style="font-size:12px; color:var(--text-muted); margin-top:8px;"></p>
+
       <label>Choose a block size</label>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <button class="btn-ghost" style="width:auto; flex:1;" onclick="selectDemoQty(100)">100 credits</button>
@@ -164,6 +169,7 @@ td { padding: 8px; border-bottom: 1px solid rgba(30,41,59,0.5); font-family: 'Je
       <div class="summary-card hidden" id="buy-summary">
         <div class="price-line"><span>Credits</span><span id="summary-qty">—</span></div>
         <div class="price-line price-total"><span>Total</span><span id="summary-total">$0.00</span></div>
+        <p id="rate-preview" style="font-size:12px; color:var(--electric-cyan); margin-top:8px;"></p>
       </div>
       <button id="pay-btn" disabled onclick="fakeCheckout()">Continue to Payment (Demo)</button>
       <div id="buy-status" style="font-size:12px; color:var(--text-muted); margin-top:10px;"></div>
@@ -209,6 +215,7 @@ td { padding: 8px; border-bottom: 1px solid rgba(30,41,59,0.5); font-family: 'Je
       </div>
 
       <button id="send-batch-btn" disabled onclick="startSendingAnimation()" style="margin-top:20px;">Send Batch (Demo)</button>
+      <button class="btn-ghost" id="buy-another-btn" onclick="returnToBuyScreen()" style="margin-top:10px;" disabled>← Buy Another Block</button>
 
       <div id="recipient-list" style="margin-top:16px;"></div>
     </div>
@@ -255,6 +262,18 @@ const demoState = {
   demoSales: [], // { company, rate, amount, date } — feeds the rep view
 };
 
+const DEMO_COMPANIES = [
+  'Ridgeline Robotics',
+  'Cascade Precision Devices',
+  'Alder Point Manufacturing',
+  'Summit Defense Systems',
+  'Brightwater Medical',
+  'Foundry Chip Works',
+];
+const MAX_PURCHASES_PER_COMPANY = 5; // 1 qualifying (30%) + 4 recurring (10%), matching the real commission rule
+const purchaseCountByCompany = {}; // real-time count per company, this demo session only
+DEMO_COMPANIES.forEach(c => { purchaseCountByCompany[c] = 0; });
+
 const SAMPLE_RECIPIENTS = [
   'Ridgeline Robotics — Austin, TX',
   'Cascade Precision Devices — Portland, OR',
@@ -263,6 +282,29 @@ const SAMPLE_RECIPIENTS = [
   'Brightwater Medical — Raleigh, NC',
   'Foundry Chip Works — Boise, ID',
 ];
+
+const companySelect = document.getElementById('company-select');
+DEMO_COMPANIES.forEach(name => {
+  const opt = document.createElement('option');
+  opt.value = name;
+  opt.textContent = name;
+  companySelect.appendChild(opt);
+});
+
+function updateCompanyStatus(){
+  const company = companySelect.value;
+  const count = purchaseCountByCompany[company];
+  const statusEl = document.getElementById('company-status');
+  if (count >= MAX_PURCHASES_PER_COMPANY){
+    statusEl.textContent = `${company} has completed all ${MAX_PURCHASES_PER_COMPANY} scripted demo purchases. Choose another company to continue.`;
+    statusEl.style.color = 'var(--error-crimson)';
+  } else {
+    const nextRate = count === 0 ? '30% (qualifying — first purchase)' : '10% (recurring)';
+    statusEl.textContent = `${company}: purchase ${count + 1} of ${MAX_PURCHASES_PER_COMPANY} — this one will pay ${nextRate}.`;
+    statusEl.style.color = 'var(--text-muted)';
+  }
+  updateRatePreview();
+}
 
 function setMode(mode){
   document.getElementById('prospect-view').classList.toggle('hidden', mode !== 'prospect');
@@ -274,15 +316,32 @@ function setMode(mode){
   }
 }
 
+function updateRatePreview(){
+  if (!demoState.selectedQty) return;
+  const company = companySelect.value;
+  const count = purchaseCountByCompany[company];
+  const rate = count === 0 ? 0.30 : 0.10;
+  const amount = demoState.selectedQty * 25 * rate;
+  document.getElementById('rate-preview').textContent =
+    `This purchase will pay the rep $${amount.toFixed(2)} (${count === 0 ? '30% qualifying' : '10% recurring'}).`;
+}
+
 function selectDemoQty(qty){
   demoState.selectedQty = qty;
   document.getElementById('buy-summary').classList.remove('hidden');
   document.getElementById('summary-qty').textContent = `${qty} credits`;
   document.getElementById('summary-total').textContent = `$${(qty * 25).toFixed(2)}`;
   document.getElementById('pay-btn').disabled = false;
+  updateRatePreview();
 }
 
 function fakeCheckout(){
+  const company = companySelect.value;
+  if (purchaseCountByCompany[company] >= MAX_PURCHASES_PER_COMPANY){
+    document.getElementById('buy-status').textContent = `${company} has already completed all scripted demo purchases — choose another company.`;
+    return;
+  }
+
   const btn = document.getElementById('pay-btn');
   const statusEl = document.getElementById('buy-status');
   btn.disabled = true;
@@ -293,16 +352,26 @@ function fakeCheckout(){
     demoState.buyerToken = 'demo_' + Math.random().toString(36).slice(2, 12);
     document.getElementById('buyer-token-value').textContent = demoState.buyerToken;
     document.getElementById('buyer-token-reveal').classList.remove('hidden');
+    btn.disabled = false;
     btn.textContent = 'Continue to Payment (Demo)';
 
-    // Record a fictitious 30% qualifying commission for the rep view.
-    const companyNames = ['Ridgeline Robotics', 'Cascade Precision Devices', 'Summit Defense Systems', 'Brightwater Medical'];
-    const company = companyNames[Math.floor(Math.random() * companyNames.length)];
-    const amount = demoState.selectedQty * 25 * 0.30;
+    // The REAL commission rule, not a random guess: the first purchase for
+    // any given company is 30% (qualifying); every purchase after that,
+    // for that SAME company, is 10% (recurring) — exactly matching
+    // calculate_and_record_commission() in the real system.
+    const isFirstPurchase = purchaseCountByCompany[company] === 0;
+    const rate = isFirstPurchase ? 0.30 : 0.10;
+    const amount = demoState.selectedQty * 25 * rate;
+    purchaseCountByCompany[company]++;
+
     demoState.demoSales.push({
-      company, rate: '30% Qualifying', amount,
+      company,
+      rate: isFirstPurchase ? '30% Qualifying' : '10% Recurring',
+      amount,
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     });
+
+    updateCompanyStatus();
   }, 1400);
 }
 
@@ -310,6 +379,34 @@ function goToWorkspace(){
   document.getElementById('buy-card').classList.add('hidden');
   document.getElementById('workspace-card').classList.remove('hidden');
   document.getElementById('workspace-token-display').textContent = demoState.buyerToken;
+}
+
+function returnToBuyScreen(){
+  // Reset only the workspace-specific state — the accumulated commission
+  // history (demoState.demoSales) and per-company purchase counts are
+  // deliberately NOT reset, so the rep view keeps building across
+  // multiple purchases within the same live demo.
+  demoState.recipients = [];
+  demoRecipientsLoaded = false;
+  demoPhotosConfirmed = false;
+  demoPhotos.length = 0;
+  buildPhotoSlots();
+  document.getElementById('demo-crop-start-btn').disabled = true;
+  document.getElementById('demo-crop-step').classList.add('hidden');
+  document.getElementById('recipient-list').innerHTML = '';
+  document.getElementById('send-batch-btn').disabled = true;
+  document.getElementById('send-batch-btn').textContent = 'Send Batch (Demo)';
+  document.getElementById('buy-another-btn').disabled = true;
+
+  document.getElementById('buy-summary').classList.add('hidden');
+  document.getElementById('pay-btn').disabled = true;
+  document.getElementById('buyer-token-reveal').classList.add('hidden');
+  document.getElementById('buy-status').textContent = '';
+  demoState.selectedQty = null;
+
+  document.getElementById('workspace-card').classList.add('hidden');
+  document.getElementById('buy-card').classList.remove('hidden');
+  updateCompanyStatus();
 }
 
 let demoRecipientsLoaded = false;
@@ -348,6 +445,7 @@ async function startSendingAnimation(){
   }
 
   btn.textContent = 'Batch Complete ✓';
+  document.getElementById('buy-another-btn').disabled = false;
 }
 
 /* ---------- Photo picking + Cropper.js — this part is genuinely real ---------- */
@@ -356,20 +454,24 @@ let demoCropper = null;
 let demoOrientation = 'landscape';
 let demoCropIndex = 0;
 
-const photoGrid = document.getElementById('demo-photo-grid');
-for (let i = 0; i < 5; i++) {
-  const slot = document.createElement('div');
-  slot.className = 'demo-photo-slot';
-  slot.innerHTML = `<span class="placeholder">Photo ${i + 1}</span>`;
-  const hiddenInput = document.createElement('input');
-  hiddenInput.type = 'file';
-  hiddenInput.accept = 'image/*';
-  hiddenInput.style.display = 'none';
-  slot.appendChild(hiddenInput);
-  slot.addEventListener('click', () => hiddenInput.click());
-  hiddenInput.addEventListener('change', (e) => { if (e.target.files[0]) loadDemoPhotoIntoSlot(i, e.target.files[0], slot); });
-  photoGrid.appendChild(slot);
+function buildPhotoSlots(){
+  const photoGrid = document.getElementById('demo-photo-grid');
+  photoGrid.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'demo-photo-slot';
+    slot.innerHTML = `<span class="placeholder">Photo ${i + 1}</span>`;
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'file';
+    hiddenInput.accept = 'image/*';
+    hiddenInput.style.display = 'none';
+    slot.appendChild(hiddenInput);
+    slot.addEventListener('click', () => hiddenInput.click());
+    hiddenInput.addEventListener('change', (e) => { if (e.target.files[0]) loadDemoPhotoIntoSlot(i, e.target.files[0], slot); });
+    photoGrid.appendChild(slot);
+  }
 }
+buildPhotoSlots();
 
 function loadDemoPhotoIntoSlot(index, file, slotEl){
   const reader = new FileReader();
@@ -470,6 +572,7 @@ function renderRepDashboard(){
 }
 
 setMode('prospect');
+updateCompanyStatus();
 </script>
 </body>
 </html>
