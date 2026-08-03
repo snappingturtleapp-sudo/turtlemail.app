@@ -163,6 +163,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <div class="price-line"><span>Credits</span><span id="summary-qty">—</span></div>
       <div class="price-line"><span>Price per credit</span><span>$25.00</span></div>
       <div class="price-line price-total"><span>Total</span><span id="summary-total">$0.00</span></div>
+      <p class="price-note" style="margin-top:4px;">Plus applicable sales tax, calculated at checkout.</p>
       <p class="perk-note hidden" id="perk-note">✓ 100+ credits unlocks ACH, SEPA, and BACS bank payment at checkout.</p>
       <p class="price-note">Under 100 credits: card payment only. This block does not expire and can be spent gradually through the Batch Order Workspace.</p>
     </div>
@@ -310,7 +311,7 @@ function updateSummary(){
   }
 
   qtyEl.textContent = `${selectedQty} credits`;
-  totalEl.textContent = `$${(selectedQty * 25).toFixed(2)}`;
+  totalEl.textContent = `$${(selectedQty * 25).toFixed(2)} + tax`;
   perkNote.classList.toggle('hidden', selectedQty < 100);
   refreshPayButton();
 }

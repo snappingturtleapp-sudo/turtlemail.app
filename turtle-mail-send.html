@@ -271,9 +271,9 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <p id="review-message" style="margin:0; font-size:13px; color: var(--text-muted);"></p>
 
       <div class="summary-card">
-        <div class="price-line"><span>1 credit (US/UK)</span><span>$25.00</span></div>
-        <div class="price-line" id="price-intl-line" style="display:none;"><span>International destination</span><span>$100.00</span></div>
-        <div class="price-line price-total"><span>Total</span><span id="price-total">$25.00</span></div>
+        <div class="price-line"><span>1 credit (US/UK)</span><span>$25.00 + tax</span></div>
+        <div class="price-line" id="price-intl-line" style="display:none;"><span>International destination</span><span>$100.00 + tax</span></div>
+        <div class="price-line price-total"><span>Total</span><span id="price-total">$25.00 + tax</span></div>
         <p class="price-note">US &amp; UK destinations: $25 flat. All other destinations: $100 flat. Some destinations can't be shipped to at all — you'll see a clear message at checkout if that's the case.</p>
       </div>
 
@@ -686,7 +686,7 @@ document.getElementById('to-step-4').addEventListener('click', () => {
 
   const isDomestic = (r.country === 'US' || r.country === 'GB');
   document.getElementById('price-intl-line').style.display = isDomestic ? 'none' : 'flex';
-  document.getElementById('price-total').textContent = isDomestic ? '$25.00' : '$100.00';
+  document.getElementById('price-total').textContent = isDomestic ? '$25.00 + tax' : '$100.00 + tax';
 
   goToStep(4);
 });
